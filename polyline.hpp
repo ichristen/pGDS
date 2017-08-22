@@ -1,7 +1,6 @@
 #ifndef POLYLINE_H
 #define POLYLINE_H
 
-//#include "include.h"
 #include <string>
 #include <vector>
 #include <iterator>
@@ -9,28 +8,13 @@
 #include <set>
 #include <algorithm>
 #include <numeric>
+#include <functional>
+
+#include <OpenGL/OpenGL.h>
+
 #include "vector.hpp"
 #include "math.hpp"
 //#include "boolean.hpp"
-#include <functional>
-
-//#include <SDL2/SDL.h>        //SDL
-
-#include <OpenGL/gl3.h>         //OpenGL
-
-//    #include <OpenGL/gl.h>
-//#include <OpenGL/glu.h>         //GLU
-
-//class CURRENTLAYER {
-//public:
-//    static uint16_t layer;      // Initializes to zero.
-//    
-//    void setCurrent(uint16_t newlayer);
-//};
-//
-//namespace global {
-//    CURRENTLAYER layer;
-//}
 
 class BOUNDINGBOX {
 public:
@@ -90,17 +74,13 @@ enum BOOLOPERATION { AND=0, OR=1, XOR=2 };
 
 class POLYLINES;
 
-// Make methods const!
 class POLYLINE {
 public:
-//private:
     std::vector<VECTOR> points;
     
     BOUNDINGBOX bb;
     
-    bool isReversed         = false;
-    
-//    bool isInside           = false;    // Only used when booleaning...
+    bool isReversed         = false;    // Only used when booleaning...
     
     double area_            = 0;
     double length_          = 0;
@@ -111,11 +91,6 @@ public:
     
     GLuint fillList         = 0;
     GLuint outlineList      = 0;
-    
-//    std::iterator<GLdouble, int> begin;
-//    std::iterator<GLdouble, int> end;
-    
-//    std::vector<std::iterator<GLdouble, int>> intersect(POLYLINE);
     
 public:
     bool isClosed           = false;

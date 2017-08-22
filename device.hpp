@@ -1,10 +1,10 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include <cstdlib>         //Console stuff
+#include <cstdlib>
 #include <cstdio>
 
-#include <cmath>            //Math stuff
+#include <cmath>
 
 #include <vector>
 #include <algorithm>
@@ -13,11 +13,10 @@
 #include <string>
 #include <bitset>
 #include <chrono>
+
 #include "polyline.hpp"
 #include "vector.hpp"
 #include "math.hpp"
-
-//#include "lua.h"
 
 struct VECTORINT {
     int32_t x;
@@ -27,17 +26,9 @@ struct VECTORINT {
     VECTORINT(VECTOR v, GLdouble scalar, AFFINE m);
 };
 
-//VECTORINT VECTOR2VECTORINT(const VECTOR&);
-
 std::string replaceIllegal(std::string str, size_t maxLength=std::string::npos);
 std::string replaceIllegalLIBNAME(std::string str);
 std::string replaceIllegalSTRNAME(std::string str);
-
-//inline int16_t endianSwap(int16_t x);
-//inline int32_t endianSwap(int32_t x);
-//
-//inline uint16_t endianSwap(uint16_t x);
-//inline uint32_t endianSwap(uint32_t x);
 
 inline uint16_t endianSwap(uint16_t x) {
     return  ( (x & 0x00FF) << 8 ) |
@@ -181,15 +172,6 @@ public:
     bool exportNoStructureGDS(FILE* f, AFFINE tranformation);
 };
 
-//bool exportGDSLibrary(FILE* f);
-//bool exportGDSLibrary(std::string fname);
-
-//std::string             buf2str(void* buf);
-//void                    str2buf(std::string str, void* buffer);
-
-//inline double   sem2num(uint64_t sem);
-//inline uint64_t num2sem(double num);
-
 inline GLdouble sem2num(uint64_t sem) {
     return          (sem & 0x8000000000000000)?(-1):(1) *           // Sign.
     std::pow(16, (((sem & 0x7F00000000000000) >> 56) - 64)) *       // Exponent.
@@ -197,15 +179,6 @@ inline GLdouble sem2num(uint64_t sem) {
 }
 
 inline uint64_t num2sem(GLdouble num) {
-    //    printf("EXP: %f\n", floor(log(std::abs(num))/log(16)) + 64);
-    
-    //    uint64_t x = ( (uint64_t)( std::abs(num) / std::pow(16.0, (floor(log(std::abs(num))/log(16)))) ) & 0x00FFFFFFFFFFFFFF);
-    //
-    //    std::bitset<64> y(x);
-    //    printf("B: %s\n", y.to_string().c_str());
-    //    std::bitset<64> z(endianSwap(x));
-    //    printf("B: %s\n", z.to_string().c_str());
-    
     uint8_t exponent = 64;
     
     while (num < .0625 && exponent > 0) {
@@ -218,15 +191,9 @@ inline uint64_t num2sem(GLdouble num) {
     }
     
     return  (num == 0)?(0):( (num <  0)?(0x0000000000000080):(0) | (uint64_t)exponent | endianSwap((uint64_t)round( num * std::pow(2, 56) )) );
-    
-    //    return  (num == 0)?(0):(                                                            // 0 if num == 0
-    //            (num <  0)?(0x0000000000000080):(0)                                     |   // otherwise, make sign bit,
-    //            ((0x7F & (uint64_t)( floor(log(std::abs(num))/log(16)) + 64 )))   |   // 7-bit exponent,
-    //            endianSwap( (uint64_t)( std::abs(num) / std::pow(16.0, (floor(log(std::abs(num))/log(16)))) ) & 0x00FFFFFFFFFFFFFF)); // and 7-byte matissa
 }
 
 DEVICE* getDevice(std::string description);
-
 
 #include "font.hpp"
 

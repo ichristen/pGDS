@@ -3,9 +3,7 @@
 MATERIAL::MATERIAL() {
     
 }
-MATERIAL::MATERIAL(std::string name_, int16_t layer_, std::array<int, 3> colorFill_, std::array<int, 3> colorOutline_, GLdouble fontThick, GLdouble fontHeight)
-//: font(std::string("/Users/i/Documents/gds-test/fonts/LiberationSerif-BoldItalic.ttf"))
-{
+MATERIAL::MATERIAL(std::string name_, int16_t layer_, std::array<int, 3> colorFill_, std::array<int, 3> colorOutline_, GLdouble fontThick, GLdouble fontHeight) {
     name = name_;
     layer = layer_;
     
@@ -14,10 +12,6 @@ MATERIAL::MATERIAL(std::string name_, int16_t layer_, std::array<int, 3> colorFi
     setFill(colorFill_);
     setOutline(colorOutline_);
 }
-
-//MATERIAL MATERIAL::getLayer(uint16_t l) {
-//    
-//}
 
 MATERIAL MATERIAL::getLayer(uint16_t l) {
     return layers[l];

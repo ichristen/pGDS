@@ -1,26 +1,16 @@
 #ifndef MATH_H
 #define MATH_H
 
-//#include <cstdlib>         //Console stuff
-//#include <cstdio>
-
-#include <cmath>            //Math stuff
+#include <cmath>
 #include <cstdint>
 
 #include <string>
 #include <vector>
 #include <iterator>
 
-//#include <SDL2/SDL.h>        //SDL
+#include <OpenGL/OpenGL.h>
 
-#include <OpenGL/gl3.h>      //OpenGL
-
-//    #include <OpenGL/gl.h>
-//#include <OpenGL/glu.h>         //GLU
-
-//#define EPSILON     .000000001
 #define EPSILON     .01
-//#define E           10*std::nextafter(0.0,1.0)
 #define E           .000000001
 
 #define MINRADIUS   20

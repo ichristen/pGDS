@@ -2,6 +2,7 @@
 #define PRIMITIVES_H
 
 #include <stdio.h>
+
 #include "polyline.hpp"
 #include "vector.hpp"
 #include "math.hpp"

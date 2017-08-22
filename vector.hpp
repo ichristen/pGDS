@@ -15,12 +15,7 @@
     #include FT_FREETYPE_H
 #endif
 
-//#include "/usr/local/include/freetype2/ft2build.h"
-//#include "/usr/local/include/freetype2/freetype/freetype.h"
-
-#include <OpenGL/gl3.h>         //OpenGL
-//#include <OpenGL/glu.h>         //GLU
-//#include <OpenGL/glui.h>
+#include <OpenGL/OpenGL.h>
 
 class AFFINE;
 

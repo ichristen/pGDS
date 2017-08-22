@@ -9,8 +9,6 @@
 
 #include <OpenGL/OpenGL.h>
 
-//class FONT;
-
 #include "font.hpp"
 
 class MATERIAL {
@@ -37,27 +35,5 @@ public:
     void setFill(   std::array<int, 3> colorFill_);
     void setOutline(std::array<int, 3> colorOutline_);
 };
-
-//uint16_t MATERIAL::currentLayer = 0;
-//
-//std::map<uint16_t, MATERIAL> MATERIAL::layers =   { {1, MATERIAL("LiNbO_3", 1, {0,0,127},   {0,0,255})},
-//                                                    {2, MATERIAL("Au",      2, {127,127,0}, {255,255,0})} };
-//
-//uint16_t currentMaterial = 1;
-
-//static MATERIAL LN =    MATERIAL("LiNbO_3", 1, {0,0,127}, {0,0,255});
-//static MATERIAL GaP =   MATERIAL("GaP",     2, {0,0,127}, {0,0,255});
-//
-//class MATERIALS {
-//public:
-//    static std::vector<MATERIAL> materials;
-//
-//    static MATERIAL* currentMaterial;
-//
-////    void add(
-//
-//};
-
-//enum { GAP = MATERIAL("LiNbO_3", 1, {0,0,127}, {0,0,255}); };
 
 #endif
