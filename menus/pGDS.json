@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "Toggle pGDS",
+        "command": "pGDStoggle"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "pGDS",
+          "submenu": [
+            {
+              "label": "Toggle",
+              "command": "pGDS:toggle"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

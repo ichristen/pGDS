@@ -1,0 +1,53 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# macOS-specific
+.DS_Store
+
+# pGDS-specific
+    # Contains font .ttf
+fonts/
+    # Atom-related
+node_modules/
+    # Compiled MATLAB bridge/mex files...
+mex/
+    # ...except for the generating files
+!mex/build
+    # Unfinished OpenGL stuff
+macOS OpenGL/
+
+package-lock.json
+
+    # "Proprietary" devices designs
+*devices.cpp
+*devices.hpp

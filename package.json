@@ -1,0 +1,19 @@
+{
+  "name": "pGDS",
+  "main": "./lib/pGDS",
+  "version": "0.0.0",
+  "description": "A short description of your package",
+  "keywords": [],
+  "activationCommands": {
+    "atom-workspace": "pGDS:toggle"
+  },
+  "repository": "https://github.com/atom/pGDS",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^1.5.11"
+  },
+  "dependencies": {}
+}
