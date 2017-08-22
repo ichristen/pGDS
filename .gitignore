@@ -40,7 +40,7 @@ fonts/
     # Atom-related
 node_modules/
     # Compiled MATLAB bridge/mex files...
-mex/
+mex/*
     # ...except for the generating files
 !mex/build
     # Unfinished OpenGL stuff
