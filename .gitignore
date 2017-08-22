@@ -39,10 +39,11 @@
 fonts/
     # Atom-related
 node_modules/
-    # Compiled MATLAB bridge/mex files...
+    # Compiled MATLAB bridge/mex files, except for the generating files
 mex/*
-    # ...except for the generating files
 !mex/build
+mex/build/mex_bridge.cpp
+mex/build/.DS_Store
     # Unfinished OpenGL stuff
 macOS OpenGL/
 
