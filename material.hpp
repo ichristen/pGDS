@@ -30,7 +30,7 @@ public:
     MATERIAL(std::string name_, int16_t layer_, std::array<uint8_t, 4> colorFill_={255,255,255,255}, std::array<uint8_t, 4> colorOutline_={255,255,255,255}, GLdouble fontThick=1, GLdouble fontHeight=7);
 
     MATERIAL getLayer(uint16_t l);                          // Returns the material in the `static` map corresponding to layer `l`. Eventually make this a reference so changes to this are reflected in the map?
-    MATERIAL setLayer(MATERIAL m, uint16_t l);              // Sets layer `l` in the `static` map to `m`.
+    void setLayer(MATERIAL m, uint16_t l);                  // Sets layer `l` in the `static` map to `m`.
     
     // Add methods for setting font/etc...
     

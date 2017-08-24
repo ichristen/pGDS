@@ -17,6 +17,10 @@ MATERIAL MATERIAL::getLayer(uint16_t l) {
     return layers[l];
 }
 
+void MATERIAL::setLayer(MATERIAL m, uint16_t l) {
+    layers[l] = m;
+}
+
 void MATERIAL::setFill(   std::array<uint8_t, 4> colorFill_) {
     colorFill[0] = colorFill_[0];
     colorFill[1] = colorFill_[1];

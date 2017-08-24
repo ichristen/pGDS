@@ -136,15 +136,26 @@ function compile(fname)
     fclose(fmex);
     
     
-    helperFile = 'class_handle.hpp';
+    helperFile = 'class_handle.hpp';    % Move this helper file with the rest of the files such that it can be used when compiling...
     movefile([mexFolder filesep mexFolder2 filesep helperFile], helperFile);
     
-    mex('-v', mexFile, 'vector.cpp', 'math.cpp', 'polyline.cpp', 'primitives.cpp',  'device.cpp', 'font.cpp', 'material.cpp', 'testdevices.cpp'); %, '-L/usr/local/opt/freetype/lib', '-I/usr/local/opt/freetype/include/freetype2/');
-%     mex('-v', mexFile, 'vector.cpp', 'math.cpp', 'polyline.cpp', 'primitives.cpp',  'device.cpp', 'font.cpp');
+    failed = false;
+    
+    try
+        mex('-v', mexFile, 'vector.cpp', 'math.cpp', 'polyline.cpp', 'primitives.cpp',  'device.cpp', 'font.cpp', 'material.cpp', 'testdevices.cpp', 'boolean.cpp'); %, '-L/usr/local/opt/freetype/lib', '-I/usr/local/opt/freetype/include/freetype2/');
+    catch err
+        disp(err.message);
+        failed = true;
+    end
+        
+    %     mex('-v', mexFile, 'vector.cpp', 'math.cpp', 'polyline.cpp', 'primitives.cpp',  'device.cpp', 'font.cpp');
 
     movefile(mexFile, mexFileWithDir);
     movefile(helperFile, [mexFolder filesep mexFolder2 filesep helperFile]);
-    movefile('mex_bridge.mexmaci64', [mexFolder filesep 'mex_bridge.mexmaci64']);
+    
+    if ~failed  % If we succeeded, move our compiled .mexmaci64 file into the mex folder, with the compiled .m files.
+        movefile('mex_bridge.mexmaci64', [mexFolder filesep 'mex_bridge.mexmaci64']);
+    end
 end
 
 function inheritMethods(classNum)
@@ -182,14 +193,14 @@ function writeMethods(fmex, class)
 %                     '    end' newline ...
 %                     '    methods' newline]);
     
-    fprintf(fmat, [ 'classdef ' class.name ' < handle' newline ...
-                    '    properties (SetAccess = public, Hidden = true)' newline ...
-                    '        objectHandle;' newline ...
-                    '    end' newline]);
+    fprintf(fmat, [ 'classdef ' class.name ' < handle' newline ]);
                 
     if strcmp(class.name, 'pGDS')
         fprintf(fmat, [ '    methods (Static)' newline]);
     else
+        fprintf(fmat, [ '    properties (SetAccess = public, Hidden = true)' newline ...
+                        '        objectHandle;' newline ...
+                        '    end' newline]);
         fprintf(fmat, [ '    methods' newline]);
     end
                 
@@ -213,7 +224,7 @@ function writeMethods(fmex, class)
     fclose(fmat);
 end
 
-function writeMatlabCall(fmat, method, ii, tab)
+function writeMatlabCall(fmat, method, ii, tab, isClass)
 %     fprintf(fmat, [ tab '            %% ' method.type newline ]);
 % 
 %     if strcmp(method.type, 'void') || strcmp(method.type, 'delete')
@@ -258,6 +269,12 @@ function writeMatlabCall(fmat, method, ii, tab)
 %     end
     
     type = interpretType(method.type);
+    
+    if isClass
+        objHandle = ', this.objectHandle';
+    else 
+        objHandle = '';
+    end
 
     if strcmp(type, 'void')
         if isempty(method.arguments)
@@ -287,27 +304,27 @@ function writeMatlabCall(fmat, method, ii, tab)
 
         fprintf(fmat, [tab '            end' newline ]);
     elseif strcmp(type, 'list')
-        fprintf(fmat, [tab '            [toReturn{1:nargout}] = mex_bridge(' num2str(ii) ', this.objectHandle, varargin{:});' newline ]);
+        fprintf(fmat, [tab '            [toReturn{1:nargout}] = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
     elseif strcmp(type, 'class')
         if isempty(method.arguments)
-            fprintf(fmat, [tab '            str.ptr = mex_bridge(' num2str(ii) ', this.objectHandle);' newline ]);
+            fprintf(fmat, [tab '            str.ptr = mex_bridge(' num2str(ii) objHandle ');' newline ]);
         else
-            fprintf(fmat, [tab '            str.ptr = mex_bridge(' num2str(ii) ', this.objectHandle, varargin{:});' newline ]);
+            fprintf(fmat, [tab '            str.ptr = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
         end
         fprintf(fmat, [tab '            toReturn = ' method.type '(str);' newline ]);
     else
 %         fprintf(fmat, [tab '            toReturn = mex_bridge(' num2str(ii) ', this.objectHandle, varargin{:});' newline ]);
         
         if isempty(method.arguments)
-            fprintf(fmat, [tab '            toReturn = mex_bridge(' num2str(ii) ', this.objectHandle);' newline ]);
+            fprintf(fmat, [tab '            toReturn = mex_bridge(' num2str(ii) objHandle ');' newline ]);
         elseif ~isempty(method.arguments(1).default)
             fprintf(fmat, [tab '            if isempty(varargin)' newline ]);
-            fprintf(fmat, [tab '                toReturn = mex_bridge(' num2str(ii) ', this.objectHandle);' newline ]);
+            fprintf(fmat, [tab '                toReturn = mex_bridge(' num2str(ii) objHandle ');' newline ]);
             fprintf(fmat, [tab '            else' newline ]);
-            fprintf(fmat, [tab '                toReturn = mex_bridge(' num2str(ii) ', this.objectHandle, varargin{:});' newline ]);
+            fprintf(fmat, [tab '                toReturn = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
             fprintf(fmat, [tab '            end' newline ]);
         else
-            fprintf(fmat, [tab '            toReturn = mex_bridge(' num2str(ii) ', this.objectHandle, varargin{:});' newline ]);
+            fprintf(fmat, [tab '            toReturn = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
         end
     end
 end
@@ -320,8 +337,11 @@ function writeMethod(fmex, fmat, ii, class)
     
     className = class.name;
     
+    this = 'this, ';
+    
     if strcmp(className, 'pGDS')
         className = '';
+        this = '';
     end
     
     % MATLAB ======================================================================================
@@ -348,14 +368,14 @@ function writeMethod(fmex, fmat, ii, class)
 %             class.methods(ii)
             fprintf(fmat, [ '        function delete(this)' newline ]);
         elseif  strcmp(class.methods(ii).type, 'void')
-            fprintf(fmat, [ '        function ' method.namematlab '(this, varargin)' newline ]);
+            fprintf(fmat, [ '        function ' method.namematlab '(' this 'varargin)' newline ]);
         else
-            fprintf(fmat, [ '        function toReturn = ' method.namematlab '(this, varargin)' newline ]);
+            fprintf(fmat, [ '        function toReturn = ' method.namematlab '(' this 'varargin)' newline ]);
         end
     end
     
     if length(samename) == 1    % If ii is the only one of this name...
-        writeMatlabCall(fmat, class.methods(ii), numWritten+1-isempty(fmex), '')
+        writeMatlabCall(fmat, class.methods(ii), numWritten+1-isempty(fmex), '', ~isempty(className))
             
         if strcmp(class.methods(ii).namematlab, 'disp')
             fprintf(fmat, [ '            disp(newline)' newline ]);
@@ -406,7 +426,7 @@ function writeMethod(fmex, fmat, ii, class)
                 fprintf(fmat, [ '            elseif ' logic(1:end-4) newline ]);
             end
             
-            writeMatlabCall(fmat, class.methods(samename(jj)), numWritten+1+samename(jj)-ii-isempty(fmex), '    ');
+            writeMatlabCall(fmat, class.methods(samename(jj)), numWritten+1+samename(jj)-ii-isempty(fmex), '    ', ~isempty(className));
         
 %             if strcmp(class.methods(jj).type, 'void') ||strcmp(class.methods(jj).type, 'delete')
 %                 fprintf(fmat,   '                '  );
@@ -862,14 +882,34 @@ function gather(fname)
                 end
             elseif getChar(0) == '('    % Found function definition...
                 jj = 0;
-                    while getChar(jj) ~= ';' && ...
-                         ~(getChar(jj) == ':' && ~(getChar(jj-1) == ':' || getChar(jj+1) == ':')) && ...
-                          getChar(jj) ~= '#' && ...
-                          getChar(jj) ~= '}' && ...
-                         ~(getChar(jj-1) == '/' && getChar(jj) == '/') && ...
-                         ~(getChar(jj-1) == '*' && getChar(jj) == '/')
-                      jj = jj - 1; 
+                while getChar(jj) ~= ';' && ...
+                     ~(getChar(jj) == ':' && ~(getChar(jj-1) == ':' || getChar(jj+1) == ':')) && ...
+                      getChar(jj) ~= '#' && ...
+                      getChar(jj) ~= '}' && ...
+                     ~(getChar(jj-1) == '/' && getChar(jj) == '/') && ...
+                     ~(getChar(jj-1) == '*' && getChar(jj) == '/')
+                  jj = jj - 1; 
+                end
+                    
+                kk = 0;
+                while ~(getChar(jj+kk-1) == '/' && getChar(jj+kk) == '/') && getChar(jj+kk) ~= 10
+                    kk = kk - 1;
+                end
+                
+%                 'HERE'
+                
+                if (getChar(jj+kk-1) == '/' && getChar(jj+kk) == '/')  % If the character we stopped on was actually inside a comment...
+%                     'THERE'
+                    
+                    jj = jj+kk;
+                    while getChar(jj) ~= 10 && jj < 0
+                        jj = jj + 1;
                     end
+                    
+                    if jj == 0
+                        error('Newline was not found; discovered function was commented...');
+                    end
+                end
                 
                 if getChar(jj) == '#' || (getChar(jj-1) == '/' && getChar(jj) == '/')
                     while getChar(jj) ~= newline; jj = jj + 1; end

@@ -622,6 +622,8 @@ DEVICEPTR DEVICEPTR::operator/=(GLdouble s) {       transformation /= s; return 
 
 GLdouble DEVICEPTR::area() {                  return device->area() * transformation.det(); }
 
+DEVICEPTR DEVICEPTR::copy() const {           return DEVICEPTR(device, transformation); }
+
 void DEVICEPTR::print() const {
     printf("DEVICEPTR consisting of DEVICE: {\n");
     device->print();

@@ -71,25 +71,27 @@ public:
 //
 //enum BOOLOPERATION { AND=0, OR=1, XOR=2 };
 
+//class POLYLINE;
 class POLYLINES;
 
+//std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op);
+
 class POLYLINE {
-public:
-    std::vector<VECTOR> points;
-    
-    BOUNDINGBOX bb;
-    
-    bool isReversed         = false;    // Only used when booleaning...
+private:
+    bool isReversed         = false;
     
     double area_            = 0;
     double length_          = 0;
     
-    uint16_t layer          = 0;
-    
-    static uint16_t currentlayer;
-    
     GLuint fillList         = 0;
     GLuint outlineList      = 0;
+    
+public:
+    std::vector<VECTOR> points;         // Make private eventually?
+    
+    BOUNDINGBOX bb;
+    
+    uint16_t layer          = 0;
     
 public:
     bool isClosed           = false;
@@ -113,8 +115,8 @@ public:
 //    void operator=(POLYLINE p);
     
     POLYLINE operator-();
-    POLYLINE reverse();             // Changes some flags such that the enclosed datapoints are treated as if they are reversed.
-    void makeforward();             // Actually reverses the data points if reversed is flaged. Turns off reversed flags.
+    POLYLINE reverse();                     // Changes the flag `isReversed` such that the enclosed data is treated as if it was reversed. This is useful for quickly changing the orientation of a closed contour.
+    void makeforward();                     // If `isReversed` is flagged, changes the order of data in memory such the the current aparent order is maintained, while `isReversed` is no longer needed.
     
     VECTOR getBeginPoint();
     VECTOR getEndPoint();
@@ -229,7 +231,6 @@ public:
     POLYLINES   operator&=(POLYLINES p);        // Boolean AND equals
     POLYLINES   operator|=(POLYLINES p);        // Boolean OR equals
     POLYLINES   operator^=(POLYLINES p);        // Boolean XOR equals
-    
     
     double area();
     
