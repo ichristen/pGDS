@@ -1,5 +1,7 @@
 #include "primitives.hpp"
 
+// CLOSED PRIMITIVES ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 POLYLINE rect(VECTOR u, VECTOR v) {
     POLYLINE toReturn = POLYLINE(4);
     toReturn.isClosed = true;
@@ -25,6 +27,12 @@ POLYLINE rect(VECTOR u, VECTOR v) {
 POLYLINE rect(GLdouble x, GLdouble y, GLdouble w, GLdouble h) {
     return rect(VECTOR(x,y), VECTOR(x+w, y+h));
 }
+
+POLYLINE circle(GLdouble r, VECTOR c) {
+    return arc(r, 0, TAU, true).close() += c;   // Change? Inefficient?
+}
+
+// PATHS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW) {
     GLdouble t1 = fmod(t1_, TAU);   // What happens in t1 or t2 are negative?
@@ -242,57 +250,28 @@ POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
     return toReturn;
 }
 
-void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep) {
-    std::function<GLdouble(GLdouble t)> lambda;
+bool intersect(CONNECTION a, CONNECTION b, VECTOR** i, bool onlyForward) {
+    if (a.dv == b.dv || a.dv == -b.dv) { *i = nullptr; return false; }  // Lines are parallel, no valid intersection...
     
-    if ( (b.w > 0 && e.w < 0) || (b.w < 0 && e.w > 0) ) {
-        return;
+    if (a.dv.x == 0 && b.dv.x == 0) {   // If both are vertical...
+        throw std::runtime_error("intersect(CONNECTION^2, VECTOR**, bool): Both-vertical case should have been caught by parallel check...");
+    } else if (a.dv.x == 0) {           // If `a` is vertical...
+        *i = new VECTOR( a.v.x, (b.dv.y / b.dv.x) * (a.v.x - b.v.x) + b.v.y );
+    } else if (b.dv.x == 0) {           // If `b` is vertical...
+        *i = new VECTOR( b.v.x, (a.dv.y / a.dv.x) * (b.v.x - a.v.x) + a.v.y );
+    } else {                            // If neither `a` nor `b` are vertical...
+        GLdouble x = ( (a.dv.y / a.dv.x) * a.v.x - (b.dv.y / b.dv.x) * b.v.x - a.v.y + b.v.y ) / ( (a.dv.y / a.dv.x) - (b.dv.y / b.dv.x) );
+        
+        *i = new VECTOR( x, (a.dv.y / a.dv.x) * (x - a.v.x) + a.v.y );
     }
     
-    bool outer = b.w + e.w < 0;
-    
-    if (b.w != e.w) {
-        GLdouble w1 = std::abs(b.w);
-        GLdouble w2 = std::abs(e.w);
-        
-        lambda = [w1,w2] (GLdouble t) -> GLdouble { return ((w2 - w1)*(3*t*t - 2*t*t*t) + w1); };
-    } else {
-        GLdouble w = std::abs(b.w);
-        
-        lambda = [w] (GLdouble t) -> GLdouble { return w; };
-    }
-    
-    POLYLINE p = connect(b, e, type, b.w != e.w);
-    
-//    printf("p.begin="); p.begin.printNL();
-//    printf("p.end=");   p.end.printNL();
-    
-    std::vector<POLYLINE> polylines;
-    
-    // Currently bugged...
-//    if (p.size() > 100) { // GDS prefers polylines with points < 200...
-//        int numpeices = ceil(p.size()/100)+1;
-//        
-//        int lengthpeice = ceil(p.size()/numpeices); // Check this...
-//        
-//        int x = 0;
-//        
-//        for (int i = 0; i < numpeices-1; i++) {
-//            polylines.push_back(POLYLINE(p, x, x + lengthpeice));
-//            
-//            x += lengthpeice;
-//        }
-//        
-//        polylines.push_back(POLYLINE(p, x, p.size()-1));
-//    } else {
-        polylines.push_back(p);
-//    }
-    
-    for (int j = 0; j < polylines.size(); j++) {
-        for (int i = (outer)?(-1):(0); i < 2; i += 2) {
-            addto->add(thicken(polylines[j], lambda, i, minstep));
+    if (onlyForward) {
+        if ( (**i - a.v) * a.dv <= 0 || (**i - b.v) * b.dv <= 0 ) {
+            delete *i;  *i = nullptr; return false;
         }
     }
+    
+    return true;
 }
 
 POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, bool pointsDuringLinear) {
@@ -452,6 +431,61 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, bool pointsDur
     toReturn.end = -f.dv;
     
     return toReturn;
+}
+
+// THICKENED CONNECTIONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep) {
+    std::function<GLdouble(GLdouble t)> lambda;
+    
+    if ( (b.w > 0 && e.w < 0) || (b.w < 0 && e.w > 0) ) {
+        return;
+    }
+    
+    bool outer = b.w + e.w < 0;
+    
+    if (b.w != e.w) {
+        GLdouble w1 = std::abs(b.w);
+        GLdouble w2 = std::abs(e.w);
+        
+        lambda = [w1,w2] (GLdouble t) -> GLdouble { return ((w2 - w1)*(3*t*t - 2*t*t*t) + w1); };
+    } else {
+        GLdouble w = std::abs(b.w);
+        
+        lambda = [w] (GLdouble t) -> GLdouble { return w; };
+    }
+    
+    POLYLINE p = connect(b, e, type, b.w != e.w);
+    
+    //    printf("p.begin="); p.begin.printNL();
+    //    printf("p.end=");   p.end.printNL();
+    
+    std::vector<POLYLINE> polylines;
+    
+    // Currently bugged...
+    //    if (p.size() > 100) { // GDS prefers polylines with points < 200...
+    //        int numpeices = ceil(p.size()/100)+1;
+    //
+    //        int lengthpeice = ceil(p.size()/numpeices); // Check this...
+    //
+    //        int x = 0;
+    //
+    //        for (int i = 0; i < numpeices-1; i++) {
+    //            polylines.push_back(POLYLINE(p, x, x + lengthpeice));
+    //
+    //            x += lengthpeice;
+    //        }
+    //
+    //        polylines.push_back(POLYLINE(p, x, p.size()-1));
+    //    } else {
+    polylines.push_back(p);
+    //    }
+    
+    for (int j = 0; j < polylines.size(); j++) {
+        for (int i = (outer)?(-1):(0); i < 2; i += 2) {
+            addto->add(thicken(polylines[j], lambda, i, minstep));
+        }
+    }
 }
 
 POLYLINE thicken(POLYLINE open, GLdouble width, int side, GLdouble minstep) {

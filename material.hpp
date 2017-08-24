@@ -21,19 +21,21 @@ public:
 
     std::string name;
 
-    uint8_t colorFill[3];
-    uint8_t colorOutline[3];
+    uint8_t colorFill[4];
+    uint8_t colorOutline[4];
     
     FONT font;
-
     
     MATERIAL();
-    MATERIAL(std::string name_, int16_t layer_, std::array<int, 3> colorFill_={255,255,255}, std::array<int, 3> colorOutline_={255,255,255}, GLdouble fontThick=1, GLdouble fontHeight=7);
+    MATERIAL(std::string name_, int16_t layer_, std::array<uint8_t, 4> colorFill_={255,255,255,255}, std::array<uint8_t, 4> colorOutline_={255,255,255,255}, GLdouble fontThick=1, GLdouble fontHeight=7);
 
-    MATERIAL getLayer(uint16_t l);
+    MATERIAL getLayer(uint16_t l);                          // Returns the material in the `static` map corresponding to layer `l`. Eventually make this a reference so changes to this are reflected in the map?
+    MATERIAL setLayer(MATERIAL m, uint16_t l);              // Sets layer `l` in the `static` map to `m`.
     
-    void setFill(   std::array<int, 3> colorFill_);
-    void setOutline(std::array<int, 3> colorOutline_);
+    // Add methods for setting font/etc...
+    
+    void setFill(   std::array<uint8_t, 4> colorFill_);     // Sets the fill    color (in rgba) for for this `MATERIAL`.
+    void setOutline(std::array<uint8_t, 4> colorOutline_);  // Sets the outline color (in rgba) for for this `MATERIAL`.
 };
 
 #endif

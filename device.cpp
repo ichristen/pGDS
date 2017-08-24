@@ -1,6 +1,6 @@
 #include "device.hpp"
 
-std::map<std::string, DEVICE*> DEVICE::allDevices;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 VECTORINT::VECTORINT(VECTOR v, GLdouble scalar) {
     x = endianSwap((int32_t)round(v.x*scalar));
@@ -11,6 +11,7 @@ VECTORINT::VECTORINT(VECTOR v, GLdouble scalar, AFFINE m) {
     y = endianSwap((int32_t)round((m.c*v.x + m.d*v.y + m.f)*scalar));
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::string replaceIllegalSTRNAME(std::string str) {    // Replaces invalid characters for STRNAME.
     std::string s = str.substr(0, 31);  // Limit the string to 32 characters (31 + '\0' at the end).
@@ -37,6 +38,7 @@ std::string replaceIllegalLIBNAME(std::string str) {    // Replaces invalid char
     return s;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void GDSDATE::setLocal() {
     time_t T = time(NULL);
@@ -62,33 +64,7 @@ GDSDATE GDSDATE::es() {
     return toReturn;
 }
 
-
-DEVICEPTR::DEVICEPTR() { device = nullptr; transformation=AFFINE(); }
-DEVICEPTR::DEVICEPTR(DEVICE* device_, AFFINE transformation_) { device = device_; transformation=transformation_; }
-
-DEVICEPTR DEVICEPTR::operator+(VECTOR v)    const { return DEVICEPTR(device, transformation + v); }
-DEVICEPTR DEVICEPTR::operator-(VECTOR v)    const { return DEVICEPTR(device, transformation - v); }
-DEVICEPTR DEVICEPTR::operator*(AFFINE m)    const { return DEVICEPTR(device, transformation * m); }
-DEVICEPTR DEVICEPTR::operator*(GLdouble s)  const { return DEVICEPTR(device, transformation * s); }
-DEVICEPTR DEVICEPTR::operator/(GLdouble s)  const { return DEVICEPTR(device, transformation / s); }
-
-DEVICEPTR DEVICEPTR::operator+=(VECTOR v) {         transformation += v; return *this; }
-DEVICEPTR DEVICEPTR::operator-=(VECTOR v) {         transformation -= v; return *this; }
-DEVICEPTR DEVICEPTR::operator*=(AFFINE m) {         transformation *= m; return *this; }
-DEVICEPTR DEVICEPTR::operator*=(GLdouble s) {       transformation *= s; return *this; }
-DEVICEPTR DEVICEPTR::operator/=(GLdouble s) {       transformation /= s; return *this; }
-
-GLdouble DEVICEPTR::area() {                  return device->area() * transformation.det(); }
-
-void DEVICEPTR::print() const {
-    printf("DEVICEPTR consisting of DEVICE: {\n");
-    device->print();
-//    for (int i = 0; i < polylines.size(); i++){ polylines[i].print(); }
-    printf("} transformed by AFFINE transformation: {\n");
-    transformation.print();
-    printf("}\n");
-}
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 DEVICE::DEVICE(std::string description_) {
     description = description_;
@@ -125,22 +101,18 @@ void DEVICE::add(DEVICEPTR device, char c) {
     for (std::map<std::string, CONNECTION>::iterator it = map.begin(); it != map.end(); ++it) {
         CONNECTION connection = it->second;
         if (c) { connection.name += c; }
-        if (device.transformation.det() < 0) {
-            add(-(device.transformation * connection));
-        } else {
-            add(device.transformation * connection);
-        }
+        add(device.transformation * connection);
     }
 
     area_ += device.area();
 }
-void DEVICE::printKeys() {
+void DEVICE::printConnectionNames() {
     for (std::map<std::string, CONNECTION>::iterator it = connections.begin(); it != connections.end(); ++it) {
         printf("%s\n", it->first.c_str());
     }
 }
-void DEVICE::add(DEVICE* device, AFFINE m) {
-    add(DEVICEPTR(device, m));
+void DEVICE::add(DEVICE* device, AFFINE m, char c) {
+    add(DEVICEPTR(device, m), c);
 }
 void DEVICE::add(CONNECTION connection) {
     if (connections.find(connection.name) == connections.end()) {    // If a connections of this key has not yet been added...
@@ -157,12 +129,30 @@ void DEVICE::add(CONNECTION connection) {
 
 double DEVICE::area() {
     if (area_ == 0) {
-//        for (int i = 0; i < polylines.size(); i++){ area_ += polylines[i].area(); }
         area_ += polylines.area();
         for (int i = 0; i < devices.size();   i++){ area_ += devices[i].area(); }
     }
     return area_;
 }
+
+bool DEVICE::initialized() {
+    return polylines.size() + devices.size() > 0;
+}
+
+DEVICEPTR DEVICE::operator+(VECTOR v)   const { return DEVICEPTR((DEVICE*)this, AFFINE(v)); }
+DEVICEPTR DEVICE::operator-(VECTOR v)   const { return DEVICEPTR((DEVICE*)this, AFFINE(-v)); }
+DEVICEPTR DEVICE::operator*(GLdouble s) const { return DEVICEPTR((DEVICE*)this, AFFINE(s,   0, 0, s)); }
+DEVICEPTR DEVICE::operator/(GLdouble s) const { return DEVICEPTR((DEVICE*)this, AFFINE(1/s, 0, 0, 1/s)); }
+DEVICEPTR DEVICE::operator*(AFFINE m)   const { return DEVICEPTR((DEVICE*)this, m); }
+
+CONNECTION DEVICE::operator[](std::string connectionName)   const {
+    if (connections.find(connectionName) == connections.end()) {    // If a connection of this name has not yet been added...
+        return CONNECTION();                    // Empty `CONNECTION`.
+    } else {
+        return connections.at(connectionName);  // `CONNECTION` corresponding to `connectionName`.
+    }
+}
+
 void DEVICE::print() {
     printf("DEVICE with description: {\n");
     printf("    %s", description.c_str());
@@ -171,9 +161,6 @@ void DEVICE::print() {
     printf("} and subDEVICEPTRs: {\n");
     for (int i = 0; i < devices.size(); i++){   devices[i].print(); }
     printf("}\n");
-}
-bool DEVICE::initialized() {
-    return polylines.size() + devices.size() > 0;
 }
 
 bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
@@ -597,6 +584,10 @@ bool DEVICE::importGDS(std::string fname) {
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::map<std::string, DEVICE*> DEVICE::allDevices;  // Declaration of empty global device map.
+
 DEVICE* getDevice(std::string description) {
     DEVICE d("");   // (Profanely) get a path to the static allDevices.
 
@@ -610,3 +601,35 @@ DEVICE* getDevice(std::string description) {
         return d.allDevices[description];
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+DEVICEPTR::DEVICEPTR() { device = nullptr; transformation=AFFINE(); }
+DEVICEPTR::DEVICEPTR(DEVICE* device_, AFFINE transformation_) { device = device_; transformation = transformation_; }
+DEVICEPTR::DEVICEPTR(DEVICEPTR const &device_, AFFINE transformation_) { device = device_.device; transformation = transformation_ * device_.transformation; }
+
+DEVICEPTR DEVICEPTR::operator+(VECTOR v)    const { return DEVICEPTR(device, transformation + v); }
+DEVICEPTR DEVICEPTR::operator-(VECTOR v)    const { return DEVICEPTR(device, transformation - v); }
+DEVICEPTR DEVICEPTR::operator*(AFFINE m)    const { return DEVICEPTR(device, transformation * m); }
+DEVICEPTR DEVICEPTR::operator*(GLdouble s)  const { return DEVICEPTR(device, transformation * s); }
+DEVICEPTR DEVICEPTR::operator/(GLdouble s)  const { return DEVICEPTR(device, transformation / s); }
+
+DEVICEPTR DEVICEPTR::operator+=(VECTOR v) {         transformation += v; return *this; }
+DEVICEPTR DEVICEPTR::operator-=(VECTOR v) {         transformation -= v; return *this; }
+DEVICEPTR DEVICEPTR::operator*=(AFFINE m) {         transformation *= m; return *this; }
+DEVICEPTR DEVICEPTR::operator*=(GLdouble s) {       transformation *= s; return *this; }
+DEVICEPTR DEVICEPTR::operator/=(GLdouble s) {       transformation /= s; return *this; }
+
+GLdouble DEVICEPTR::area() {                  return device->area() * transformation.det(); }
+
+void DEVICEPTR::print() const {
+    printf("DEVICEPTR consisting of DEVICE: {\n");
+    device->print();
+    printf("} transformed by AFFINE transformation: {\n");
+    transformation.print();
+    printf("}\n");
+}
+
+
+
+

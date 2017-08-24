@@ -5,12 +5,13 @@
 
 FONT::FONT() {
     layer = 0;
-    fontprefix = "";
+    
+    setFontprefix();
 }
 FONT::FONT(uint16_t l) {
     layer = l;
     
-    fontprefix = "FONT layer=" + std::to_string(layer) + ", char=";
+    setFontprefix();
 }
 FONT::FONT(uint16_t l, GLdouble scale) {
     layer = l;
@@ -20,6 +21,8 @@ FONT::FONT(uint16_t l, GLdouble scale) {
     
     height  *= scale;
     width   *= scale;
+    
+    setFontprefix();
 }
 FONT::FONT(uint16_t l, GLdouble t, GLdouble h) {
     layer = l;
@@ -29,6 +32,13 @@ FONT::FONT(uint16_t l, GLdouble t, GLdouble h) {
     
     width  =  h*width/height;
     height  = h;
+    
+    setFontprefix();
+}
+
+void FONT::setFontprefix() {
+    if (layer) {    fontprefix = "FONT layer=" + std::to_string(layer) + ", char="; }
+    else       {    fontprefix = ""; }
 }
 
 void FONT::setThick(GLdouble t) {
@@ -558,12 +568,8 @@ DEVICE* FONT::getChar(char c) {
     return nullptr;
 }
 
-DEVICE* FONT::getText(std::string text, std::string devname) {
-    if (devname.size() == 0){
-        devname = text;
-    }
-    
-    DEVICE* toReturn = new DEVICE(devname);
+DEVICE* FONT::getTextPrivate(std::string text) {
+    DEVICE* toReturn = new DEVICE(text);
     
     VECTOR pen;
     
@@ -571,13 +577,29 @@ DEVICE* FONT::getText(std::string text, std::string devname) {
         DEVICE* character = getChar(text[i]);
         toReturn->add( DEVICEPTR(character, AFFINE(pen)) );
         pen += VECTOR(width + thick, 0);    // Change this...
-//        character->
+        
 //        pen += VECTOR(character->bb.width() + thick, 0);    // Change this...
     }
     
     return toReturn;
+//    DEVICEPTR(toReturn, AFFINE(-toReturn->bb.width()/2, -toReturn->bb.height()/2));
     
 //    return nullptr;
+}
+DEVICEPTR FONT::getText(std::string text, int anchorx, int anchory) {
+    DEVICE* toReturn = getTextPrivate(text);
+    
+    VECTOR shift;
+    
+    if      (anchorx >  0) { shift.x = toReturn->bb.width(); }      // Right,
+    else if (anchorx == 0) { shift.x = toReturn->bb.width()/2; }    // Center,
+                                                                    // Otherwise left.
+    
+    if      (anchory >  0) { shift.y = toReturn->bb.height(); }     // Top,
+    else if (anchory == 0) { shift.y = toReturn->bb.height()/2; }   // Mid,
+                                                                    // Otherwise bottom.
+    
+    return DEVICEPTR(toReturn, AFFINE(shift));
 }
 
 #else
@@ -809,15 +831,11 @@ DEVICE* FONT::getChar(char c) {
         return chars[c];
     }
 }
-DEVICE* FONT::getText(std::string text, std::string devname) {
-    if (devname.size() == 0){
-        devname = text;
-    }
-    
-    DEVICE* toReturn = new DEVICE(devname);
+DEVICE* FONT::getText(std::string text) {
+    DEVICE* toReturn = new DEVICE(text);
     
     if (toReturn->initialized()) {
-        printf("FONT::getText(\"%s\"): DEVICE %s was already created.", text.c_str(), devname.c_str());
+        printf("FONT::getText(\"%s\") was already created.", text.c_str());
         return toReturn;
     }
     

@@ -20,13 +20,13 @@
 #define PI          3.141592653589793238462643383279502884197169399375105820974
 #define DEG2RAD     0.017453292519943295769236907684886127134428718885417254560
 
-inline int sign(double x) { return (x > 0)?( 1 ):( (x < 0)?( -1 ):( 0 ) ); }
+enum BOOLOPERATION { AND=0, OR=1, XOR=2 };                                      // The three possible boolean operations. Boolean Difference can be acomplished with AND and negative area.
 
-inline GLdouble max(GLdouble x, GLdouble y) { return (x > y)?(x):(y); }
-inline GLdouble min(GLdouble x, GLdouble y) { return (x < y)?(x):(y); }
+inline int sign(GLdouble x) { return (x > 0)?( 1 ):( (x < 0)?( -1 ):( 0 ) ); }  // Returns the sign of a number (e.g. -1 for -2, +1 for 3). Zero returns zero.
 
-bool getRoot(GLdouble* root, GLdouble a, GLdouble b, GLdouble c, GLdouble s=1);
+inline GLdouble max(GLdouble x, GLdouble y) { return (x > y)?(x):(y); }         // Maximum of two `GLdouble`s.
+inline GLdouble min(GLdouble x, GLdouble y) { return (x < y)?(x):(y); }         // Minimum of two `GLdouble`s.
 
-class VECTOR;
+bool getRoot(GLdouble* root, GLdouble a, GLdouble b, GLdouble c, GLdouble s=1); // Sets the value at the pointer `root` to be the right root (`s > 0`), left root (`s < 0`), or center (`s == 0`) of a parabola `y = ax^2 + bx = c`.
 
 #endif
