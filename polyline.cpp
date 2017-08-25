@@ -267,7 +267,7 @@ POLYLINE POLYLINE::clip(int b, int e) {
 
 
 VECTOR POLYLINE::operator[](int i) const {
-    //    if (i < 0 || i >= points.size()){   return VECTOR(); }  // Or throw error?
+//    if (i < 0 || i >= points.size()){   return VECTOR(); }  // Or throw error?
 //    if (i < 0 || i >= points.size()){   printf("POLYLINE[int i]: i out of range. Setting i = i %% size().\n"); }
     if (points.size()) {
         i = i % points.size();
@@ -275,8 +275,7 @@ VECTOR POLYLINE::operator[](int i) const {
         if (isReversed) {                   return points[points.size() - i - 1]; }
         else {                              return points[i]; }
     } else {
-        throw std::runtime_error("This POLYLINE has no points to reference[]...");
-        //        return VECTOR();
+        throw std::runtime_error("POLYLINE::operator[](int): This POLYLINE has no points to reference[]...");
     }
 }
 bool POLYLINE::insert(int i, VECTOR v) {
@@ -499,10 +498,16 @@ size_t POLYLINE::size() const {
 }
 
 POLYLINE POLYLINE::close() {
+    length_ = 0;    // Or just add the end -> 0 segment?
+    area_ = 0;
+    
     isClosed = true;
     return *this;
 }
 POLYLINE POLYLINE::open() {
+    length_ = 0;    // Or just remove the end -> 0 segment?
+    area_ = 0;
+    
     isClosed = false;
     return *this;
 }
@@ -591,6 +596,10 @@ GLdouble POLYLINE::length() {
     if (length_ == 0) {
         for (int i = 0; i < points.size()-1; i++) {
             length_ += (points[i] - points[i+1]).magn();
+        }
+        
+        if (isClosed) {
+            length_ += (points[points.size()-1] - points[0]).magn();
         }
     }
     return length_;
@@ -689,6 +698,13 @@ POLYLINE POLYLINE::copy() const {
 //    glPopAFFINE();
 //}*/
 void POLYLINE::print() const {
+    
+//#ifdef MATLAB_MEX_FILE
+//    mexPrintf("Pointer = 0x%i\n", this);
+//#else
+//    printf("Pointer = 0x%i\n", this);
+//#endif
+    
     if (isEmpty()) {
 #ifdef MATLAB_MEX_FILE
         mexPrintf("Empty POLYLINE\n");

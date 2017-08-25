@@ -77,15 +77,16 @@ function compile(fname)
     
     for ii = 1:length(gatheredClasses)
 %         newMethod.type = gatheredClasses(ii).name;
-        gatheredClasses(ii).methods = [deleteMethod gatheredClasses(ii).methods];
+%         gatheredClasses(ii).methods = [deleteMethod gatheredClasses(ii).methods];
         
         for jj = 1:length(gatheredClasses(ii).methods)
             gatheredClasses(ii).methods(jj).namematlab = convertFunc(gatheredClasses(ii).methods(jj).name, length(gatheredClasses(ii).methods(jj).arguments));
         end
         
+        deleteMethod.namematlab = convertFunc(deleteMethod.name, deleteMethod.arguments);
         newMethod.namematlab = gatheredClasses(ii).name;
 
-        gatheredClasses(ii).methods = [newMethod gatheredClasses(ii).methods];
+        gatheredClasses(ii).methods = [deleteMethod newMethod gatheredClasses(ii).methods];
     end
     
     for jj = 1:length(gatheredMethods)
@@ -229,13 +230,13 @@ function writeMethods(fmex, class)
     for ii = 1:length(class.methods)
         writeMethod(fmex, fmat, ii, class);
         
-        if      strcmp(class.methods(ii).name, 'print')     % VECTOR-specific...
-            class.methods(ii).namematlab = 'disp';
-            writeMethod([], fmat, ii, class);
-        elseif  strcmp(class.methods(ii).name, 'magn')      % VECTOR-specific...
-            class.methods(ii).namematlab = 'length';
-            writeMethod([], fmat, ii, class);
-        end
+%         if      strcmp(class.methods(ii).name, 'print')     % VECTOR-specific...
+%             class.methods(ii).namematlab = 'disp';
+%             writeMethod([], fmat, ii, class);
+%         elseif  strcmp(class.methods(ii).name, 'magn')      % VECTOR-specific...
+%             class.methods(ii).namematlab = 'length';
+%             writeMethod([], fmat, ii, class);
+%         end
     end
     
     fprintf(fmat, [ '    end' newline ...
@@ -269,7 +270,7 @@ function writeMatlabCall(fmat, method, ii, tab, isClass)
     
     fprintf(fmat, [ tab '            %% ' method.type newline ]);
     
-    accountForThis = ~strcmp(method.type, 'new');
+    accountForThis = ~strcmp(method.type, 'new') && isClass;
     
 %     classPresent = false;
     
@@ -384,7 +385,7 @@ function writeMethod(fmex, fmat, ii, class)
         end
     end
     
-    accountForThis = ~strcmp(class.methods(ii).type, 'new');
+    accountForThis = ~strcmp(class.methods(ii).type, 'new') && ~isempty(className);
     
     if length(samename) == 1 || ii == samename(1)
         if      strcmp(class.methods(ii).type, 'new')
@@ -401,8 +402,9 @@ function writeMethod(fmex, fmat, ii, class)
     end
     
     if length(samename) == 1    % If ii is the only one of this name...
-        fprintf(fmat, [' %% ' class.methods(ii).str ' - ' class.methods(ii).description newline]);
+        fprintf(fmat, [' %% ' class.methods(ii).str ' %% ' class.methods(ii).description newline]);
         
+%         num1 = numWritten+1-isempty(fmex)
         writeMatlabCall(fmat, class.methods(ii), numWritten+1-isempty(fmex), '', ~isempty(className))
             
         if strcmp(class.methods(ii).namematlab, 'disp')
@@ -424,7 +426,7 @@ function writeMethod(fmex, fmat, ii, class)
             if numWithoutDefault == length(class.methods(samename(jj)).arguments)
                 logic = ['(nargin == ' num2str(length(class.methods(samename(jj)).arguments)+accountForThis) ') && '];
             else
-                logic = ['(nargin >= ' num2str(numWithoutDefault+accountForThis) ' && nargin <= ' num2str(length(class.methods(jj).arguments)+accountForThis) ') && '];
+                logic = ['(nargin >= ' num2str(numWithoutDefault+accountForThis) ' && nargin <= ' num2str(length(class.methods(samename(jj)).arguments)+accountForThis) ') && '];
             end
             
             for kk = 1:length(class.methods(samename(jj)).arguments)
@@ -453,12 +455,18 @@ function writeMethod(fmex, fmat, ii, class)
             end
             
             if jj == 1
-                fprintf(fmat, [ '            if ' logic(1:end-4) ' %% ' class.methods(samename(jj)).str ' - ' class.methods(samename(jj)).description newline]);
+                fprintf(fmat, [ '            if ' logic(1:end-4) ' %% ' class.methods(samename(jj)).str ' %% ' class.methods(samename(jj)).description newline]);
             else
-                fprintf(fmat, [ '            elseif ' logic(1:end-4) ' %% ' class.methods(samename(jj)).str ' - ' class.methods(samename(jj)).description newline]);
+                fprintf(fmat, [ '            elseif ' logic(1:end-4) ' %% ' class.methods(samename(jj)).str ' %% ' class.methods(samename(jj)).description newline]);
             end
             
-            writeMatlabCall(fmat, class.methods(samename(jj)), numWritten+1+samename(jj)-ii-isempty(fmex), '    ', ~isempty(className));
+%             numWritten
+%             samename(jj)
+%             ii
+%             isempty(fmex)
+%             num2 = numWritten+1+samename(jj)-ii-isempty(fmex)
+            
+            writeMatlabCall(fmat, class.methods(samename(jj)), numWritten+1+samename(jj)-ii-isempty(fmex) - strcmp(class.methods(ii).type, 'new'), '    ', ~isempty(className));
         
 %             if strcmp(class.methods(jj).type, 'void') ||strcmp(class.methods(jj).type, 'delete')
 %                 fprintf(fmat,   '                '  );
@@ -485,6 +493,12 @@ function writeMethod(fmex, fmat, ii, class)
     end
         
     if length(samename) == 1 || ii == samename(1)
+        if strcmp(class.methods(ii).type, 'new')
+            fprintf(fmat, [ '            ' newline ]);
+            fprintf(fmat, [ '            if isempty(this.objectHandle)' newline ]);
+            fprintf(fmat, [ '                error(''Constructor failed to construct; this.objectHandle is empty...'');' newline ]);
+            fprintf(fmat, [ '            end' newline ]);
+        end
         fprintf(fmat, [ '        end' newline ]);
     end
     
@@ -493,7 +507,7 @@ function writeMethod(fmex, fmat, ii, class)
         inClass = ~isempty(className) && ~strcmp(method.type, 'new');
 
         % Begin command definition
-        fprintf(fmex, [ '    if (cmd == ' num2str(numWritten+1) ') { // ' method.str ' - ' method.description newline ]);
+        fprintf(fmex, [ '    if (cmd == ' num2str(numWritten+1) ') { // ' method.str ' // ' method.description newline ]);
 
     %     fprintf(fmex, ['        printf("nlhs = %%i, nrhs = %%i", nlhs, nrhs);' newline newline]);
 
@@ -673,8 +687,13 @@ function writeReturn(fmex, type, typespecial, tab)
                 fprintf(fmex, [ '        ' tab 'plhs[0] = convertPtr2Mat<' type '>(toReturn);' newline]);
             else
 %                 fprintf(fmex, [ '        ' tab 'plhs[0] = convertPtr2Mat<' type '>(&toReturn);' newline]);
+%                 fprintf(fmex, [ '        ' tab 'toReturn.print();' newline]);
                 fprintf(fmex, [ '        ' tab type '* toReturnPtr = new ' type '();' newline]);
-                fprintf(fmex, [ '        memcpy(toReturnPtr, &toReturn, sizeof(' type '));' newline]);  % This is a bad way to do this...
+
+                fprintf(fmex, [ '        ' tab 'toReturnPtr->operator=(toReturn);' newline]);
+
+%                 fprintf(fmex, [ '        memcpy(toReturnPtr, &toReturn, sizeof(' type '));' newline]);  % This is a bad way to do this...
+%                 fprintf(fmex, [ '        ' tab 'toReturnPtr->print();' newline]);
                 fprintf(fmex, [ '        ' tab 'plhs[0] = convertPtr2Mat<' type '>(toReturnPtr);' newline]);
             end
         case 'enum'
@@ -693,7 +712,7 @@ end
 
 function str = convertFunc(func, narg)
     if length(func) > 8 && strcmp(func(1:8), 'operator')
-        func(9:end)
+%         func(9:end)
         
         if narg == 0
             switch func(9:end)
@@ -735,7 +754,9 @@ function str = convertFunc(func, narg)
                 case '|';	str = 'or';
                 case '^';	str = 'mpower';
     %             case '^';	str = 'xor';
-                case '[]';	str = 'subsindex';
+%                 case '[]';	str = 'subsindex';
+%                 case '[]';	str = 'subsref';
+                case '[]';	str = 'at';
 
                 % Non-matlab-supported
                 case '=';   str = 'set';
@@ -772,6 +793,8 @@ function str = convertFunc(func, narg)
 
             end
         end
+    elseif strcmp(func, 'print')
+        str = 'disp';
     else
         str = func;
     end

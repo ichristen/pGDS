@@ -32,6 +32,8 @@ public:
     MATERIAL getLayer(uint16_t l);                          // Returns the material in the `static` map corresponding to layer `l`. Eventually make this a reference so changes to this are reflected in the map?
     void setLayer(MATERIAL m, uint16_t l);                  // Sets layer `l` in the `static` map to `m`.
     
+    void print();
+    
     // Add methods for setting font/etc...
     
     void setFill(   std::array<uint8_t, 4> colorFill_);     // Sets the fill    color (in rgba) for for this `MATERIAL`.

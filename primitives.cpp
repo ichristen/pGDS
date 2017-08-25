@@ -19,8 +19,10 @@ POLYLINE rect(VECTOR u, VECTOR v) {
             toReturn.reverse();
         }
     } else {
-        printf("primitives.hpp::rect(u,v): points defining rectangle are inline! Empty rectangle returned.\n");  // Make this more official.
+        printf("primitives.hpp::rect(u,v): points defining rectangle are inline! Empty POLYLINE returned.\n");  // Make this more official.
     }
+    
+//    toReturn.print();
     
     return toReturn;
 }

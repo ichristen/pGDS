@@ -33,6 +33,9 @@ void MATERIAL::setOutline(std::array<uint8_t, 4> colorOutline_) {
     colorOutline[2] = colorOutline_[2];
     colorOutline[3] = colorOutline_[3];
 }
+void MATERIAL::print() {
+    printf("MATERIAL %s for layer %i", name.c_str(), layer);
+}
 
 uint16_t MATERIAL::currentLayer = 1;
 
