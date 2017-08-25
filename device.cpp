@@ -155,7 +155,7 @@ CONNECTION DEVICE::operator[](std::string connectionName)   const {
 
 void DEVICE::print() {
     printf("DEVICE with description: {\n");
-    printf("    %s", description.c_str());
+    printf("    %s\n", description.c_str());
     printf("} containing POLYLINEs: {\n");
     for (int i = 0; i < polylines.size(); i++){ polylines[i].print(); }
     printf("} and subDEVICEPTRs: {\n");

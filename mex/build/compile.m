@@ -57,15 +57,35 @@ function compile(fname)
     deleteMethod.type = 'delete';
     deleteMethod.typespecial = '';
     deleteMethod.arguments = [];
-    deleteMethod.description = 'Deletes pointer reference.';
+    deleteMethod.description = 'MATLAB-specific... Deletes MEX pointer reference.';
     deleteMethod.str = 'delete()';
     
+    
+
+    argument.type = 'new';
+    argument.typespecial = '';
+    argument.typedereference = '';
+    argument.var = 'new';
+    argument.default = '';
+    
+    newMethod.name = 'new';
+    newMethod.type = 'new';
+    newMethod.typespecial = '';
+    newMethod.arguments = argument;
+    newMethod.description = 'MATLAB-specific... Takes a pointer returned from MEX and turns it into an object.';
+    newMethod.str = 'new(mexptr)';
+    
     for ii = 1:length(gatheredClasses)
+%         newMethod.type = gatheredClasses(ii).name;
         gatheredClasses(ii).methods = [deleteMethod gatheredClasses(ii).methods];
         
         for jj = 1:length(gatheredClasses(ii).methods)
             gatheredClasses(ii).methods(jj).namematlab = convertFunc(gatheredClasses(ii).methods(jj).name, length(gatheredClasses(ii).methods(jj).arguments));
         end
+        
+        newMethod.namematlab = gatheredClasses(ii).name;
+
+        gatheredClasses(ii).methods = [newMethod gatheredClasses(ii).methods];
     end
     
     for jj = 1:length(gatheredMethods)
@@ -288,13 +308,19 @@ function writeMatlabCall(fmat, method, ii, tab, isClass)
 %         fprintf(fmat, [tab '            varargin' newline ]);
 %         fprintf(fmat, [tab '            ~isempty(varargin)' newline ]);
 %         fprintf(fmat, [tab '            isstruct(varargin{1})' newline ]);
-        fprintf(fmat, [tab '            if ~isempty(varargin) && isstruct(varargin{1})' newline ]);
-%         fprintf(fmat, [tab '                varargin{1}.ptr;' newline ]);
-        fprintf(fmat, [tab '                this.objectHandle = varargin{1}.ptr;' newline ]);
-        fprintf(fmat, [tab '            elseif isempty(varargin)' newline ]);
-        fprintf(fmat, [tab '                this.objectHandle = mex_bridge(' num2str(ii) ');' newline ]);
-        fprintf(fmat, [tab '            else' newline ]);
-        fprintf(fmat, [tab '                this.objectHandle = mex_bridge(' num2str(ii) ', varargin{:});' newline ]);
+%         fprintf(fmat, [tab '            if ~isempty(varargin) && isstruct(varargin{1})' newline ]);
+% %         fprintf(fmat, [tab '                varargin{1}.ptr;' newline ]);
+%         fprintf(fmat, [tab '                this.objectHandle = varargin{1}.ptr;' newline ]);
+%         fprintf(fmat, [tab '            if isempty(varargin)' newline ]); 
+
+        if isempty(method.arguments)
+            fprintf(fmat, [tab '            this.objectHandle = mex_bridge(' num2str(ii) ');' newline ]);
+        elseif strcmpi(method.arguments(1).type, 'new')
+            fprintf(fmat, [tab '            this.objectHandle = varargin{1}.ptr;' newline ]);
+        else
+%         fprintf(fmat, [tab '            else' newline ]);
+            fprintf(fmat, [tab '            this.objectHandle = mex_bridge(' num2str(ii) ', varargin{:});' newline ]);
+        end
 
 %         if isempty(method.arguments)
 %             fprintf(fmat, [tab '                mex_bridge(' num2str(ii) ', this.objectHandle);' newline ]);
@@ -302,16 +328,16 @@ function writeMatlabCall(fmat, method, ii, tab, isClass)
 %             fprintf(fmat, [tab '                mex_bridge(' num2str(ii) ', this.objectHandle, varargin{:});' newline ]);
 %         end
 
-        fprintf(fmat, [tab '            end' newline ]);
+%         fprintf(fmat, [tab '            end' newline ]);
     elseif strcmp(type, 'list')
         fprintf(fmat, [tab '            [toReturn{1:nargout}] = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
     elseif strcmp(type, 'class')
         if isempty(method.arguments)
-            fprintf(fmat, [tab '            str.ptr = mex_bridge(' num2str(ii) objHandle ');' newline ]);
+            fprintf(fmat, [tab '            structure.ptr = mex_bridge(' num2str(ii) objHandle ');' newline ]);
         else
-            fprintf(fmat, [tab '            str.ptr = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
+            fprintf(fmat, [tab '            structure.ptr = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
         end
-        fprintf(fmat, [tab '            toReturn = ' method.type '(str);' newline ]);
+        fprintf(fmat, [tab '            toReturn = ' method.type '(structure);' newline ]);
     else
 %         fprintf(fmat, [tab '            toReturn = mex_bridge(' num2str(ii) ', this.objectHandle, varargin{:});' newline ]);
         
@@ -363,18 +389,20 @@ function writeMethod(fmex, fmat, ii, class)
     if length(samename) == 1 || ii == samename(1)
         if      strcmp(class.methods(ii).type, 'new')
 %             class.methods(ii)
-            fprintf(fmat, [ '        function this = ' method.namematlab '(varargin)' newline ]);
+            fprintf(fmat, [ '        function this = ' method.namematlab '(varargin)' ]);
         elseif  strcmp(class.methods(ii).type, 'delete')
 %             class.methods(ii)
-            fprintf(fmat, [ '        function delete(this)' newline ]);
+            fprintf(fmat, [ '        function delete(this)' ]);
         elseif  strcmp(class.methods(ii).type, 'void')
-            fprintf(fmat, [ '        function ' method.namematlab '(' this 'varargin)' newline ]);
+            fprintf(fmat, [ '        function ' method.namematlab '(' this 'varargin)' ]);
         else
-            fprintf(fmat, [ '        function toReturn = ' method.namematlab '(' this 'varargin)' newline ]);
+            fprintf(fmat, [ '        function toReturn = ' method.namematlab '(' this 'varargin)' ]);
         end
     end
     
     if length(samename) == 1    % If ii is the only one of this name...
+        fprintf(fmat, [' %% ' class.methods(ii).str ' - ' class.methods(ii).description newline]);
+        
         writeMatlabCall(fmat, class.methods(ii), numWritten+1-isempty(fmex), '', ~isempty(className))
             
         if strcmp(class.methods(ii).namematlab, 'disp')
@@ -382,6 +410,8 @@ function writeMethod(fmex, fmat, ii, class)
         end
 %         fprintf(fmat, [ '            [toReturn{1:nargout}] = mex_bridge(' num2str(numWritten+1) ', this.objectHandle, varargin{:});' newline ]);
     elseif ii == samename(1)    % If ii is the first of this name, with potentially-many following...
+        fprintf(fmat, [' %% ' class.methods(ii).type ' ' class.methods(ii).name '(...), an overloaded method.' newline]);
+        
         for jj = 1:length(samename)
             numWithoutDefault = 0;
             
@@ -411,6 +441,8 @@ function writeMethod(fmex, fmat, ii, class)
                         logic = [logic 'isa(varargin{' num2str(kk) '}, ''' class.methods(samename(jj)).arguments(kk).type ''')) && '];       %#ok
                     case 'string'
                         logic = [logic 'ischar(varargin{' num2str(kk) '})) && '];       %#ok
+                    case 'new'
+                        logic = [logic 'isstruct(varargin{' num2str(kk) '})) && '];       %#ok
                     case 'static'
                         logic = [logic 'isnumeric(varargin{' num2str(kk) '}) || islogical(varargin{' num2str(kk) '})) && '];    %#ok
                 end
@@ -421,9 +453,9 @@ function writeMethod(fmex, fmat, ii, class)
             end
             
             if jj == 1
-                fprintf(fmat, [ '            if ' logic(1:end-4) newline ]);
+                fprintf(fmat, [ '            if ' logic(1:end-4) ' %% ' class.methods(samename(jj)).str ' - ' class.methods(samename(jj)).description newline]);
             else
-                fprintf(fmat, [ '            elseif ' logic(1:end-4) newline ]);
+                fprintf(fmat, [ '            elseif ' logic(1:end-4) ' %% ' class.methods(samename(jj)).str ' - ' class.methods(samename(jj)).description newline]);
             end
             
             writeMatlabCall(fmat, class.methods(samename(jj)), numWritten+1+samename(jj)-ii-isempty(fmex), '    ', ~isempty(className));
@@ -457,7 +489,7 @@ function writeMethod(fmex, fmat, ii, class)
     end
     
     % MEX ======================================================================================
-    if ~isempty(fmex)
+    if ~isempty(fmex) && ~(length(method.arguments) == 1 && strcmp(method.arguments(1).type, 'new'))
         inClass = ~isempty(className) && ~strcmp(method.type, 'new');
 
         % Begin command definition
