@@ -1,5 +1,5 @@
-#ifndef POLYLINE_H
-#define POLYLINE_H
+#ifndef POLYLINE_HPP
+#define POLYLINE_HPP
 
 #include <string>
 #include <vector>
@@ -43,22 +43,22 @@ public:
     
     bool doesIntersect(BOUNDINGBOX bb);     // Checks whether this bounding box intersects with another.
     
-    BOUNDINGBOX operator&(BOUNDINGBOX bb);  // Boolean and.
-    BOUNDINGBOX operator&=(BOUNDINGBOX bb);
+    BOUNDINGBOX  operator&(BOUNDINGBOX bb); // Boolean and.
+    BOUNDINGBOX& operator&=(BOUNDINGBOX bb);
     
-    BOUNDINGBOX operator|(BOUNDINGBOX bb);  // Boolean or.
-    BOUNDINGBOX operator|=(BOUNDINGBOX bb);
+    BOUNDINGBOX  operator|(BOUNDINGBOX bb); // Boolean or.
+    BOUNDINGBOX& operator|=(BOUNDINGBOX bb);
     
-    BOUNDINGBOX operator|(VECTOR v);        // Same as enlarge.
-    BOUNDINGBOX operator|=(VECTOR v);
+    BOUNDINGBOX  operator|(VECTOR v);       // Same as enlarge.
+    BOUNDINGBOX& operator|=(VECTOR v);
     
-    BOUNDINGBOX operator=(BOUNDINGBOX bb);
+    BOUNDINGBOX& operator=(BOUNDINGBOX bb);
     
-    BOUNDINGBOX operator/ (GLdouble s)   const;
-    BOUNDINGBOX operator* (GLdouble s)   const;
+    BOUNDINGBOX  operator* (GLdouble s)  const;
+    BOUNDINGBOX  operator/ (GLdouble s)  const;
     
-    BOUNDINGBOX operator/=(GLdouble s);
-    BOUNDINGBOX operator*=(GLdouble s);
+    BOUNDINGBOX& operator*=(GLdouble s);
+    BOUNDINGBOX& operator/=(GLdouble s);
     
     GLdouble area()                 const;
     
@@ -114,8 +114,8 @@ public:
     
 //    void operator=(POLYLINE p);
     
-    POLYLINE operator-();
-    POLYLINE reverse();                     // Changes the flag `isReversed` such that the enclosed data is treated as if it was reversed. This is useful for quickly changing the orientation of a closed contour.
+    POLYLINE  operator-();
+    POLYLINE& reverse();                    // Changes the flag `isReversed` such that the enclosed data is treated as if it was reversed. This is useful for quickly changing the orientation of a closed contour.
     void makeforward();                     // If `isReversed` is flagged, changes the order of data in memory such the the current aparent order is maintained, while `isReversed` is no longer needed.
     
     VECTOR getBeginPoint();
@@ -123,22 +123,22 @@ public:
     VECTOR getBeginDirection();
     VECTOR getEndDirection();
     
-    POLYLINE operator+ (VECTOR v)   const;
-    POLYLINE operator- (VECTOR v)   const;
-    POLYLINE operator+=(VECTOR v);
-    POLYLINE operator-=(VECTOR v);
+    POLYLINE  operator+ (VECTOR v)      const;
+    POLYLINE  operator- (VECTOR v)      const;
+    POLYLINE& operator+=(VECTOR v);
+    POLYLINE& operator-=(VECTOR v);
     
-    POLYLINE operator/ (double s)   const;
-    POLYLINE operator* (double s)   const;
-    POLYLINE operator* (AFFINE m)   const;
-    POLYLINE operator/=(double s);
-    POLYLINE operator*=(double s);
-    POLYLINE operator*=(AFFINE m);
+    POLYLINE  operator/ (double s)   const;
+    POLYLINE  operator* (double s)   const;
+    POLYLINE  operator* (AFFINE m)   const;
+    POLYLINE& operator/=(double s);
+    POLYLINE& operator*=(double s);
+    POLYLINE& operator*=(AFFINE m);
     
-    POLYLINE operator+ (POLYLINE p) const;
-    POLYLINE operator- (POLYLINE p) const;
-    POLYLINE operator+=(POLYLINE p);
-    POLYLINE operator-=(POLYLINE p);
+    POLYLINE  operator+ (POLYLINE p) const;
+    POLYLINE  operator- (POLYLINE p) const;
+    POLYLINE& operator+=(POLYLINE p);
+    POLYLINE& operator-=(POLYLINE p);
     
     POLYLINES boolean(POLYLINE p, BOOLOPERATION op) const;
     
@@ -150,8 +150,8 @@ public:
     
     size_t size() const;
     
-    POLYLINE close();
-    POLYLINE open();
+    POLYLINE& close();
+    POLYLINE& open();
     
     bool isCCW();
     bool isEmpty() const;
@@ -198,13 +198,13 @@ public:
     POLYLINES   operator/ (double s)    const;
     POLYLINES   operator* (double s)    const;
     POLYLINES   operator* (AFFINE m)    const;
-    POLYLINES   operator/=(double s);
-    POLYLINES   operator*=(double s);
-    POLYLINES   operator*=(AFFINE m);
+    POLYLINES&  operator/=(double s);
+    POLYLINES&  operator*=(double s);
+    POLYLINES&  operator*=(AFFINE m);
     
     
     POLYLINES   operator-();
-    POLYLINES   reverse();
+    POLYLINES&  reverse();
     
     
     POLYLINES   boolean(POLYLINE p, BOOLOPERATION op) const;
@@ -213,11 +213,11 @@ public:
     POLYLINES   operator|(POLYLINE p)   const;  // Boolean OR
     POLYLINES   operator^(POLYLINE p)   const;  // Boolean XOR
     
-    POLYLINES   booleanEquals(POLYLINE p, BOOLOPERATION op);
+    POLYLINES&  booleanEquals(POLYLINE p, BOOLOPERATION op);
     
-    POLYLINES   operator&=(POLYLINE p);         // Boolean AND equals
-    POLYLINES   operator|=(POLYLINE p);         // Boolean OR equals
-    POLYLINES   operator^=(POLYLINE p);         // Boolean XOR equals
+    POLYLINES&  operator&=(POLYLINE p);         // Boolean AND equals
+    POLYLINES&  operator|=(POLYLINE p);         // Boolean OR equals
+    POLYLINES&  operator^=(POLYLINE p);         // Boolean XOR equals
     
     
     POLYLINES   boolean(POLYLINES p, BOOLOPERATION op) const;
@@ -226,11 +226,11 @@ public:
     POLYLINES   operator|(POLYLINES p)  const;  // Boolean OR
     POLYLINES   operator^(POLYLINES p)  const;  // Boolean XOR
     
-    POLYLINES   booleanEquals(POLYLINES p, BOOLOPERATION op);
+    POLYLINES&  booleanEquals(POLYLINES p, BOOLOPERATION op);
     
-    POLYLINES   operator&=(POLYLINES p);        // Boolean AND equals
-    POLYLINES   operator|=(POLYLINES p);        // Boolean OR equals
-    POLYLINES   operator^=(POLYLINES p);        // Boolean XOR equals
+    POLYLINES&  operator&=(POLYLINES p);        // Boolean AND equals
+    POLYLINES&  operator|=(POLYLINES p);        // Boolean OR equals
+    POLYLINES&  operator^=(POLYLINES p);        // Boolean XOR equals
     
     double area();
     

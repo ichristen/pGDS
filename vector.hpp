@@ -1,5 +1,5 @@
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
 
 #ifdef MATLAB_MEX_FILE
     #include <mex.h>
@@ -163,9 +163,13 @@ public:
     AFFINE(GLdouble radians);                           // Matrix that rotates by `radians` with no translation.
     AFFINE(GLdouble radians, VECTOR v);                 // Matrix that rotates by `radians` with translation `v`.
     AFFINE(GLdouble radians, GLdouble e_, GLdouble f_); // Matrix that rotates by `radians` with translation `[ e_, f_ ]`.
-
+    
     AFFINE(VECTOR v);                                                                           // Returns a translation by `v`.
     AFFINE(GLdouble e_, GLdouble f_);                                                           // Returns a translation by `[ e_, f_ ]`.
+    
+    AFFINE(VECTOR u, VECTOR v);                                                                 // Returns a matrix with columns `u` and `v`.
+    AFFINE(VECTOR u, VECTOR v, VECTOR w);                                                       // Returns a matrix with columns `u` and `v` with a translation by `w`.
+    
     AFFINE(GLdouble a_, GLdouble b_, GLdouble c_, GLdouble d_, VECTOR v);                       // Returns the matrix `[ a, b; c, d ]` with an additional translation by `v`.
     AFFINE(GLdouble a_, GLdouble b_, GLdouble c_, GLdouble d_, GLdouble e_=0, GLdouble f_=0);   // Returns the matrix `[ a, b; c, d ]` with an additional translation by `[ e_, f_ ]`.
 
@@ -189,7 +193,7 @@ public:
 
     AFFINE operator+(VECTOR v)              const;  // Returns a transformation with additional translation of `v`.
     AFFINE operator-(VECTOR v)              const;  // Returns a transformation with additional translation of `-v`.
-    AFFINE operator*(GLdouble s)            const;  // Returns the product of this transformation with the linear transformation that scales by `s`.
+    AFFINE operator*(GLdouble s)            const;  // Returns the product of this transformation with the linear transformation that scales by `s`, i.e. the matrix [ s, 0; 0, s ].
     AFFINE operator/(GLdouble s)            const;  // Returns the product of this transformation with the linear transformation that scales by `1/s`.
 
     AFFINE operator+=(VECTOR v);                    // Increases translation by `v`.

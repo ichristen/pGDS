@@ -1,5 +1,5 @@
-#ifndef TESTING_H
-#define TESTING_H
+#ifndef TESTING_HPP
+#define TESTING_HPP
 
 #include "polyline.hpp"
 

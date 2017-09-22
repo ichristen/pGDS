@@ -26,12 +26,73 @@ POLYLINE rect(VECTOR u, VECTOR v) {
     
     return toReturn;
 }
-POLYLINE rect(GLdouble x, GLdouble y, GLdouble w, GLdouble h) {
-    return rect(VECTOR(x,y), VECTOR(x+w, y+h));
+//POLYLINE rect(GLdouble x, GLdouble y, GLdouble w, GLdouble h) {
+//    return rect(VECTOR(x,y), VECTOR(x+w, y+h));
+//}
+POLYLINE rect(VECTOR c, GLdouble w, GLdouble h, int anchorx, int anchory) {
+    return rect(c - VECTOR((1+anchorx)*w/2, (1+anchory)*h/2), c + VECTOR((1-anchorx)*w/2, (1-anchory)*h/2));
 }
+//POLYLINE rect(VECTOR c, VECTOR s, int anchorx=0, int anchory=0) {
+//    return rect(c, s.x, s.y, anchorx, anchory);
+//}
 
 POLYLINE circle(GLdouble r, VECTOR c) {
-    return arc(r, 0, TAU, true).close() += c;   // Change? Inefficient?
+    
+    POLYLINE toReturn;
+    
+    int steps = ceil(TAU/acos(1 - EPSILON/r));
+    
+    AFFINE m = AFFINE(TAU/steps);
+    
+    VECTOR s = VECTOR(0, r);
+    
+    toReturn.add(s + c);
+    for (int i = 0; i < steps-1; i++) {
+        s = m*s;
+        toReturn.add(s + c);
+    }
+    
+    toReturn.close();
+    
+    return toReturn;
+}
+
+POLYLINE ellipse(GLdouble a, GLdouble b, VECTOR c, VECTOR semimajorunit) {
+    return circle(1) * (AFFINE(semimajorunit, semimajorunit.perpCCW(), c) * AFFINE(a,0,0,b));
+    
+//    POLYLINE toReturn;
+//    
+//    int steps = ceil(TAU/acos(1 - EPSILON/a));
+//    
+//    AFFINE m = AFFINE(TAU/steps);
+//    
+//    VECTOR s = semimajorunit;
+//    
+//    toReturn.add(s + c);
+//    for (int i = 0; i < steps-1; i++) {
+//        s = m*s;
+//        toReturn.add(s + c);
+//    }
+//    
+//    toReturn.close();
+//    
+//    return toReturn;
+}
+POLYLINE ellipse(VECTOR focus1, VECTOR focus2, GLdouble L) {
+    VECTOR semimajorunit = (focus1 - focus2);
+    
+    GLdouble magn2 = semimajorunit.magn2();
+    
+    if (magn2 > L*L) { return POLYLINE(); }     // Cannot make a polyline with such a small L...
+    
+    semimajorunit /= sqrt(magn2);
+    
+    VECTOR c = (focus1 + focus2)/2;
+    
+    GLdouble a = L/2;
+    GLdouble b = sqrt((L*L - magn2)/4);
+    
+    return ellipse(a, b, c, semimajorunit);
 }
 
 // PATHS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,6 +167,43 @@ POLYLINE parametricCylindrical( std::function<GLdouble(GLdouble t)> lambdaR,
     return parametric([lambdaR, lambdaT] (GLdouble t) -> VECTOR { return VECTOR(lambdaR(t), lambdaT(t), true); }	, steps);
 }
 
+POLYLINE parabola(GLdouble x0, GLdouble x1, VECTOR focus, VECTOR vertex, int steps) {
+    return parabola(x0, x1, 1/(4 * (vertex-focus).magn()), vertex, (vertex-focus).unit(), steps);
+}
+POLYLINE parabola(GLdouble x0, GLdouble x1, GLdouble a, VECTOR center, VECTOR direction, int steps) {
+    if (!steps) { steps = ceil(std::abs(x0 - x1)) + 10; }
+    
+    VECTOR perp = direction.perpCW();
+    
+    return parametric([x0,x1,a,center,direction,perp] (GLdouble t) -> VECTOR {
+        return direction * (a * ( x0 + (x1-x0)*t ) * ( x0 + (x1-x0)*t )) + perp * ( x0 + (x1-x0)*t ) + center;
+    }, steps);
+}
+POLYLINE parabola(GLdouble x0, GLdouble x1, GLdouble a, GLdouble b, GLdouble c, int steps) {
+    if (!steps) { steps = ceil(std::abs(x0 - x1)) + 10; }
+    
+    return parametric([x0,x1,a,b,c] (GLdouble t) -> VECTOR {
+        return a * ( x0 + (x1-x0)*t ) * ( x0 + (x1-x0)*t ) + b* ( x0 + (x1-x0)*t ) + c;
+    }, steps);
+}
+
+//POLYLINE hyperbola(GLdouble x0, GLdouble x1, VECTOR focus, VECTOR vertex, VECTOR c, int steps) {
+//    GLdouble a = 0;
+//    GLdouble b = 0;
+//    
+//    return hyperbola(x0, x1, <#GLdouble a#>, <#GLdouble b#>)
+//}
+POLYLINE hyperbola(GLdouble x0, GLdouble x1, GLdouble a, GLdouble b, VECTOR c, VECTOR direction, int steps) {
+    if (!steps) { steps = ceil(std::abs(x0 - x1)) + 10; }
+    
+    VECTOR perp = direction.perpCW();
+    
+    return parametric([x0,x1,a,b,c,direction,perp] (GLdouble t) -> VECTOR {
+        return direction * ( (a/b) * sqrt( ( x0 + (x1-x0)*t ) * ( x0 + (x1-x0)*t ) + b*b ) ) + perp * ( x0 + (x1-x0)*t ) + c;
+    }, steps);
+}
+
+
 POLYLINE linear(VECTOR p0, VECTOR p1, size_t steps) {
     VECTOR dp = p1 - p0;
     GLdouble magn = dp.magn();
@@ -144,7 +242,7 @@ POLYLINE qBezier(VECTOR p0, VECTOR p1, VECTOR p2, size_t steps) {
             printf("qBezier(VECTOR^3): Control points should not be colinear.");
         }
             
-        steps = ceil((dp1.magn() + dp2.magn()) / (dot + 1));
+        steps = ceil(3*(dp1.magn() + dp2.magn()) / (dot + 2));
     }
 //    printf("steps: %i", steps);
     
@@ -173,12 +271,34 @@ POLYLINE cBezier(VECTOR p0, VECTOR p1, VECTOR p2, VECTOR p3, size_t steps) {
             printf("cBezier(VECTOR^4): Control points should not be colinear.");
         }
         
-        steps = ceil(2*(dp1.magn() + dp2.magn()) / (dot1 + dot2 + 2));
+        steps = ceil(5*(dp1.magn() + dp2.magn() + dp3.magn()) / (dot1 + dot2 + 3));
     }
     
     return parametric([p0,p1,p2,p3] (GLdouble t) -> VECTOR {
         return p0*((1.0-t)*(1.0-t)*(1.0-t)) + p1*(3*(1.0-t)*(1.0-t)*t) + p2*(3*(1.0-t)*t*t) + p3*(t*t*t);
     }, steps);
+}
+
+POLYLINE qBezier(std::vector<VECTOR> pts) {
+//    if (isQuadratic) {
+        if (pts.size() == 3) {
+            return qBezier(pts[0], pts[1], pts[2], 0); // We only need to define one segment...
+        } else if (pts.size() < 3) {
+            return POLYLINE();                      // Return empty.
+        } else {
+            POLYLINE toReturn = qBezier(pts[0], pts[1], (pts[1] + pts[2])/2, 0);
+            
+            for (int i = 1; i < pts.size()-2; i++) {
+                toReturn.add(qBezier((pts[i-1] + pts[i])/2, pts[i], (pts[i] + pts[i+1])/2, 0));     // Make this more efficient!
+            }
+            
+            toReturn.add(qBezier((pts[pts.size()-3] + pts[pts.size()-2])/2, pts[pts.size()-2], pts[pts.size()-1], 0));
+                
+            return toReturn;
+        }
+//    } else {
+//        throw std::runtime_error("longBezier(std::vector<VECTOR>, false): Cubic longBezier NotImplemented.");
+//    }
 }
 
 GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
@@ -276,7 +396,7 @@ bool intersect(CONNECTION a, CONNECTION b, VECTOR** i, bool onlyForward) {
     return true;
 }
 
-POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, bool pointsDuringLinear) {
+POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsDuringLinear) {
 //    if (b.type != e.type) {
 //        
 //    }
@@ -302,8 +422,8 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, bool pointsDur
 //        printf("HERE2");
         
         // Connections are inline; return linear.
-        if (pointsDuringLinear) {
-            toReturn += linear(i.v, f.v, 0);
+        if (numPointsDuringLinear) {
+            toReturn += linear(i.v, f.v, numPointsDuringLinear);
         } else {
             toReturn += i.v;
             toReturn += f.v;
@@ -457,7 +577,7 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
         lambda = [w] (GLdouble t) -> GLdouble { return w; };
     }
     
-    POLYLINE p = connect(b, e, type, b.w != e.w);
+    POLYLINE p = connect(b, e, type, (b.w != e.w)?((int)((e.v-b.v).magn()/minstep) + 2):(0));
     
     //    printf("p.begin="); p.begin.printNL();
     //    printf("p.end=");   p.end.printNL();
@@ -512,7 +632,7 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
     VECTOR v;
     
     GLdouble offset;
-    GLdouble thisLength = minstep;
+    GLdouble thisLength = 0;// = minstep;
     
     if (i == open->size()-1) {
         if (!open->end.isZero()) {  u = open->end; }
@@ -541,7 +661,7 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
         if (open->points[i+1] == open->points[i]) { v = (open->points[i+2] - open->points[i+1]).unit(); }
         else {                                      v = (open->points[i+1] - open->points[i]).unit(); }
         
-        GLdouble thisLength = u.magn();
+        thisLength = u.magn();
         u /= thisLength;
         
 //        currentLength + thisLength;

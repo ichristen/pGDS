@@ -11,14 +11,18 @@
 // CLOSED PRIMITIVES ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 POLYLINE rect(VECTOR u, VECTOR v);
-POLYLINE rect(GLdouble x, GLdouble y, GLdouble w, GLdouble h);
+//POLYLINE rect(GLdouble x, GLdouble y, GLdouble w, GLdouble h);
+POLYLINE rect(VECTOR c, GLdouble w, GLdouble h, int anchorx=0, int anchory=0);
+//POLYLINE rect(VECTOR c, VECTOR s, int anchorx=0, int anchory=0);
 
-POLYLINE circle(GLdouble r, VECTOR c);
+POLYLINE circle(GLdouble r, VECTOR c=VECTOR());
+
+POLYLINE ellipse(GLdouble a, GLdouble b, VECTOR c=VECTOR(), VECTOR semimajorunit=VECTOR(1,0));
+POLYLINE ellipse(VECTOR focus1, VECTOR focus2, GLdouble L);
 
 // PATHS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//std::function<VECTOR> linearLambda();
-
+// Parametrics
 POLYLINE parametric(            std::function<VECTOR(GLdouble t)> lambda, size_t steps=0);
 POLYLINE parametricCartesian(   std::function<GLdouble(GLdouble t)> lambdaX,
                                 std::function<GLdouble(GLdouble t)> lambdaY,
@@ -27,19 +31,32 @@ POLYLINE parametricCylindrical( std::function<GLdouble(GLdouble t)> lambdaR,
                                 std::function<GLdouble(GLdouble t)> lambdaT,
                                 size_t steps=0);
 
+// Conic Sections
 POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW=true);
 GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true);
 POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true);
+
+POLYLINE parabola(GLdouble x0, GLdouble x1, VECTOR focus, VECTOR vertex=VECTOR(), int steps=0);
+POLYLINE parabola(GLdouble x0, GLdouble x1, GLdouble a, VECTOR center=VECTOR(), VECTOR direction=VECTOR(0,1), int steps=0);
+POLYLINE parabola(GLdouble x0, GLdouble x1, GLdouble a, GLdouble b, GLdouble c, int steps=0);
+
+//POLYLINE hyperbola(GLdouble x0, GLdouble x1, VECTOR focus, VECTOR vertex, VECTOR c=VECTOR(), int steps=0);
+POLYLINE hyperbola(GLdouble x0, GLdouble x1, GLdouble a, GLdouble b, VECTOR c=VECTOR(), VECTOR direction=VECTOR(0,1), int steps=0);
+
 
 POLYLINE linear( VECTOR p0, VECTOR p1, size_t steps=5);
 POLYLINE qBezier(VECTOR p0, VECTOR p1, VECTOR p2, size_t steps=5);
 POLYLINE cBezier(VECTOR p0, VECTOR p1, VECTOR p2, VECTOR p3, size_t steps=5);
 
+POLYLINE qBezier(std::vector<VECTOR> pts);
+//POLYLINE longBezier(std::vector<VECTOR> pts, bool isQuadratic=true);
+
+
 enum CONNECTIONTYPE { LINEAR=0, QBEZIER=1, CBEZIER=2, CIRCULAR=3, MONOCIRCULAR=4 };
 
 bool intersect(CONNECTION a, CONNECTION b, VECTOR** i, bool onlyForward=false);     // Get the intersection point of the lines originating from `CONNECTION`s `a` and `b`. If `onlyForward`, do not consider intersections strictly 'behind' the `CONNECTIONS`. `*i` is set to `NULL` if no intersection exists.
 
-POLYLINE connect(CONNECTION b, CONNECTION e, CONNECTIONTYPE type=CIRCULAR, bool pointsDuringLinear=false);
+POLYLINE connect(CONNECTION b, CONNECTION e, CONNECTIONTYPE type=CIRCULAR, int numPointsDuringLinear=2);
 
 // THICKENED CONNECTIONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

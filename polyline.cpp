@@ -82,10 +82,10 @@ bool BOUNDINGBOX::doesIntersect(BOUNDINGBOX bb) {
     return (ur.x >= bb.ll.x && bb.ur.x >= ll.x) && (ur.y >= bb.ll.y && bb.ur.y >= ll.y);
 }
 
-BOUNDINGBOX BOUNDINGBOX::operator&(BOUNDINGBOX bb) {    return copy() &= bb; }
-BOUNDINGBOX BOUNDINGBOX::operator&=(BOUNDINGBOX bb) {
+BOUNDINGBOX  BOUNDINGBOX::operator&(BOUNDINGBOX bb) {   return copy() &= bb; }
+BOUNDINGBOX& BOUNDINGBOX::operator&=(BOUNDINGBOX bb) {
     if (!initialized) {
-        return BOUNDINGBOX();
+        return *this;
     } else {
         if (doesIntersect(bb)) {
             ur.x = min(ur.x, bb.ur.x);
@@ -100,8 +100,8 @@ BOUNDINGBOX BOUNDINGBOX::operator&=(BOUNDINGBOX bb) {
     }
 }
 
-BOUNDINGBOX BOUNDINGBOX::operator|(BOUNDINGBOX bb) {    return copy() |= bb; }
-BOUNDINGBOX BOUNDINGBOX::operator|=(BOUNDINGBOX bb) {
+BOUNDINGBOX  BOUNDINGBOX::operator|(BOUNDINGBOX bb) {   return copy() |= bb; }
+BOUNDINGBOX& BOUNDINGBOX::operator|=(BOUNDINGBOX bb) {
     if (!initialized) {
         return operator=(bb);
     } else {
@@ -114,8 +114,8 @@ BOUNDINGBOX BOUNDINGBOX::operator|=(BOUNDINGBOX bb) {
     }
 }
 
-BOUNDINGBOX BOUNDINGBOX::operator|(VECTOR v) {          return copy() |= v; }
-BOUNDINGBOX BOUNDINGBOX::operator|=(VECTOR v) {
+BOUNDINGBOX  BOUNDINGBOX::operator|(VECTOR v) {         return copy() |= v; }
+BOUNDINGBOX& BOUNDINGBOX::operator|=(VECTOR v) {
     if (!initialized) {
         ur = v;
         ll = v;
@@ -131,7 +131,7 @@ BOUNDINGBOX BOUNDINGBOX::operator|=(VECTOR v) {
         return *this;
     }
 }
-BOUNDINGBOX BOUNDINGBOX::operator=(BOUNDINGBOX bb) {
+BOUNDINGBOX& BOUNDINGBOX::operator=(BOUNDINGBOX bb) {
     ll = bb.ll;
     ur = bb.ur;
     initialized = bb.initialized;
@@ -139,14 +139,15 @@ BOUNDINGBOX BOUNDINGBOX::operator=(BOUNDINGBOX bb) {
     return *this;
 }
 
-BOUNDINGBOX BOUNDINGBOX::operator/ (GLdouble s)   const { return copy() /= s; }
-BOUNDINGBOX BOUNDINGBOX::operator* (GLdouble s)   const { return copy() *= s; }
-BOUNDINGBOX BOUNDINGBOX::operator/=(GLdouble s) {
+BOUNDINGBOX  BOUNDINGBOX::operator* (GLdouble s)  const { return copy() *= s; }
+BOUNDINGBOX  BOUNDINGBOX::operator/ (GLdouble s)  const { return copy() /= s; }
+
+BOUNDINGBOX& BOUNDINGBOX::operator*=(GLdouble s) {
     ur /= s;
     ll /= s;
     return *this;
 }
-BOUNDINGBOX BOUNDINGBOX::operator*=(GLdouble s) {
+BOUNDINGBOX& BOUNDINGBOX::operator/=(GLdouble s) {
     ur /= s;
     ll /= s;
     return *this;
@@ -299,7 +300,7 @@ POLYLINE POLYLINE::operator-() {        // Revist whether area should be calcula
     
     return toReturn;
 }
-POLYLINE POLYLINE::reverse() {
+POLYLINE& POLYLINE::reverse() {
     area_ = -area();
     isReversed = !isReversed;
     
@@ -354,31 +355,31 @@ VECTOR POLYLINE::getEndDirection() {
     }
 }
 
-POLYLINE POLYLINE::operator/(double s) const { return copy() /= s; }
-POLYLINE POLYLINE::operator*(double s) const { return copy() *= s; }
-POLYLINE POLYLINE::operator*(AFFINE m) const { return copy() *= m; }
+POLYLINE  POLYLINE::operator/(double s) const { return copy() /= s; }
+POLYLINE  POLYLINE::operator*(double s) const { return copy() *= s; }
+POLYLINE  POLYLINE::operator*(AFFINE m) const { return copy() *= m; }
 
-POLYLINE POLYLINE::operator/=(double s) {
+POLYLINE& POLYLINE::operator/=(double s) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [s](VECTOR v) -> VECTOR { return v/s; });
     bb /= s;
     return *this;
 }
-POLYLINE POLYLINE::operator*=(double s) {
+POLYLINE& POLYLINE::operator*=(double s) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [s](VECTOR v) -> VECTOR { return v*s; });
     bb *= s;
     return *this;
 }
-POLYLINE POLYLINE::operator*=(AFFINE m) {
+POLYLINE& POLYLINE::operator*=(AFFINE m) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [m](VECTOR v) -> VECTOR { return v*m; });
     recomputeBoundingBox();
     return *this;
 }
 
-POLYLINE POLYLINE::operator+(VECTOR v) const {  return copy() += v; }
-POLYLINE POLYLINE::operator-(VECTOR v) const {  return copy() -= v; }
+POLYLINE  POLYLINE::operator+(VECTOR v) const { return copy() += v; }
+POLYLINE  POLYLINE::operator-(VECTOR v) const { return copy() -= v; }
 
 //POLYLINE POLYLINE::operator+=(VECTOR v) {                         // Use a AFFINE for a shift like this.
 //    std::transform(points.begin(), points.end(), points.begin(),
@@ -391,7 +392,7 @@ POLYLINE POLYLINE::operator-(VECTOR v) const {  return copy() -= v; }
 //    return *this;
 //}
 
-POLYLINE POLYLINE::operator+=(VECTOR v) {
+POLYLINE& POLYLINE::operator+=(VECTOR v) {
     area_ = 0;
     length_ = 0;
     
@@ -408,14 +409,14 @@ POLYLINE POLYLINE::operator+=(VECTOR v) {
 
     return *this;
 }
-POLYLINE POLYLINE::operator-=(VECTOR v) {
+POLYLINE& POLYLINE::operator-=(VECTOR v) {
     return operator+=(-v);
 }
 
-POLYLINE POLYLINE::operator+(POLYLINE p) const {  return copy() += p; }
-POLYLINE POLYLINE::operator-(POLYLINE p) const {  return copy() -= p; }
+POLYLINE  POLYLINE::operator+(POLYLINE p) const { return copy() += p; }
+POLYLINE  POLYLINE::operator-(POLYLINE p) const { return copy() -= p; }
 
-POLYLINE POLYLINE::operator+=(POLYLINE p) {
+POLYLINE& POLYLINE::operator+=(POLYLINE p) {
     if (!p.size()) {
         // Do nothing...
     } else if (layer == p.layer && p.size() == 1) {
@@ -460,7 +461,7 @@ POLYLINE POLYLINE::operator+=(POLYLINE p) {
     
     return *this;
 }
-POLYLINE POLYLINE::operator-=(POLYLINE p) {
+POLYLINE& POLYLINE::operator-=(POLYLINE p) {
     return operator+=(-p);
 }
 
@@ -497,14 +498,14 @@ size_t POLYLINE::size() const {
     return points.size();
 }
 
-POLYLINE POLYLINE::close() {
+POLYLINE& POLYLINE::close() {
     length_ = 0;    // Or just add the end -> 0 segment?
     area_ = 0;
     
     isClosed = true;
     return *this;
 }
-POLYLINE POLYLINE::open() {
+POLYLINE& POLYLINE::open() {
     length_ = 0;    // Or just remove the end -> 0 segment?
     area_ = 0;
     
@@ -798,17 +799,17 @@ bool        POLYLINES::isEmpty()                const {
 POLYLINES   POLYLINES::operator/ (double s)     const { return copy() /= s; }
 POLYLINES   POLYLINES::operator* (double s)     const { return copy() *= s; }
 POLYLINES   POLYLINES::operator* (AFFINE m)     const { return copy() *= m; }
-POLYLINES   POLYLINES::operator/=(double s) {
+POLYLINES&  POLYLINES::operator/=(double s) {
     for (int i = 0; i < polylines.size(); i++) { polylines[i] /= s; }
     bb /= s;
     return *this;
 }
-POLYLINES   POLYLINES::operator*=(double s) {
+POLYLINES&  POLYLINES::operator*=(double s) {
     for (int i = 0; i < polylines.size(); i++) { polylines[i] *= s; }
     bb *= s;
     return *this;
 }
-POLYLINES   POLYLINES::operator*=(AFFINE m) {
+POLYLINES&  POLYLINES::operator*=(AFFINE m) {
     for (int i = 0; i < polylines.size(); i++) { polylines[i] *= m; }
     recomputeBoundingBox();
     return *this;
@@ -816,14 +817,14 @@ POLYLINES   POLYLINES::operator*=(AFFINE m) {
 
 
 POLYLINES   POLYLINES::operator-() { return copy().reverse(); }
-POLYLINES   POLYLINES::reverse() {
+POLYLINES&  POLYLINES::reverse() {
     for (int i = 0; i < polylines.size(); i++) { polylines[i].reverse(); }
     return *this;
 }
 
 
 POLYLINES   POLYLINES::boolean(POLYLINE p, BOOLOPERATION op) const { return copy().booleanEquals(p, op); }
-POLYLINES   POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
+POLYLINES&  POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
 //    for (int i = 0; i < polylines.size(); i++) { polylines[i].boolean(p, op); }
     
     if (op == OR) {
@@ -868,7 +869,7 @@ POLYLINES   POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
     return *this;
 }
 POLYLINES   POLYLINES::boolean(POLYLINES p, BOOLOPERATION op) const { return copy().booleanEquals(p, op); }
-POLYLINES   POLYLINES::booleanEquals(POLYLINES p, BOOLOPERATION op) {
+POLYLINES&  POLYLINES::booleanEquals(POLYLINES p, BOOLOPERATION op) {
     if (size()*p.size() > 100) {
         printf("POLYLINES::booleanEquals(POLYLINES, BOOLOPERATION): There are this.size() * other.size() = %lu * %lu = %lu comparisons to make.\nMaybe it's time to implement Bentley–Ottmann\n", size(), p.size(), size()*p.size());
     }
@@ -924,18 +925,18 @@ POLYLINES   POLYLINES::operator&(POLYLINE p)    const { return boolean(p, AND); 
 POLYLINES   POLYLINES::operator|(POLYLINE p)    const { return boolean(p, OR); }
 POLYLINES   POLYLINES::operator^(POLYLINE p)    const { return boolean(p, XOR); }
 
-POLYLINES   POLYLINES::operator&=(POLYLINE p) { return booleanEquals(p, AND); }
-POLYLINES   POLYLINES::operator|=(POLYLINE p) { return booleanEquals(p, OR); }
-POLYLINES   POLYLINES::operator^=(POLYLINE p) { return booleanEquals(p, XOR); }
+POLYLINES&  POLYLINES::operator&=(POLYLINE p) { return booleanEquals(p, AND); }
+POLYLINES&  POLYLINES::operator|=(POLYLINE p) { return booleanEquals(p, OR); }
+POLYLINES&  POLYLINES::operator^=(POLYLINE p) { return booleanEquals(p, XOR); }
 
 
 POLYLINES   POLYLINES::operator&(POLYLINES p)   const { return boolean(p, AND); }
 POLYLINES   POLYLINES::operator|(POLYLINES p)   const { return boolean(p, OR); }
 POLYLINES   POLYLINES::operator^(POLYLINES p)   const { return boolean(p, XOR); }
 
-POLYLINES   POLYLINES::operator&=(POLYLINES p) { return booleanEquals(p, AND); }
-POLYLINES   POLYLINES::operator|=(POLYLINES p) { return booleanEquals(p, OR); }
-POLYLINES   POLYLINES::operator^=(POLYLINES p) { return booleanEquals(p, XOR); }
+POLYLINES&  POLYLINES::operator&=(POLYLINES p) { return booleanEquals(p, AND); }
+POLYLINES&  POLYLINES::operator|=(POLYLINES p) { return booleanEquals(p, OR); }
+POLYLINES&  POLYLINES::operator^=(POLYLINES p) { return booleanEquals(p, XOR); }
 
 GLdouble    POLYLINES::area() {
     GLdouble toReturn = 0;

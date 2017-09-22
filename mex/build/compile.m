@@ -109,7 +109,9 @@ function compile(fname)
 %             gatheredClasses(ii).methods(jj).name
             
             if isempty(strfind(gatheredClasses(ii).methods(jj).name, ':'))
-                if ~isempty(interpretType(gatheredClasses(ii).methods(jj).type)) && ~strcmp('replaceIllegal', gatheredClasses(ii).methods(jj).name)     % If we recognize the return type...
+                interpretedType = interpretType(gatheredClasses(ii).methods(jj).type);
+                
+                if ~isempty(interpretedType) && ~strcmp(interpretedType, 'classvector') && ~strcmp('replaceIllegal', gatheredClasses(ii).methods(jj).name)     % If we recognize the return type...
                     kk = 1;
 
                     while kk <= length(gatheredClasses(ii).methods(jj).arguments)
@@ -447,6 +449,8 @@ function writeMethod(fmex, fmat, ii, class)
                         logic = [logic 'isstruct(varargin{' num2str(kk) '})) && '];       %#ok
                     case 'static'
                         logic = [logic 'isnumeric(varargin{' num2str(kk) '}) || islogical(varargin{' num2str(kk) '})) && '];    %#ok
+                    otherwise
+                        logic = [logic 'true) && '];    %#ok
                 end
                 
 %                 if 
@@ -670,6 +674,19 @@ function writeArgument(fmex, argument, ii, tab)
             fprintf(fmex, [ '        ' tab 'char str' num2str(ii) '[64];' newline ]);  % Make longer?
             fprintf(fmex, [ '        ' tab 'mxGetString(prhs[' num2str(ii) '], str' num2str(ii) ', 64);' newline ]);
             fprintf(fmex, [ '        ' tab 'std::string ' argument.var ' = std::string(str' num2str(ii) ');' newline ]);
+        case 'vector'
+%             fprintf(fmex, [ '        ' tab argument.type ' ' argument.var ';' newline ]);
+%             fprintf(fmex, [ '        ' tab 'for (int i = 0; i < mxGetN(prhs[' num2str(ii) ']); i++) { ' argument.var '.push_back( (mxGetPr(prhs[' num2str(ii) ']))[i] ); }' newline ]);
+            fprintf(fmex, [ '        ' tab argument.type ' ' argument.var '(mxGetPr(prhs[' num2str(ii) ']), mxGetPr(prhs[' num2str(ii) ']) + mxGetN(prhs[' num2str(ii) ']));' newline ]);
+        case 'classvector'
+            fprintf(fmex, [ '        ' tab argument.type argument.typespecial ' ' argument.var ';' newline ]);
+            
+            C = strsplit(argument.type, '<');
+            type = C{2}(1:end-1);
+            
+            fprintf(fmex, [ '        ' tab 'for (int i = 0; i < mxGetN(prhs[' num2str(ii) ']); i++) { ' argument.var '.push_back( *convertMat2Ptr<' type '>(prhs[' num2str(ii) ']) ); }' newline ]);
+
+%             fprintf(fmex, [ '        ' tab argument.type ' ' argument.var '(mxGetPr(prhs[' num2str(ii) ']), mxGetPr(prhs[' num2str(ii) ']) + mxGetN(prhs[' num2str(ii) ']));' newline ]);
 %         case 'static'
         otherwise
             if argument.typespecial == '*'
@@ -683,8 +700,21 @@ end
 function writeReturn(fmex, type, typespecial, tab)
     switch interpretType(type)
         case 'class'
-            if typespecial == '*'
+            if      typespecial == '*'
                 fprintf(fmex, [ '        ' tab 'plhs[0] = convertPtr2Mat<' type '>(toReturn);' newline]);
+            elseif  typespecial == '&'
+%                 fprintf(fmex, [ '        ' tab 'plhs[0] = convertPtr2Mat<' type '>(&toReturn);' newline]);
+%                 fprintf(fmex, [ '        ' tab 'toReturn.print();' newline]);
+%                 fprintf(fmex, [ '        ' tab type '* toReturnPtr = new ' type '();' newline]);
+
+%                 fprintf(fmex, [ '        ' tab 'toReturnPtr->operator=(toReturn);' newline]);
+
+%                 fprintf(fmex, [ '        memcpy(toReturnPtr, &toReturn, sizeof(' type '));' newline]);  % This is a bad way to do this...
+%                 fprintf(fmex, [ '        ' tab 'toReturnPtr->print();' newline]);
+                fprintf(fmex, [ '        ' tab 'mexPrintf("0x%%X", ptr);']);
+                fprintf(fmex, [ '        ' tab 'plhs[0] = convertPtr2Mat<' type '>(ptr);' newline]);   % Change this? This assumes that every reference return type will be returning `this`...
+                fprintf(fmex, [ '        ' tab 'mexPrintf("HERE!");']);
+%                 fprintf(fmex, [ '        ' tab 'plhs[0] = convertPtr2Mat<' type '>(&toReturn);' newline]);
             else
 %                 fprintf(fmex, [ '        ' tab 'plhs[0] = convertPtr2Mat<' type '>(&toReturn);' newline]);
 %                 fprintf(fmex, [ '        ' tab 'toReturn.print();' newline]);
@@ -700,6 +730,19 @@ function writeReturn(fmex, type, typespecial, tab)
             % will support...
         case 'string'
             fprintf(fmex, [ '        ' tab 'plhs[0] = mxCreateString(toReturn.c_str());' newline ]);
+%         case 'doublevector'
+        case 'vector'
+            fprintf(fmex, [ '        ' tab 'plhs[0] = mxCreateDoubleMatrix(toReturn.size(), 1, mxREAL);' newline ]);
+            fprintf(fmex, [ '        ' tab 'for (int i = 0; i < toReturn.size(); i++) { (mxGetPr(plhs[0]))[i] = toReturn[i]; }' newline ]);
+        case 'classvector'
+            
+%             type 
+%             typespecial
+            error('NotImplemented');
+            
+            %         case 'intvector'
+%             fprintf(fmex, [ '        ' tab 'plhs[0] = mxCreateDoubleMatrix(toReturn.size(), 1, mxREAL);' newline ]);
+%             fprintf(fmex, [ '        ' tab 'for (int i = 0; i < toReturn.size(); i++) { (mxGetPr(plhs[0]))[i] = toReturn[i]; }' newline ]);
 %         case 'static'
         otherwise
 %             fprintf(fmex, [ '        ' tab 'double toReturnDouble = (double)toReturn;' newline]);
@@ -821,14 +864,18 @@ function str = interpretType(type)
     % Check to see if it is one of several std:: or static types
     switch type
         case 'std::string'
-            str = 'string'; return;
+            str = 'string';         return;
+        case {'std::vector<GLdouble>', 'std::vector<int>'}
+            str = 'vector';         return;
+%         case 'std::vector<VECTOR>'
+%             str = 'classvector';    return;
         case {'new', 'delete', 'void'}
-            str = type; return;
+            str = type;             return;
         case {'bool', 'char', 'int', 'long', 'float', 'double', 'GLdouble',...
               'int16_t', 'int32_t', 'uint16_t', 'uint32_t', 'uint64_t', 'size_t'}    % Don't deal with unsigned/etc at the moment...
-            str = 'static'; return;
+            str = 'static';         return;
         otherwise
-            str = ''; return;
+            str = '';               return;
     end
     
 end

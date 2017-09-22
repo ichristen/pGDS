@@ -180,8 +180,12 @@ AFFINE::AFFINE(GLdouble radians, GLdouble e_, GLdouble f_) {
     a = c_; b = -s_; c = s_; d = c_; e = e_; f = f_;
 }
 
-AFFINE::AFFINE(VECTOR v) {                  a = 1; b = 0; c = 0; d = 1; e = v.x; f = v.y; }
-AFFINE::AFFINE(GLdouble e_, GLdouble f_) {  a = 1; b = 0; c = 0; d = 1; e = e_; f = f_; }
+AFFINE::AFFINE(VECTOR v) {                      a = 1;   b = 0;   c = 0;   d = 1;   e = v.x; f = v.y; }
+AFFINE::AFFINE(GLdouble e_, GLdouble f_) {      a = 1;   b = 0;   c = 0;   d = 1;   e = e_;  f = f_; }
+
+AFFINE::AFFINE(VECTOR u, VECTOR v) {            a = u.x; b = v.x; c = u.y; d = v.y; e = 0;   f = 0; }
+AFFINE::AFFINE(VECTOR u, VECTOR v, VECTOR w) {  a = u.x; b = v.x; c = u.y; d = v.y; e = w.x; f = w.y; }
+
 AFFINE::AFFINE(GLdouble a_, GLdouble b_, GLdouble c_, GLdouble d_, GLdouble e_, GLdouble f_) {
     a = a_; b = b_; c = c_; d = d_; e = e_; f = f_;
 }

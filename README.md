@@ -16,7 +16,7 @@ Todo.
  - [ ] Finish `OpenGL` visualization.
  - [ ] Write a `C++` engine to process updates to `MATLAB` scripts in realtime.
  - [ ] Integration with Atom.
- - [ ] Atomic features (e.g. highlight the device in OpenGL that is currently highlighted in code).
+ - [ ] Atomic features (e.g. in `OpenGL`, highlight the device  that is currently selected in `MATLAB` code).
  - [ ] VR Support!
 
 ## Optimization Plans
@@ -24,6 +24,7 @@ Todo.
   - [ ] Improve path thickening algorithm.
   - [ ] Write Bentley–Ottmann-like many-polyline boolean code.
   - [ ] Use references (`&`, `const&`) more to reduce the amount of internal copying between functions.
+  - [ ] Multithreading?
 
 <!-- ## Mac/Unix Dependencies -->
 <!-- * homebrew `/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`

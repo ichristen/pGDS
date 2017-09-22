@@ -1,5 +1,5 @@
-#ifndef DEVICE_H
-#define DEVICE_H
+#ifndef DEVICE_HPP
+#define DEVICE_HPP
 
 #include <cstdlib>
 #include <cstdio>
@@ -129,7 +129,11 @@ public:
     
     std::string description;
     
-    bool hasRendered = false;
+    std::string generatingCode;
+    std::string generatingFunction;
+    
+//    bool isLocked = true;
+//    bool hasRendered = false;
     
     double area_ = 0;
     
@@ -153,6 +157,7 @@ public:
 //    void checkOverlap();
     
     bool initialized();                     // Returns whether `POLYLINE`s or `DEVICEPTR` have already been added to this device.
+//    void unlock();
     
     DEVICEPTR operator+(VECTOR v)   const;  // Returns a pointer to this device, translated by `v`.
     DEVICEPTR operator-(VECTOR v)   const;  // Returns a pointer to this device, translated by `v`.

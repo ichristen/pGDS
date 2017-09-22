@@ -138,6 +138,9 @@ double DEVICE::area() {
 bool DEVICE::initialized() {
     return polylines.size() + devices.size() > 0;
 }
+//bool DEVICE::unlock() {
+//    isLocked = false;
+//}
 
 DEVICEPTR DEVICE::operator+(VECTOR v)   const { return DEVICEPTR((DEVICE*)this, AFFINE(v)); }
 DEVICEPTR DEVICE::operator-(VECTOR v)   const { return DEVICEPTR((DEVICE*)this, AFFINE(-v)); }

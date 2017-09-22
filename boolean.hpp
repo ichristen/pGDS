@@ -1,5 +1,5 @@
-#ifndef BOOLEAN_H
-#define BOOLEAN_H
+#ifndef BOOLEAN_HPP
+#define BOOLEAN_HPP
 
 #include <vector>
 #include <map>

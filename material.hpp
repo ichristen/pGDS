@@ -1,5 +1,5 @@
-#ifndef MATERIAL_H
-#define MATERIAL_H
+#ifndef MATERIAL_HPP
+#define MATERIAL_HPP
 
 #include <stdio.h>
 #include <string>
@@ -23,6 +23,8 @@ public:
 
     uint8_t colorFill[4];
     uint8_t colorOutline[4];
+    
+    GLdouble turnRadius = 10;
     
     FONT font;
     

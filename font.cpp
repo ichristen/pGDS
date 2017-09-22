@@ -591,12 +591,12 @@ DEVICEPTR FONT::getText(std::string text, int anchorx, int anchory) {
     
     VECTOR shift;
     
-    if      (anchorx >  0) { shift.x = toReturn->bb.width(); }      // Right,
-    else if (anchorx == 0) { shift.x = toReturn->bb.width()/2; }    // Center,
+    if      (anchorx >  0) { shift.x = -toReturn->bb.width(); }      // Right,
+    else if (anchorx == 0) { shift.x = -toReturn->bb.width()/2; }    // Center,
                                                                     // Otherwise left.
     
-    if      (anchory >  0) { shift.y = toReturn->bb.height(); }     // Top,
-    else if (anchory == 0) { shift.y = toReturn->bb.height()/2; }   // Mid,
+    if      (anchory >  0) { shift.y = -toReturn->bb.height(); }     // Top,
+    else if (anchory == 0) { shift.y = -toReturn->bb.height()/2; }   // Mid,
                                                                     // Otherwise bottom.
     
     return DEVICEPTR(toReturn, AFFINE(shift));
