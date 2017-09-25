@@ -36,11 +36,13 @@ POLYLINE rect(VECTOR c, GLdouble w, GLdouble h, int anchorx, int anchory) {
 //    return rect(c, s.x, s.y, anchorx, anchory);
 //}
 
-POLYLINE circle(GLdouble r, VECTOR c) {
+POLYLINE circle(GLdouble r, VECTOR c, int steps) {
     
     POLYLINE toReturn;
     
-    int steps = ceil(TAU/acos(1 - EPSILON/r));
+    if (!steps) {
+        steps = ceil(TAU/acos(1 - EPSILON/r));
+    }
     
     AFFINE m = AFFINE(TAU/steps);
     
@@ -97,7 +99,7 @@ POLYLINE ellipse(VECTOR focus1, VECTOR focus2, GLdouble L) {
 
 // PATHS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW) {
+POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW, int steps) {
     GLdouble t1 = fmod(t1_, TAU);   // What happens in t1 or t2 are negative?
     GLdouble t2 = fmod(t2_, TAU);
     
@@ -109,11 +111,19 @@ POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW) {
     
 //    printf("t1: %f, t2: %f, dt: %f\n", t1, t2, dt);
     
+    if (r == 0) {
+        return POLYLINE();  // Return empty...
+    } else if (r < 0) {
+        r = -r;
+    }
+    
     if (t1 == t2) {
         throw std::runtime_error("Use circle() instead of arc() for arcs returning to the same angle.");
     }
     
-    int steps = ceil(dt/acos(1 - EPSILON/r));
+    if (!steps) {
+        steps = ceil(dt/acos(1 - EPSILON/r));
+    }
     
     AFFINE m = AFFINE(dt/steps);
     
@@ -336,13 +346,15 @@ GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
     return ang;
 }
 
-POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
+POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps) {
     GLdouble ang = getArcAngle(c, b, e, chooseShortest);
     GLdouble r = (b - c).magn();
     
 //    printf("ang: %f\n", ang);
     
-    int steps = ceil(std::abs(ang)/acos(1 - EPSILON/r));
+    if (!steps) {
+        steps = ceil(std::abs(ang)/acos(1 - EPSILON/r));
+    }
     
 //    printf("steps: %i\n", steps);
     

@@ -18,6 +18,12 @@
 #include "vector.hpp"
 #include "math.hpp"
 
+#ifdef MATLAB_MEX_FILE
+#include <mex.h>
+#endif
+
+#define DBUNIT 10000
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Helper structures/functions for GDSII writing...

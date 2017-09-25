@@ -355,6 +355,25 @@ VECTOR POLYLINE::getEndDirection() {
     }
 }
 
+bool POLYLINE::setBeginDirection(VECTOR dir) {
+    if (isClosed) {
+        return false;
+    } else {
+        if (isReversed) {   end =   dir.unit(); }
+        else {              begin = dir.unit(); }
+        return true;
+    }
+}
+bool POLYLINE::setEndDirection(VECTOR dir) {
+    if (isClosed) {
+        return false;
+    } else {
+        if (isReversed) {   begin = dir.unit(); }
+        else {              end =   dir.unit(); }
+        return true;
+    }
+}
+
 POLYLINE  POLYLINE::operator/(double s) const { return copy() /= s; }
 POLYLINE  POLYLINE::operator*(double s) const { return copy() *= s; }
 POLYLINE  POLYLINE::operator*(AFFINE m) const { return copy() *= m; }

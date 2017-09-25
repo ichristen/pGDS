@@ -15,7 +15,7 @@ POLYLINE rect(VECTOR u, VECTOR v);
 POLYLINE rect(VECTOR c, GLdouble w, GLdouble h, int anchorx=0, int anchory=0);
 //POLYLINE rect(VECTOR c, VECTOR s, int anchorx=0, int anchory=0);
 
-POLYLINE circle(GLdouble r, VECTOR c=VECTOR());
+POLYLINE circle(GLdouble r, VECTOR c=VECTOR(), int steps=0);
 
 POLYLINE ellipse(GLdouble a, GLdouble b, VECTOR c=VECTOR(), VECTOR semimajorunit=VECTOR(1,0));
 POLYLINE ellipse(VECTOR focus1, VECTOR focus2, GLdouble L);
@@ -32,9 +32,9 @@ POLYLINE parametricCylindrical( std::function<GLdouble(GLdouble t)> lambdaR,
                                 size_t steps=0);
 
 // Conic Sections
-POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW=true);
+POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW=true, int steps=0);
 GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true);
-POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true);
+POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true, int steps=0);
 
 POLYLINE parabola(GLdouble x0, GLdouble x1, VECTOR focus, VECTOR vertex=VECTOR(), int steps=0);
 POLYLINE parabola(GLdouble x0, GLdouble x1, GLdouble a, VECTOR center=VECTOR(), VECTOR direction=VECTOR(0,1), int steps=0);

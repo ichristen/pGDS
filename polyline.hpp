@@ -123,6 +123,9 @@ public:
     VECTOR getBeginDirection();
     VECTOR getEndDirection();
     
+    bool setBeginDirection(VECTOR dir);
+    bool setEndDirection(VECTOR dir);
+    
     POLYLINE  operator+ (VECTOR v)      const;
     POLYLINE  operator- (VECTOR v)      const;
     POLYLINE& operator+=(VECTOR v);

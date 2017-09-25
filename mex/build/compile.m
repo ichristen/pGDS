@@ -335,12 +335,22 @@ function writeMatlabCall(fmat, method, ii, tab, isClass)
     elseif strcmp(type, 'list')
         fprintf(fmat, [tab '            [toReturn{1:nargout}] = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
     elseif strcmp(type, 'class')
-        if isempty(method.arguments)
-            fprintf(fmat, [tab '            structure.ptr = mex_bridge(' num2str(ii) objHandle ');' newline ]);
+        if any(method.typespecial == '&') && isClass
+            if isempty(method.arguments)
+                fprintf(fmat, [tab '            mex_bridge(' num2str(ii) objHandle ');' newline ]);
+            else
+                fprintf(fmat, [tab '            mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
+            end
+            fprintf(fmat, [tab '            structure.ptr = this.objectHandle;' newline ]);
+            fprintf(fmat, [tab '            toReturn = ' method.type '(structure);' newline ]);
         else
-            fprintf(fmat, [tab '            structure.ptr = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
+            if isempty(method.arguments)
+                fprintf(fmat, [tab '            structure.ptr = mex_bridge(' num2str(ii) objHandle ');' newline ]);
+            else
+                fprintf(fmat, [tab '            structure.ptr = mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
+            end
+            fprintf(fmat, [tab '            toReturn = ' method.type '(structure);' newline ]);
         end
-        fprintf(fmat, [tab '            toReturn = ' method.type '(structure);' newline ]);
     else
 %         fprintf(fmat, [tab '            toReturn = mex_bridge(' num2str(ii) ', this.objectHandle, varargin{:});' newline ]);
         
@@ -518,6 +528,12 @@ function writeMethod(fmex, fmat, ii, class)
         % Return num check
         if (strcmp(method.type, 'void') && ~any(method.typespecial(1:end-1) == '*')) || strcmp(method.type, 'delete')
             fprintf(fmex, [ '        if (nlhs != 0) {  mexErrMsgTxt("' mexFile ': Expected no return values; void type."); }' newline ]);
+        elseif any(method.typespecial == '&')
+            if inClass
+                fprintf(fmex, [ '        if (nlhs != 0) {  mexErrMsgTxt("' mexFile ': Expected no return values; void type."); }' newline ]);
+            else
+                error('Not sure how to deal with references outside of classes.')
+            end
         else
             fprintf(fmex, [ '        if (nlhs != 1) {  mexErrMsgTxt("' mexFile ': Expected 1 return value."); }' newline ]);
         end
@@ -574,7 +590,7 @@ function writeMethod(fmex, fmat, ii, class)
                     fprintf(fmex, [ '        destroyObject<' className '>(prhs[1]);' newline ]);
                 else
                     if inClass
-                        if strcmp(method.type, 'void')
+                        if strcmp(method.type, 'void') || any(method.typespecial == '&')
                             fprintf(fmex, [ '        ptr->' method.name '(' args ');' newline]);
                         else
                             fprintf(fmex, [ '        ' method.type method.typespecial ' toReturn = ptr->' method.name '(' args ');' newline]);
@@ -1082,6 +1098,9 @@ function gather(fname)
 %                     argument = strtrim(argument);
                     
                     if ~isempty(argument_{1})
+                        argumentstr = strtrim(strrep(argument_{1}, ' const ', ''));      % Ignore const for now...
+                        argumentstr = strtrim(strrep(argument_{1}, ' const', ''));      % Ignore const for now...
+                        argumentstr = strtrim(strrep(argument_{1}, 'const ', ''));      % Ignore const for now...
                         argumentstr = strtrim(strrep(argument_{1}, 'const', ''));      % Ignore const for now...
 
     %                     seplist = strfind(argument, {' ', '*', '&'});
@@ -1100,6 +1119,10 @@ function gather(fname)
                                 argument.type = argument.type(1:end-1);
                                 argument.typespecial = special;
                             end
+                        end
+                        
+                        if any(argument.typespecial == '&')
+                            argument.typespecial = '';
                         end
                         
                         C = strsplit(argumentstr(sep+1 : end), '=');
@@ -1160,6 +1183,10 @@ function gather(fname)
                         func.type = func.type(1:end-1);
                         func.typespecial = special;
                     end
+                end
+                        
+                if any(func.typespecial == '&')
+                    func.typespecial = '';
                 end
                 
                 func.description = description;

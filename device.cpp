@@ -206,17 +206,17 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
             if (transformation.isIdentity() || transformation.isZero()) {
                 std::transform(polylines.polylines[i].points.begin(), polylines.polylines[i].points.end(),
                                std::back_inserter(intPoints),
-                               [](VECTOR v) -> VECTORINT { return VECTORINT(v, 1000); });   // Assuming dbUnit = .001
+                               [](VECTOR v) -> VECTORINT { return VECTORINT(v, DBUNIT); });   // Assuming dbUnit = .001
 
-                intPoints.push_back(VECTORINT(polylines[i].points[0], 1000));
+                intPoints.push_back(VECTORINT(polylines[i].points[0], DBUNIT));
             } else {
                 std::transform(polylines.polylines[i].points.begin(), polylines.polylines[i].points.end(),
                                std::back_inserter(intPoints),
                                [transformation](VECTOR v) -> VECTORINT {
-                                   return VECTORINT(v, 1000, transformation);
+                                   return VECTORINT(v, DBUNIT, transformation);
                                });   // Assuming dbUnit = .001
 
-                intPoints.push_back(VECTORINT(polylines.polylines[i].points[0], 1000, transformation));
+                intPoints.push_back(VECTORINT(polylines.polylines[i].points[0], DBUNIT, transformation));
             }
 
             uint16_t size = endianSwap((uint16_t)(8*intPoints.size() + 4));
@@ -247,7 +247,21 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
     return true;
 }
 bool DEVICE::exportLibraryGDS(std::string fname, bool flatten) {
-    return exportLibraryGDS(fopen(fname.c_str(), "wb"), flatten);
+//#ifdef MATLAB_MEX_FILE
+//    mexPrintf("HERE!\n");
+//    
+//    FILE* f1 = fopen("/Users/i/Desktop/hyper1.gds", "w");  mexPrintf("1 - 0x%X\n", f1);
+//    FILE* f2 = fopen("/Users/i/Desktop/hyper2.gds", "wb"); mexPrintf("2 - 0x%X\n", f2);
+//    FILE* f3 = fopen("/Users/i/Desktop/hyper3.gds", "w+"); mexPrintf("3 - 0x%X\n", f3);
+//    
+//    mexPrintf("HERE!\n");
+//    
+//    mexPrintf("%s\n", fname.c_str());
+//    
+//#endif
+    
+    return exportLibraryGDS(fopen("/Users/i/Desktop/hyper.gds", "wb"), flatten);
+//    return exportLibraryGDS(fopen(fname.c_str(), "w+"), flatten);
 }
 bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
     // References:  http://www.cnf.cornell.edu/cnf_spie9.html
@@ -339,8 +353,8 @@ bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
     putc(0x03, f);              // RECORD TYPE  = UNITS
     putc(0x05, f);              // DATA TYPE    = 8-sem
 
-    GLdouble dbUnitUser =       .001;
-    GLdouble dbUnitsMeters =    1e-9;
+    GLdouble dbUnitUser =       1/DBUNIT;
+    GLdouble dbUnitsMeters =    1e-6/DBUNIT;
 
     uint64_t dbUnitUserSEM =    num2sem(dbUnitUser);
     uint64_t dbUnitsMetersSEM = num2sem(dbUnitsMeters);
