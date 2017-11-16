@@ -29,4 +29,5 @@ Todo.
 <!-- ## Mac/Unix Dependencies -->
 <!-- * homebrew `/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"`
 * node `brew install node` `npm install --save-dev electron-rebuild`
+* glew `brew install glew`
 * freetype `brew install freetype` -->

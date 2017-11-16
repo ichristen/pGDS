@@ -447,12 +447,35 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
         return toReturn;
     }
     
+    VECTOR* v = nullptr;
+    
     switch (type) {
         case QBEZIER:
         case CBEZIER:
         case LINEAR:
-        case MONOCIRCULAR:
             throw std::runtime_error("CONNECTIONTYPE not currently supported...");
+            
+            break;
+        case MONOCIRCULAR:
+//            v = new VECTOR();
+//
+//            intersect(i, f, &v);
+//
+//            if (v) {
+//
+//
+//                toReturn.add(arc(<#VECTOR c#>, <#VECTOR b#>, <#VECTOR e#>))
+//
+//                if ((i.v - *v).magn2() < (f.v - *v).magn2()) {  // If we need to make a straight segment from f
+//
+//                } else {                                        // If we need to make a straight segment from i
+//
+//                }
+//
+//                delete v;
+//            } else {
+//
+//            }
             
             break;
         case CIRCULAR:
@@ -626,7 +649,7 @@ POLYLINE thicken(POLYLINE open, GLdouble width, int side, GLdouble minstep) {
     return thicken(open, [width] (GLdouble t) -> GLdouble { return width; }, side, minstep);
 }
 POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, int side, GLdouble minstep) {
-    POLYLINE toReturn = POLYLINE(open.size()*2);
+    POLYLINE toReturn = POLYLINE(open.size()*2).setLayer(open.layer);
     
     if (open.size() >= 2) {
         thickenRecurse(&open, &toReturn, &lambda, side, minstep, 0, 0);

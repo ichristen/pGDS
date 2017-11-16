@@ -575,8 +575,11 @@ DEVICE* FONT::getTextPrivate(std::string text) {
     
     for (int i = 0; i < text.size(); i++) {
         DEVICE* character = getChar(text[i]);
-        toReturn->add( DEVICEPTR(character, AFFINE(pen)) );
-        pen += VECTOR(width + thick, 0);    // Change this...
+        if (character) {
+            character->setLayer(layer);
+            toReturn->add( DEVICEPTR(character, AFFINE(pen)) );
+            pen += VECTOR(width + thick, 0);    // Change this...
+        }
         
 //        pen += VECTOR(character->bb.width() + thick, 0);    // Change this...
     }

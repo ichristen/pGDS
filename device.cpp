@@ -127,6 +127,11 @@ void DEVICE::add(CONNECTION connection) {
     }
 }
 
+void DEVICE::setLayer(uint16_t layer) {
+//    for (int i = 0; i < devices.size();     i++){ devices[i].device->setLayer(layer); }
+    for (int i = 0; i < polylines.size();   i++){ polylines[i].setLayer(layer); }
+}
+
 double DEVICE::area() {
     if (area_ == 0) {
         area_ += polylines.area();
@@ -260,8 +265,8 @@ bool DEVICE::exportLibraryGDS(std::string fname, bool flatten) {
 //    
 //#endif
     
-    return exportLibraryGDS(fopen("/Users/i/Desktop/hyper.gds", "wb"), flatten);
-//    return exportLibraryGDS(fopen(fname.c_str(), "w+"), flatten);
+    // return exportLibraryGDS(fopen("/Users/i/Desktop/hyper.gds", "wb"), flatten);
+    return exportLibraryGDS(fopen(fname.c_str(), "w+"), flatten);
 }
 bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
     // References:  http://www.cnf.cornell.edu/cnf_spie9.html
@@ -353,8 +358,11 @@ bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
     putc(0x03, f);              // RECORD TYPE  = UNITS
     putc(0x05, f);              // DATA TYPE    = 8-sem
 
-    GLdouble dbUnitUser =       1/DBUNIT;
-    GLdouble dbUnitsMeters =    1e-6/DBUNIT;
+    GLdouble dbUnitUser =       1.0/DBUNIT;
+    GLdouble dbUnitsMeters =    (1e-6)/DBUNIT;
+    
+    // printf("dbUnitUser = %.10f\n",     dbUnitUser);
+    // printf("dbUnitsMeters = %.10f\n",  dbUnitsMeters);
 
     uint64_t dbUnitUserSEM =    num2sem(dbUnitUser);
     uint64_t dbUnitsMetersSEM = num2sem(dbUnitsMeters);

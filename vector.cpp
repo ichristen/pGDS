@@ -409,3 +409,29 @@ void CONNECTION::render()   const {
     glEnd();
 #endif
 }
+
+CONNECTION bendRadius(CONNECTION start, GLdouble radius, GLdouble ang) {
+    VECTOR pivot = start.v + start.dv.perpCCW() * radius*sign(ang);
+    
+    VECTOR dv = AFFINE(ang) * start.dv;
+//    dv.printNL();
+    VECTOR v = pivot + dv.perpCW() * radius*sign(ang);
+    
+    return CONNECTION(v, dv);
+}
+CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang) {
+    if (ang == 0) { return start; }
+    
+    GLdouble radius = length/ang;
+    
+    if (radius < 0) {   return bendRadius(start, -radius, -ang); }
+    else {              return bendRadius(start,  radius,  ang); }
+}
+CONNECTION bendLeft(CONNECTION start, GLdouble radius) {    return bendRadius(start, radius, TAU/4); }
+CONNECTION bendRight(CONNECTION start, GLdouble radius) {   return bendRadius(start, radius, -TAU/4); }
+
+
+
+
+
+

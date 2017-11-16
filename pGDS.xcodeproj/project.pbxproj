@@ -13,10 +13,7 @@
 		080BC5D51F06A292003BDE67 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D41F06A292003BDE67 /* AppKit.framework */; };
 		080BC5D71F06A29D003BDE67 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D61F06A29D003BDE67 /* CoreData.framework */; };
 		080BC5D91F06A2AE003BDE67 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D81F06A2AE003BDE67 /* Foundation.framework */; };
-		080BC5F51F06A62B003BDE67 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5CC1F069F2E003BDE67 /* Cocoa.framework */; };
-		080BC5F61F06A62E003BDE67 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D21F06A198003BDE67 /* CoreVideo.framework */; };
-		080BC5F81F06A63C003BDE67 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5A41F059D8E003BDE67 /* OpenGL.framework */; };
-		080BC6091F06CD44003BDE67 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D41F06A292003BDE67 /* AppKit.framework */; };
+		08156FAE1FA79A34009702F5 /* diamonddevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08156FAC1FA79A34009702F5 /* diamonddevices.cpp */; };
 		083CC0FF1F4CE0170054FD31 /* device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0E81F4CE0170054FD31 /* device.cpp */; };
 		083CC1011F4CE0170054FD31 /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EA1F4CE0170054FD31 /* font.cpp */; };
 		083CC1021F4CE0170054FD31 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EB1F4CE0170054FD31 /* main.cpp */; };
@@ -31,12 +28,40 @@
 		083CC11B1F4CFCED0054FD31 /* boolean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1191F4CFCED0054FD31 /* boolean.cpp */; };
 		084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 084F2B791F5B3BE800C604EB /* window.cpp */; };
 		08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
-		08A8D1701F58D16200DC4F70 /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
 		08A8D1721F5B203C00DC4F70 /* pgdsNSOpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */; };
-		08A8D1731F5B203C00DC4F70 /* pgdsNSOpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */; };
+		08D51B461F90342200091ECB /* testing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1161F4CFCCD0054FD31 /* testing.cpp */; };
+		08D51B471F90342200091ECB /* testdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1131F4CE0C00054FD31 /* testdevices.cpp */; };
+		08D51B481F90342200091ECB /* polyline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EE1F4CE0170054FD31 /* polyline.cpp */; };
+		08D51B491F90342200091ECB /* math.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0ED1F4CE0170054FD31 /* math.cpp */; };
+		08D51B4A1F90342200091ECB /* boolean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1191F4CFCED0054FD31 /* boolean.cpp */; };
+		08D51B4B1F90342200091ECB /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EA1F4CE0170054FD31 /* font.cpp */; };
+		08D51B4C1F90342200091ECB /* vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0F21F4CE0170054FD31 /* vector.cpp */; };
+		08D51B4D1F90342200091ECB /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EC1F4CE0170054FD31 /* material.cpp */; };
+		08D51B4E1F90342200091ECB /* eodevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1121F4CE0C00054FD31 /* eodevices.cpp */; };
+		08D51B4F1F90342200091ECB /* primitives.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EF1F4CE0170054FD31 /* primitives.cpp */; };
+		08D51B511F90342200091ECB /* pgdsNSOpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */; };
+		08D51B521F90342200091ECB /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 084F2B791F5B3BE800C604EB /* window.cpp */; };
+		08D51B531F90342200091ECB /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
+		08D51B541F90342200091ECB /* device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0E81F4CE0170054FD31 /* device.cpp */; };
+		08D51B561F90342200091ECB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D81F06A2AE003BDE67 /* Foundation.framework */; };
+		08D51B571F90342200091ECB /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D61F06A29D003BDE67 /* CoreData.framework */; };
+		08D51B581F90342200091ECB /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D41F06A292003BDE67 /* AppKit.framework */; };
+		08D51B591F90342200091ECB /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D21F06A198003BDE67 /* CoreVideo.framework */; };
+		08D51B5A1F90342200091ECB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5CC1F069F2E003BDE67 /* Cocoa.framework */; };
+		08D51B5B1F90342200091ECB /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5A41F059D8E003BDE67 /* OpenGL.framework */; };
+		08D51B611F90349F00091ECB /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0FB1F4CE0170054FD31 /* main.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		08D51B5C1F90342200091ECB /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		08FBFB831F00AF9300C35A59 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -55,7 +80,8 @@
 		080BC5D41F06A292003BDE67 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		080BC5D61F06A29D003BDE67 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		080BC5D81F06A2AE003BDE67 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		080BC5E01F06A5A2003BDE67 /* gdsC++.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gdsC++.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		08156FAC1FA79A34009702F5 /* diamonddevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = diamonddevices.cpp; sourceTree = SOURCE_ROOT; };
+		08156FAD1FA79A34009702F5 /* diamonddevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = diamonddevices.hpp; sourceTree = SOURCE_ROOT; };
 		083CC0D81F4CE0170054FD31 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "pGDS/macOS OpenGL/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
 		083CC0DB1F4CE0170054FD31 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "pGDS/macOS OpenGL/Info.plist"; sourceTree = SOURCE_ROOT; };
 		083CC0DD1F4CE0170054FD31 /* device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = device.hpp; sourceTree = SOURCE_ROOT; };
@@ -88,18 +114,21 @@
 		08A8D16E1F58D16200DC4F70 /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = engine.hpp; sourceTree = SOURCE_ROOT; };
 		08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = pgdsNSOpenGLView.mm; path = macOS/pgdsNSOpenGLView.mm; sourceTree = SOURCE_ROOT; };
 		08A8D1741F5B207500DC4F70 /* pgdsNSOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pgdsNSOpenGLView.h; path = macOS/pgdsNSOpenGLView.h; sourceTree = SOURCE_ROOT; };
+		08D51B601F90342300091ECB /* pGDS OpenGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "pGDS OpenGL"; sourceTree = BUILT_PRODUCTS_DIR; };
 		08FBFB851F00AF9300C35A59 /* pGDS.app */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = pGDS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		080BC5DD1F06A5A2003BDE67 /* Frameworks */ = {
+		08D51B551F90342200091ECB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				080BC6091F06CD44003BDE67 /* AppKit.framework in Frameworks */,
-				080BC5F81F06A63C003BDE67 /* OpenGL.framework in Frameworks */,
-				080BC5F61F06A62E003BDE67 /* CoreVideo.framework in Frameworks */,
-				080BC5F51F06A62B003BDE67 /* Cocoa.framework in Frameworks */,
+				08D51B561F90342200091ECB /* Foundation.framework in Frameworks */,
+				08D51B571F90342200091ECB /* CoreData.framework in Frameworks */,
+				08D51B581F90342200091ECB /* AppKit.framework in Frameworks */,
+				08D51B591F90342200091ECB /* CoreVideo.framework in Frameworks */,
+				08D51B5A1F90342200091ECB /* Cocoa.framework in Frameworks */,
+				08D51B5B1F90342200091ECB /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,8 +174,10 @@
 		083CC10F1F4CE0AD0054FD31 /* Devices */ = {
 			isa = PBXGroup;
 			children = (
+				08156FAD1FA79A34009702F5 /* diamonddevices.hpp */,
 				083CC1101F4CE0C00054FD31 /* eodevices.hpp */,
 				083CC1111F4CE0C00054FD31 /* testdevices.hpp */,
+				08156FAC1FA79A34009702F5 /* diamonddevices.cpp */,
 				083CC1121F4CE0C00054FD31 /* eodevices.cpp */,
 				083CC1131F4CE0C00054FD31 /* testdevices.cpp */,
 			);
@@ -176,7 +207,7 @@
 			isa = PBXGroup;
 			children = (
 				08FBFB851F00AF9300C35A59 /* pGDS.app */,
-				080BC5E01F06A5A2003BDE67 /* gdsC++.app */,
+				08D51B601F90342300091ECB /* pGDS OpenGL */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -218,22 +249,22 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		080BC5DF1F06A5A2003BDE67 /* gdsC++ */ = {
+		08D51B441F90342200091ECB /* pGDS OpenGL */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 080BC5F11F06A5A2003BDE67 /* Build configuration list for PBXNativeTarget "gdsC++" */;
+			buildConfigurationList = 08D51B5D1F90342200091ECB /* Build configuration list for PBXNativeTarget "pGDS OpenGL" */;
 			buildPhases = (
-				080BC5DC1F06A5A2003BDE67 /* Sources */,
-				080BC5DD1F06A5A2003BDE67 /* Frameworks */,
-				080BC5DE1F06A5A2003BDE67 /* Resources */,
+				08D51B451F90342200091ECB /* Sources */,
+				08D51B551F90342200091ECB /* Frameworks */,
+				08D51B5C1F90342200091ECB /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "gdsC++";
-			productName = "gdsC++";
-			productReference = 080BC5E01F06A5A2003BDE67 /* gdsC++.app */;
-			productType = "com.apple.product-type.application";
+			name = "pGDS OpenGL";
+			productName = "gds-test";
+			productReference = 08D51B601F90342300091ECB /* pGDS OpenGL */;
+			productType = "com.apple.product-type.tool";
 		};
 		08FBFB841F00AF9300C35A59 /* pGDS */ = {
 			isa = PBXNativeTarget;
@@ -261,10 +292,6 @@
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Ian Christen";
 				TargetAttributes = {
-					080BC5DF1F06A5A2003BDE67 = {
-						CreatedOnToolsVersion = 8.3.3;
-						ProvisioningStyle = Automatic;
-					};
 					08FBFB841F00AF9300C35A59 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
@@ -284,28 +311,31 @@
 			projectRoot = "";
 			targets = (
 				08FBFB841F00AF9300C35A59 /* pGDS */,
-				080BC5DF1F06A5A2003BDE67 /* gdsC++ */,
+				08D51B441F90342200091ECB /* pGDS OpenGL */,
 			);
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		080BC5DE1F06A5A2003BDE67 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
-		080BC5DC1F06A5A2003BDE67 /* Sources */ = {
+		08D51B451F90342200091ECB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				08A8D1701F58D16200DC4F70 /* engine.cpp in Sources */,
-				08A8D1731F5B203C00DC4F70 /* pgdsNSOpenGLView.mm in Sources */,
+				08D51B611F90349F00091ECB /* main.mm in Sources */,
+				08D51B461F90342200091ECB /* testing.cpp in Sources */,
+				08D51B471F90342200091ECB /* testdevices.cpp in Sources */,
+				08D51B481F90342200091ECB /* polyline.cpp in Sources */,
+				08D51B491F90342200091ECB /* math.cpp in Sources */,
+				08D51B4A1F90342200091ECB /* boolean.cpp in Sources */,
+				08D51B4B1F90342200091ECB /* font.cpp in Sources */,
+				08D51B4C1F90342200091ECB /* vector.cpp in Sources */,
+				08D51B4D1F90342200091ECB /* material.cpp in Sources */,
+				08D51B4E1F90342200091ECB /* eodevices.cpp in Sources */,
+				08D51B4F1F90342200091ECB /* primitives.cpp in Sources */,
+				08D51B511F90342200091ECB /* pgdsNSOpenGLView.mm in Sources */,
+				08D51B521F90342200091ECB /* window.cpp in Sources */,
+				08D51B531F90342200091ECB /* engine.cpp in Sources */,
+				08D51B541F90342200091ECB /* device.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -315,6 +345,7 @@
 			files = (
 				083CC1181F4CFCCD0054FD31 /* testing.cpp in Sources */,
 				083CC1151F4CE0C00054FD31 /* testdevices.cpp in Sources */,
+				08156FAE1FA79A34009702F5 /* diamonddevices.cpp in Sources */,
 				083CC1051F4CE0170054FD31 /* polyline.cpp in Sources */,
 				083CC1041F4CE0170054FD31 /* math.cpp in Sources */,
 				083CC11B1F4CFCED0054FD31 /* boolean.cpp in Sources */,
@@ -334,60 +365,60 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		080BC5F21F06A5A2003BDE67 /* Debug */ = {
+		08D51B5E1F90342200091ECB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_IDENTITY = "";
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
-				GCC_NO_COMMON_BLOCKS = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "gds-test/gds-test.pch";
-				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
-				GCC_WARN_PEDANTIC = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/gds-test/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "";
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "fish.gdsC--";
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"MATLABPATH=#/Applications/Code/MATLAB_R2017a.app",
+				);
+				HEADER_SEARCH_PATHS = (
+					/Applications/Code/MATLAB_R2017a.app/,
+					/opt/local/include,
+					/usr/local/inlcude,
+				);
+				INFOPLIST_FILE = "pGDS copy-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					/Applications/Code/MATLAB_R2017a.app/bin/maci64,
+					/opt/local/lib,
+					/usr/local/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_LDFLAGS = (
+					"-lGLEW",
+					"-lGLU",
+					"-lGL",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				RUN_CLANG_STATIC_ANALYZER = YES;
 			};
 			name = Debug;
 		};
-		080BC5F31F06A5A2003BDE67 /* Release */ = {
+		08D51B5F1F90342200091ECB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = NO;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CODE_SIGN_IDENTITY = "";
-				COMBINE_HIDPI_IMAGES = YES;
-				COPY_PHASE_STRIP = YES;
-				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
-				GCC_NO_COMMON_BLOCKS = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "gds-test/gds-test.pch";
-				GCC_TREAT_WARNINGS_AS_ERRORS = NO;
-				GCC_WARN_PEDANTIC = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/gds-test/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "";
-				ONLY_ACTIVE_ARCH = NO;
-				PRODUCT_BUNDLE_IDENTIFIER = "fish.gdsC--";
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "MATLABPATH=#/Applications/Code/MATLAB_R2017a.app";
+				HEADER_SEARCH_PATHS = (
+					/Applications/Code/MATLAB_R2017a.app/,
+					/opt/local/include,
+					/usr/local/inlcude,
+				);
+				INFOPLIST_FILE = "pGDS copy-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					/Applications/Code/MATLAB_R2017a.app/bin/maci64,
+					/opt/local/lib,
+					/usr/local/lib,
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				OTHER_LDFLAGS = (
+					"-lGLEW",
+					"-lGLU",
+					"-lGL",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				RUN_CLANG_STATIC_ANALYZER = YES;
 			};
 			name = Release;
 		};
@@ -524,11 +555,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		080BC5F11F06A5A2003BDE67 /* Build configuration list for PBXNativeTarget "gdsC++" */ = {
+		08D51B5D1F90342200091ECB /* Build configuration list for PBXNativeTarget "pGDS OpenGL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				080BC5F21F06A5A2003BDE67 /* Debug */,
-				080BC5F31F06A5A2003BDE67 /* Release */,
+				08D51B5E1F90342200091ECB /* Debug */,
+				08D51B5F1F90342200091ECB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

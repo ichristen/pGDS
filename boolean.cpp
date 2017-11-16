@@ -131,7 +131,7 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
     std::vector<POLYLINE> finalClosedPolylines;
     std::map<VECTOR, std::vector<POLYLINE*>> ssp;
     
-    if (!a.area() || !b.area()) {               // If one of the shapes is empty...
+    if (std::abs(a.area()) < EPSILON || std::abs(b.area()) < EPSILON) {               // If one of the shapes is empty...
         switch (op) {
             case OR:
             case XOR:
@@ -150,6 +150,10 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
     bool bPos = b.area() > 0;
     
     BOUNDINGBOX interesting = a.bb & b.bb;
+    
+    a.bb.print();
+    b.bb.print();
+    interesting.print();
     
     if (interesting.isEmpty()) {                // If there is no intersection whatsoever...
         noIntersectionNoContainmentLogic(a, b, finalClosedPolylines, op);
@@ -301,8 +305,12 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
                         
                         finalPath.close();
                         
-                        if (reverseAtEnd) { finalClosedPolylines.push_back(-finalPath); }
-                        else {              finalClosedPolylines.push_back(finalPath); }
+//                        printf("AREA!: %f", finalPath.area());
+                        
+                        if (std::abs(finalPath.area()) > EPSILON) {
+                            if (reverseAtEnd) { finalClosedPolylines.push_back(-finalPath); }
+                            else {              finalClosedPolylines.push_back(finalPath); }
+                        }
                     } else {    // Only traverse forward for now. We might want to eventually consider the intersection of open polylines.
                                 //                    nextIntersection = currentPath->getBegin();
                     }
@@ -589,19 +597,19 @@ void cutPolyline(POLYLINE& a, POLYLINE& b, std::vector<int> acuts, BOOLOPERATION
     
     for (int i = 0; i < acuts.size(); i++) {
         
-//        printf("i1 = %i\n", i);
-//        printf("i2 = %lu\n", (i+1) % acuts.size());
+        printf("i1 = %i\n", i);
+        printf("i2 = %lu\n", (i+1) % acuts.size());
         
         int x1 = acuts[i];
         int x2 = acuts[ (i+1) % acuts.size() ];
         
-//        printf("x1 = %i\n", x1);
-//        printf("x2 = %i\n", x2);
+        printf("x1 = %i\n", x1);
+        printf("x2 = %i\n", x2);
         
         int l = x2-x1+1;
         
         if (l <= 0) {
-            l += a.size();
+            l += a.size() + 1;  // Not sure about the +1...
         }
         
         VECTOR testPoint;

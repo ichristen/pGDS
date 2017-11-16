@@ -22,7 +22,7 @@
 #include <mex.h>
 #endif
 
-#define DBUNIT 10000
+#define DBUNIT 1000
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -154,6 +154,8 @@ public:
     void add(DEVICEPTR device, char c=0);                   // Add a pointer to a transformed device. Suffix all `CONNECTION` in this device with `c` (does not suffix if `c == 0`). Note that all `CONNECTION`s are appropriately transformed.
     void add(DEVICE* device, AFFINE m=AFFINE(), char c=0);  // Same as above.
     void add(CONNECTION connection);                        // Add a `CONNECTION`. If a `CONNECTION` of this name already exists, replace the existing `CONNECTION`.
+    
+    void setLayer(uint16_t layer);
     
 //    void render();
 //    void flush();

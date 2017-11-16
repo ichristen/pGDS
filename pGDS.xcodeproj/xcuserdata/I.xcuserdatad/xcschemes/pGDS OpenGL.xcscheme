@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "080BC5DF1F06A5A2003BDE67"
-               BuildableName = "gdsC++.app"
-               BlueprintName = "gdsC++"
+               BlueprintIdentifier = "08D51B441F90342200091ECB"
+               BuildableName = "pGDS OpenGL"
+               BlueprintName = "pGDS OpenGL"
                ReferencedContainer = "container:pGDS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "080BC5DF1F06A5A2003BDE67"
-            BuildableName = "gdsC++.app"
-            BlueprintName = "gdsC++"
+            BlueprintIdentifier = "08D51B441F90342200091ECB"
+            BuildableName = "pGDS OpenGL"
+            BlueprintName = "pGDS OpenGL"
             ReferencedContainer = "container:pGDS.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -55,9 +55,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "080BC5DF1F06A5A2003BDE67"
-            BuildableName = "gdsC++.app"
-            BlueprintName = "gdsC++"
+            BlueprintIdentifier = "08D51B441F90342200091ECB"
+            BuildableName = "pGDS OpenGL"
+            BlueprintName = "pGDS OpenGL"
             ReferencedContainer = "container:pGDS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -74,9 +74,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "080BC5DF1F06A5A2003BDE67"
-            BuildableName = "gdsC++.app"
-            BlueprintName = "gdsC++"
+            BlueprintIdentifier = "08D51B441F90342200091ECB"
+            BuildableName = "pGDS OpenGL"
+            BlueprintName = "pGDS OpenGL"
             ReferencedContainer = "container:pGDS.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

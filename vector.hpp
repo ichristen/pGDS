@@ -149,6 +149,12 @@ public:
     void render()                       const;  // Draws an arrow with appropriate location, width and direction using OpenGL2.
 };
 
+CONNECTION bendRadius(CONNECTION start, GLdouble radius, GLdouble ang);
+CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang=0);
+
+CONNECTION bendLeft(CONNECTION start, GLdouble radius);
+CONNECTION bendRight(CONNECTION start, GLdouble radius);
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class BOUNDINGBOX;          // Forward declaraction of `BOUNDINGBOX` for use in `AFFINE`.

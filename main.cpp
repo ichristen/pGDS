@@ -2,9 +2,14 @@
 #define USE_GL_RENDER 1
 
 #include "testdevices.hpp"
+#include "diamonddevices.hpp"
+#include "eodevices.hpp"
 
 int main(int argc, const char * argv[]) {
-    mainDevice(1);
+//    mainDevice(1);
+//    mainDiamondDevice(1);
+    mainEODevice(1);
+//    symmetricallyCoupledFilter();
     
 //    auto start = std::chrono::steady_clock::now();
 //    

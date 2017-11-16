@@ -864,6 +864,7 @@ POLYLINES&  POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
                 throw std::runtime_error("Expected OR to have been caught previously...");
             case AND:
                 for (int i = 0; i < temp.size(); i++) {
+                    printf("ATTEMPT: %i\n", i);
                     add(temp[i].boolean(p, AND));
                 }
                 
