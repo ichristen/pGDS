@@ -14,14 +14,22 @@ BOUNDINGBOX::BOUNDINGBOX(VECTOR a, VECTOR b) {
     ll = VECTOR(min(a.x, b.x), min(a.y, b.y));
     initialized = true;
 }
-GLdouble BOUNDINGBOX::width() {
+GLdouble BOUNDINGBOX::width() const {
     if (initialized) {  return ur.x - ll.x; }
     else {              return 0; }
 }
-GLdouble BOUNDINGBOX::height() {
+GLdouble BOUNDINGBOX::height() const {
     if (initialized) {  return ur.y - ll.y; }
     else {              return 0; }
 }
+
+VECTOR BOUNDINGBOX::center() const {    return (ur + ll)/2; }
+
+//VECTOR north() const;
+//VECTOR south() const;
+//VECTOR east() const;
+//VECTOR west() const;
+
 BOUNDINGBOX BOUNDINGBOX::copy() const {
     return BOUNDINGBOX(ur, ll);
 }
@@ -271,7 +279,11 @@ VECTOR POLYLINE::operator[](int i) const {
 //    if (i < 0 || i >= points.size()){   return VECTOR(); }  // Or throw error?
 //    if (i < 0 || i >= points.size()){   printf("POLYLINE[int i]: i out of range. Setting i = i %% size().\n"); }
     if (points.size()) {
-        i = i % points.size();
+//        printf("\np.s()=%i\n", points.size());
+//        printf("i=%i\n", i);
+        i = (i + points.size()) % (points.size());
+//        printf("i'=%i\n", i);
+//        printf("-1 %% 10 = %i\n", -1 + 10 % 10);
         
         if (isReversed) {                   return points[points.size() - i - 1]; }
         else {                              return points[i]; }
@@ -460,8 +472,18 @@ POLYLINE& POLYLINE::operator+=(POLYLINE p) {
             
             int add = 0;
             
+//            printf("\n\np.print()\n");
+//            p.print();
+//            printf("\n\nprint()\n");
+//            print();
+            
             if (size()) {
-                add = (p[0] == operator[](0));
+                add = (p[0] == operator[](-1));
+//                printf("p[0] = ");  p[0].printNL();
+//                printf("p[-1] = "); p[-1].printNL();
+//                printf("operator[](0) = ");  operator[](0).printNL();
+//                printf("operator[](-1) = "); operator[](-1).printNL();
+//                printf("ADD: %i\n", add);
             }
             
             if (p.isReversed) {

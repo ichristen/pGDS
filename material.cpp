@@ -40,9 +40,9 @@ void MATERIAL::print() {
 uint16_t MATERIAL::currentLayer = 1;
 
 std::map<uint16_t, MATERIAL> MATERIAL::layers =   { {1, MATERIAL("LiNbO_3",             1, {0,   0,   127, 255}, {0,   0,   255, 255}, 1./2, 7./2)},
-                                                    {2, MATERIAL("Au",                  2, {255, 188, 38,  255}, {255, 210, 110, 255})},
-                                                    {3, MATERIAL("Oxide Window",        3, {127, 127, 127, 255}, {255, 255, 255, 255})},
-                                                    {4, MATERIAL("Au2",                 4, {205, 151, 29,  255}, {207, 170, 88,  255})} ,
+                                                    {2, MATERIAL("Au",                  2, {255, 188, 38,  255}, {255, 210, 110, 255}, 1., 7.)},
+                                                    {3, MATERIAL("Oxide Window",        3, {127, 127, 127, 255}, {255, 255, 255, 255}, 2., 14.)},
+                                                    {4, MATERIAL("Au2",                 4, {205, 151, 29,  255}, {207, 170, 88,  255}, 2., 14.)} ,
                                                     {5, MATERIAL("Diamond",             5, {200, 200, 200, 255}, {200, 200, 200, 255}, 1./14, .5)} };
 
 //uint16_t currentMaterial = 1;

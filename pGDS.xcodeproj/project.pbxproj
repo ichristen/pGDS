@@ -27,6 +27,8 @@
 		083CC1181F4CFCCD0054FD31 /* testing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1161F4CFCCD0054FD31 /* testing.cpp */; };
 		083CC11B1F4CFCED0054FD31 /* boolean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1191F4CFCED0054FD31 /* boolean.cpp */; };
 		084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 084F2B791F5B3BE800C604EB /* window.cpp */; };
+		0885CA461FD0862E005FE296 /* SFML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0885CA451FD0862E005FE296 /* SFML.framework */; };
+		0885CA481FD086B3005FE296 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EB1F4CE0170054FD31 /* main.cpp */; };
 		08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
 		08A8D1721F5B203C00DC4F70 /* pgdsNSOpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */; };
 		08D51B461F90342200091ECB /* testing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1161F4CFCCD0054FD31 /* testing.cpp */; };
@@ -49,7 +51,6 @@
 		08D51B591F90342200091ECB /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D21F06A198003BDE67 /* CoreVideo.framework */; };
 		08D51B5A1F90342200091ECB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5CC1F069F2E003BDE67 /* Cocoa.framework */; };
 		08D51B5B1F90342200091ECB /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5A41F059D8E003BDE67 /* OpenGL.framework */; };
-		08D51B611F90349F00091ECB /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0FB1F4CE0170054FD31 /* main.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -99,7 +100,6 @@
 		083CC0EE1F4CE0170054FD31 /* polyline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = polyline.cpp; sourceTree = SOURCE_ROOT; };
 		083CC0EF1F4CE0170054FD31 /* primitives.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitives.cpp; sourceTree = SOURCE_ROOT; };
 		083CC0F21F4CE0170054FD31 /* vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector.cpp; sourceTree = SOURCE_ROOT; };
-		083CC0FB1F4CE0170054FD31 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = SOURCE_ROOT; };
 		083CC1101F4CE0C00054FD31 /* eodevices.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = eodevices.hpp; sourceTree = SOURCE_ROOT; };
 		083CC1111F4CE0C00054FD31 /* testdevices.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = testdevices.hpp; sourceTree = SOURCE_ROOT; };
 		083CC1121F4CE0C00054FD31 /* eodevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eodevices.cpp; sourceTree = SOURCE_ROOT; };
@@ -110,6 +110,7 @@
 		083CC11A1F4CFCED0054FD31 /* boolean.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = boolean.hpp; sourceTree = SOURCE_ROOT; };
 		084F2B791F5B3BE800C604EB /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = SOURCE_ROOT; };
 		084F2B7A1F5B3BE800C604EB /* window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = window.hpp; sourceTree = SOURCE_ROOT; };
+		0885CA451FD0862E005FE296 /* SFML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SFML.framework; path = ../../../../Library/Frameworks/SFML.framework; sourceTree = "<group>"; };
 		08A8D16D1F58D16200DC4F70 /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = engine.cpp; sourceTree = SOURCE_ROOT; };
 		08A8D16E1F58D16200DC4F70 /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = engine.hpp; sourceTree = SOURCE_ROOT; };
 		08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = pgdsNSOpenGLView.mm; path = macOS/pgdsNSOpenGLView.mm; sourceTree = SOURCE_ROOT; };
@@ -123,6 +124,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0885CA461FD0862E005FE296 /* SFML.framework in Frameworks */,
 				08D51B561F90342200091ECB /* Foundation.framework in Frameworks */,
 				08D51B571F90342200091ECB /* CoreData.framework in Frameworks */,
 				08D51B581F90342200091ECB /* AppKit.framework in Frameworks */,
@@ -151,6 +153,7 @@
 		080BC5A31F059D8E003BDE67 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0885CA451FD0862E005FE296 /* SFML.framework */,
 				080BC5D81F06A2AE003BDE67 /* Foundation.framework */,
 				080BC5D61F06A29D003BDE67 /* CoreData.framework */,
 				080BC5D41F06A292003BDE67 /* AppKit.framework */,
@@ -216,7 +219,6 @@
 			isa = PBXGroup;
 			children = (
 				083CC0EB1F4CE0170054FD31 /* main.cpp */,
-				083CC0FB1F4CE0170054FD31 /* main.mm */,
 				083CC11A1F4CFCED0054FD31 /* boolean.hpp */,
 				083CC0DD1F4CE0170054FD31 /* device.hpp */,
 				08A8D16E1F58D16200DC4F70 /* engine.hpp */,
@@ -321,7 +323,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				08D51B611F90349F00091ECB /* main.mm in Sources */,
+				0885CA481FD086B3005FE296 /* main.cpp in Sources */,
 				08D51B461F90342200091ECB /* testing.cpp in Sources */,
 				08D51B471F90342200091ECB /* testdevices.cpp in Sources */,
 				08D51B481F90342200091ECB /* polyline.cpp in Sources */,
@@ -369,6 +371,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -385,12 +391,8 @@
 					/opt/local/lib,
 					/usr/local/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				OTHER_LDFLAGS = (
-					"-lGLEW",
-					"-lGLU",
-					"-lGL",
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				OTHER_LDFLAGS = "-lGLEW";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -399,6 +401,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "MATLABPATH=#/Applications/Code/MATLAB_R2017a.app";
 				HEADER_SEARCH_PATHS = (
@@ -412,12 +418,8 @@
 					/opt/local/lib,
 					/usr/local/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				OTHER_LDFLAGS = (
-					"-lGLEW",
-					"-lGLU",
-					"-lGL",
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				OTHER_LDFLAGS = "-lGLEW";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

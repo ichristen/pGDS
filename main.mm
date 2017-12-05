@@ -91,7 +91,8 @@
 #define GLEW_STATIC
 
 // Headers
-#include <OpenGL/gl>
+#include <OpenGL/OpenGL.h>
+//#include <OpenGL/gl>
 //#include <glew.h>
 //#include <GL/glew.h>
 #include <SFML/Window.hpp>

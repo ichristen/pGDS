@@ -18,14 +18,14 @@ bool VECTOR::operator!=(VECTOR v)           const { return !operator==(v); }
 #define SQUISHYLOGIC 1
 
 #ifdef SQUISHYLOGIC
-bool VECTOR::operator==(VECTOR v)           const { return (x == v.x && y == v.y) || (std::abs(x - v.x) < E && std::abs(y - v.y) < E); }
+bool VECTOR::operator==(VECTOR v)           const { return (x == v.x && y == v.y) || (std::abs(x - v.x) < ERROR && std::abs(y - v.y) < ERROR); }
 
-bool VECTOR::operator< (VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < E)?(y <   v.y - E):(x <   v.x - E); }
-bool VECTOR::operator<=(VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < E)?(y <=  v.y - E):(x <=  v.x - E); }
-bool VECTOR::operator> (VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < E)?(y >   v.y - E):(x >   v.x - E); }
-bool VECTOR::operator>=(VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < E)?(y >=  v.y - E):(x >=  v.x - E); }
+bool VECTOR::operator< (VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < ERROR)?(y <   v.y - ERROR):(x <   v.x - ERROR); }
+bool VECTOR::operator<=(VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < ERROR)?(y <=  v.y - ERROR):(x <=  v.x - ERROR); }
+bool VECTOR::operator> (VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < ERROR)?(y >   v.y - ERROR):(x >   v.x - ERROR); }
+bool VECTOR::operator>=(VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < ERROR)?(y >=  v.y - ERROR):(x >=  v.x - ERROR); }
 
-bool VECTOR::inLine(VECTOR v)               const { return x == v.x || y == v.y || std::abs(x - v.x) < E || std::abs(y - v.y) < E; }
+bool VECTOR::inLine(VECTOR v)               const { return x == v.x || y == v.y || std::abs(x - v.x) < ERROR || std::abs(y - v.y) < ERROR; }
 #else
 bool VECTOR::operator==(VECTOR v)           const { return (x == v.x && y == v.y); }
     
@@ -285,6 +285,9 @@ AFFINE AFFINE::operator-(VECTOR v)      const { return AFFINE(a, b, c, d, e-v.x,
 AFFINE AFFINE::operator*(GLdouble s)    const { return copy() *= s; }
 AFFINE AFFINE::operator/(GLdouble s)    const { return copy() /= s; }
 
+//DEVICEPTR AFFINE::operator+(DEVICE* ptr)    const { return DEVICEPTR(ptr, *this); }
+//DEVICEPTR AFFINE::operator+(DEVICEPTR ptr)  const { return ptr * (*this); }
+
 AFFINE AFFINE::operator+=(VECTOR v) {   e += v.x; f += v.y; return *this; }
 AFFINE AFFINE::operator-=(VECTOR v) {   e -= v.x; f -= v.y; return *this; }
 //AFFINE AFFINE::operator*=(GLdouble s) { a *= s; b *= s; c *= s; d *= s; return *this; }
@@ -330,32 +333,36 @@ AFFINE zeroAFFINE() {   return AFFINE( 0,  0,  0,  0); }
 // CONNECTION ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CONNECTION::CONNECTION() {
-    v = VECTOR(0,0); dv = VECTOR(1,0); w = 1; name = "Default";
+    v = VECTOR(0,0); dv = VECTOR(1,0); w = 1; name = "default";
 }
-CONNECTION::CONNECTION(VECTOR v_, VECTOR dv_, GLdouble w_, std::string name_) {
+CONNECTION::CONNECTION(VECTOR v_, VECTOR dv_, GLdouble w_, std::string name_, int16_t l_) {
 //    v = v_; dv = dv_; w = std::abs(w_); name = name_;
     v = v_; dv = dv_; w = w_; name = name_;
+    
+    if (l_ == -1)   { l = 1; } //l = MATERIAL::currentLayer; }
+    else            { l = l_; }
 }
-CONNECTION CONNECTION::operator=(CONNECTION c) {    v = c.v; dv = c.dv; w = c.w; name = c.name; l = c.l; return *this; }
-CONNECTION CONNECTION::operator-()          const { return CONNECTION(v, -dv, w, name); }
+bool CONNECTION::isEmpty() const { return v.isZero() && dv ==  VECTOR(1,0) && w == 1 && name == "default"; }
+CONNECTION CONNECTION::operator=(CONNECTION c) {        v = c.v; dv = c.dv; w = c.w; name = c.name; l = c.l; return *this; }
+CONNECTION CONNECTION::operator-()          const {     return CONNECTION(v, -dv, w, name); }
 
 //CONNECTION CONNECTION::operator+(VECTOR v_) const { return CONNECTION(v + v_, dv, w, name); }
 //CONNECTION CONNECTION::operator-(VECTOR v_) const { return CONNECTION(v - v_, dv, w, name); }
-CONNECTION CONNECTION::operator+(VECTOR v_) const { return copy() += v_; }
-CONNECTION CONNECTION::operator-(VECTOR v_) const { return copy() -= v_; }
-CONNECTION CONNECTION::operator+=(VECTOR v_) {      v += v_; return *this; }
-CONNECTION CONNECTION::operator-=(VECTOR v_) {      v -= v_; return *this; }
+CONNECTION CONNECTION::operator+(VECTOR v_) const {     return copy() += v_; }
+CONNECTION CONNECTION::operator-(VECTOR v_) const {     return copy() -= v_; }
+CONNECTION CONNECTION::operator+(GLdouble x) const {    return copy() += x; }
+CONNECTION CONNECTION::operator-(GLdouble x) const {    return copy() -= x; }
+
+CONNECTION CONNECTION::operator+=(VECTOR v_) {          v += v_;    return *this; }
+CONNECTION CONNECTION::operator-=(VECTOR v_) {          v -= v_;    return *this; }
+CONNECTION CONNECTION::operator+=(GLdouble x) {         v += dv*x;  return *this; }
+CONNECTION CONNECTION::operator-=(GLdouble x) {         v -= dv*x;  return *this; }
 
 //CONNECTION CONNECTION::operator*(GLdouble s) const {    return CONNECTION(v*s, dv*sign(s), w*std::abs(s), name); }
 //CONNECTION CONNECTION::operator*=(GLdouble s) {         v *= s; dv *= sign(s); w *= std::abs(s); return *this; }
 
-CONNECTION CONNECTION::operator* (GLdouble s) const {    return copy() *= s; }
-CONNECTION CONNECTION::operator*=(GLdouble s) {
-//    if (s) {
-        v *= s; dv *= sign(s); w *= std::abs(s); return *this;
-//    }
-//    else {    }
-}
+CONNECTION CONNECTION::operator* (GLdouble s) const {   return copy() *= s; }
+CONNECTION CONNECTION::operator*=(GLdouble s) {         v *= s; dv *= sign(s); w *= std::abs(s); return *this; }
 
 CONNECTION CONNECTION::operator/ (GLdouble s) const {   return copy() /= s; }
 CONNECTION CONNECTION::operator/=(GLdouble s) {         v /= s; dv *= sign(s); w /= std::abs(s); return *this; }
@@ -377,6 +384,8 @@ CONNECTION CONNECTION::operator*=(AFFINE m) {
 
 bool CONNECTION::operator==(CONNECTION c)    const { return v == c.v && dv == c.dv && w == c.w; }
 
+CONNECTION CONNECTION::setWidth(GLdouble w_) {      w = w_;         return *this; }
+
 CONNECTION CONNECTION::setName(std::string name_){  name = name_;   return *this; }
 CONNECTION CONNECTION::setLayer(int16_t l_){        l = l_;         return *this; }
 
@@ -387,7 +396,11 @@ void CONNECTION::print()    const {
     dv.print();
     printf(" with width %f\n", w);
 }
-CONNECTION CONNECTION::copy() const { return CONNECTION(v, dv, w, name); }
+CONNECTION  CONNECTION::copy()  const { return CONNECTION(v, dv, w, name, l); }
+
+VECTOR      CONNECTION::left()  const { return v + dv.perpCW()*(w/2); }
+VECTOR      CONNECTION::right() const { return v + dv.perpCCW()*(w/2); }
+
 void CONNECTION::render()   const {
 #ifdef USE_GL_RENDER
     VECTOR offset = dv.perpCW()*(w/2);
@@ -417,7 +430,7 @@ CONNECTION bendRadius(CONNECTION start, GLdouble radius, GLdouble ang) {
 //    dv.printNL();
     VECTOR v = pivot + dv.perpCW() * radius*sign(ang);
     
-    return CONNECTION(v, dv);
+    return CONNECTION(v, dv, start.w, start.name + "+", start.l);
 }
 CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang) {
     if (ang == 0) { return start; }

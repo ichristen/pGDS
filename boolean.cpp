@@ -193,6 +193,8 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
         } else if  (!aSmaller && a.bb.doesContain(b.bb)) {  // If b might be inside a
             noIntersectionPossibleContainment(b, a, finalClosedPolylines, op);
         } else {                                            // No possible intersection
+//            printf("FISH!!!");
+            noIntersectionNoContainmentLogic(a, b, finalClosedPolylines, op);
                                                             // Don't fill finalClosedPolylines
         }
         
@@ -304,6 +306,7 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
                         }
                         
                         finalPath.close();
+                        finalPath.recomputeBoundingBox();
                         
 //                        printf("AREA!: %f", finalPath.area());
                         
@@ -351,7 +354,7 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
     //
     //    switch (op) {
     //        case AND:   printf("OP = AND\n");   break;
-    //        case OR:    printf("OP = OR\n");   break;
+    //        case OR:    printf("OP = OR\n");    break;
     //        case XOR:   printf("OP = XOR\n");   break;
     //    }
     
@@ -621,7 +624,7 @@ void cutPolyline(POLYLINE& a, POLYLINE& b, std::vector<int> acuts, BOOLOPERATION
         } else if (l == 2) {
             testPoint = (a[x1] + a[x2]) / 2;
         } else {
-            throw std::runtime_error("splitPolylines(POLYLINE^2, OP): Did not expect a polyline with less than two points...");
+//            throw std::runtime_error("splitPolylines(POLYLINE^2, OP): Did not expect a polyline with less than two points...");
         }
         
         bool isInside = b.contains(testPoint);
@@ -701,6 +704,8 @@ void cutPolyline(POLYLINE& a, POLYLINE& b, std::vector<int> acuts, BOOLOPERATION
 }
 
 void noIntersectionNoContainmentLogic(POLYLINE& a, POLYLINE& b, std::vector<POLYLINE>& finalClosedPolylines, BOOLOPERATION op) {
+    printf("noIntersectionNoContainmentLogic\n");
+    
     bool aPos = a.area() > 0;
     bool bPos = b.area() > 0;
     
@@ -739,6 +744,7 @@ void noIntersectionNoContainmentLogic(POLYLINE& a, POLYLINE& b, std::vector<POLY
 }
 
 void resolveContainment(POLYLINE& a, POLYLINE& b, std::vector<POLYLINE>& finalClosedPolylines, BOOLOPERATION op) {
+    printf("resolveContainment\n");
     // Expects negative a contained in positive b.
     
     GLdouble cutx = a[0].x;
@@ -764,6 +770,8 @@ void resolveContainment(POLYLINE& a, POLYLINE& b, std::vector<POLYLINE>& finalCl
 }
 
 void noIntersectionPossibleContainment(POLYLINE& a, POLYLINE& b, std::vector<POLYLINE>& finalClosedPolylines, BOOLOPERATION op) {
+    printf("noIntersectionPossibleContainment\n");
+    
     bool aPos = a.area() > 0;
     bool bPos = b.area() > 0;
     

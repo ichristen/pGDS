@@ -131,6 +131,20 @@ void DEVICE::setLayer(uint16_t layer) {
 //    for (int i = 0; i < devices.size();     i++){ devices[i].device->setLayer(layer); }
     for (int i = 0; i < polylines.size();   i++){ polylines[i].setLayer(layer); }
 }
+void DEVICE::setConnectionName(std::string prev, std::string next) {
+    CONNECTION c = operator[](prev);
+    
+    if (c.isEmpty()) {
+        printf("DEVICE::setConnectionName(std::string^2): Connection name '%s' does not exist.", prev.c_str());
+    } else {
+        c.name = next;
+        add(c);
+        eraseConnection(prev);
+    }
+}
+void DEVICE::eraseConnection(std::string name) {
+    connections.erase(name);
+}
 
 double DEVICE::area() {
     if (area_ == 0) {

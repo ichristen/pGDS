@@ -25,8 +25,20 @@ public:
     BOUNDINGBOX(VECTOR a);
     BOUNDINGBOX(VECTOR a, VECTOR b);    // Makes the smallest bounding box that contains both a and b (a != ur, b != ll, generally).
     
-    GLdouble width();
-    GLdouble height();
+    GLdouble width() const;
+    GLdouble height() const;
+    
+    VECTOR center() const;
+    
+    VECTOR north() const;
+    VECTOR south() const;
+    VECTOR east() const;
+    VECTOR west() const;
+    
+//    VECTOR north() const;
+//    VECTOR south() const;
+//    VECTOR east() const;
+//    VECTOR west() const;
     
     BOUNDINGBOX copy() const;
     void clear();

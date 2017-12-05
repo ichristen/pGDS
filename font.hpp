@@ -81,6 +81,8 @@ public:
     DEVICEPTR getText(std::string text, int anchorx=0, int anchory=0);  // Returns device containing text. Anchor determines location of origin (e.g. `anchorx == -1 ==>` origin is on the leftmost part of resulting device; `anchorx == 0 ==>` origin is at center; etc).
 };
 
+#include "material.hpp"
+
 #endif
 
 

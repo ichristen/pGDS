@@ -117,16 +117,22 @@ public:
     std::string name;   // Name of connection.
 
     CONNECTION();
-    CONNECTION(VECTOR v_, VECTOR dv_, GLdouble w_=1, std::string name_="Connection");
+    CONNECTION(VECTOR v_, VECTOR dv_, GLdouble w_=1, std::string name_="connection", int16_t l_=-1);
 
+    bool isEmpty() const;
+    
     CONNECTION operator=(CONNECTION c);         // Changes the values of this connection to the second connection.
     CONNECTION operator-()              const;  // Returns connection with `dv = -dv`. No other changes.
 
     CONNECTION operator+ (VECTOR v_)    const;  // Returns connection with `v = v + v_`.
     CONNECTION operator+=(VECTOR v_);           // Sets `v = v + v_`.
+    CONNECTION operator+ (GLdouble x)   const;  // Returns connection with `v = v + x*dv`.
+    CONNECTION operator+=(GLdouble x);          // Sets `v = v + x*dv`.
     
     CONNECTION operator- (VECTOR v_)    const;  // Returns connection with `v = v - v_`.
     CONNECTION operator-=(VECTOR v_);           // Sets `v = v - v_`.
+    CONNECTION operator- (GLdouble x)   const;  // Returns connection with `v = v - x*dv`.
+    CONNECTION operator-=(GLdouble x);          // Sets `v = v - x*dv`.
     
     CONNECTION operator* (GLdouble s)   const;  // Returns scaled connection such that `v *= s`, `dv *= sign(s)` and `w *= |s|`. Does not check for `s = 0`.
     CONNECTION operator*=(GLdouble s);          // Scales connection such that `v *= s`, `dv *= sign(s)` and `w *= |s|`. Does not check for `s = 0`.
@@ -134,17 +140,22 @@ public:
     CONNECTION operator/ (GLdouble s)   const;  // Returns scaled connection such that `v /= s`, `dv /= sign(s)` and `w /= |s|`. Does not check for `s = 0`.
     CONNECTION operator/=(GLdouble s);          // Scales connection such that `v /= s`, `dv /= sign(s)` and `w /= |s|`. Does not check for `s = 0`.
     
-    CONNECTION operator* (AFFINE m)     const;  // Blasphemously equivalent to `m*c`, where the transformation is applied perpendicularly to retain the appropraite connection angle.
+    CONNECTION operator* (AFFINE m)     const;  // Blasphemously equivalent to `m*c`, where the transformation is applied perpendicularly to retain the appropriate connection angle.
     CONNECTION operator*=(AFFINE m);            // Sets to `m*c`
 
     bool operator==(CONNECTION c)       const;  // Checks equality in `v`, `dv`, and `w`. Does not check `l` or `name`.
 
+    CONNECTION setWidth(GLdouble w_);           // Returns connection with `w = w_`.
+    
     CONNECTION setName(std::string name_);      // Changes the name `name` of the connection.
     CONNECTION setLayer(int16_t l_);            // Changes the layer `l` of the connection.
     
     void print()                        const;  // Prints the name `name`, location `v`, direction `dv`, and width `w` of the connection.
     
     CONNECTION copy()                   const;  // Returns a copy of the connection.
+
+    VECTOR left()                       const;  // Returns the position of the left side of the connection (forward is the direction of the connection).
+    VECTOR right()                      const;  // Returns the position of the right side of the connection.
 
     void render()                       const;  // Draws an arrow with appropriate location, width and direction using OpenGL2.
 };
@@ -158,6 +169,8 @@ CONNECTION bendRight(CONNECTION start, GLdouble radius);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class BOUNDINGBOX;          // Forward declaraction of `BOUNDINGBOX` for use in `AFFINE`.
+class DEVICEPTR;            // Forward declaraction of `DEVICEPTR` for use in `AFFINE`.
+class DEVICE;               // Forward declaraction of `DEVICE` for use in `AFFINE`.
 
 class AFFINE {              // Affine transformation:
 public:
@@ -202,6 +215,9 @@ public:
     AFFINE operator*(GLdouble s)            const;  // Returns the product of this transformation with the linear transformation that scales by `s`, i.e. the matrix [ s, 0; 0, s ].
     AFFINE operator/(GLdouble s)            const;  // Returns the product of this transformation with the linear transformation that scales by `1/s`.
 
+    DEVICEPTR operator+(DEVICE* ptr)        const;  // Returns a device(ptr) transformed by this `AFFINE`.
+    DEVICEPTR operator+(DEVICEPTR ptr)      const;
+    
     AFFINE operator+=(VECTOR v);                    // Increases translation by `v`.
     AFFINE operator-=(VECTOR v);                    // Increases translation by `-v`.
     AFFINE operator*=(GLdouble s);                  // Sets the transformation to `m*s`.
@@ -226,6 +242,8 @@ AFFINE mirrorYeX();     // Transformation that mirrors across the line `y = x`.
 AFFINE mirrorYemX();    // Transformation that mirrors across the line `y = -x`.
 AFFINE zeroAFFINE();    // Zero matrix with no translation.
 
+//#include "material.hpp"
 #include "polyline.hpp"
+//#include "device.hpp"
 
 #endif

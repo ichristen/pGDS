@@ -76,6 +76,10 @@ DEVICE* FONT::getChar(char c) {
         
         GLdouble chamfer = width/8;
         
+        uint16_t cl = MATERIAL::currentLayer;
+        
+        MATERIAL::currentLayer = layer;
+        
         if (c == 'a' || c == 'A') {
             POLYLINE p = POLYLINE();
             p += VECTOR(left, 0);
@@ -562,6 +566,9 @@ DEVICE* FONT::getChar(char c) {
             toReturn->add(p);
         }
         
+        
+        MATERIAL::currentLayer = cl;
+        
         return toReturn;
     }
     
@@ -574,20 +581,26 @@ DEVICE* FONT::getTextPrivate(std::string text) {
     VECTOR pen;
     
     for (int i = 0; i < text.size(); i++) {
-        DEVICE* character = getChar(text[i]);
-        if (character) {
-            character->setLayer(layer);
-            toReturn->add( DEVICEPTR(character, AFFINE(pen)) );
-            pen += VECTOR(width + thick, 0);    // Change this...
+        if (text[i] == '_' && i < text.size()-1) {
+            i++;
+            DEVICE* character = getChar(text[i]);
+            
+            if (character) {
+                character->setLayer(layer);
+                toReturn->add( DEVICEPTR(character, AFFINE(pen)*.5) );
+                pen += VECTOR(width/2 + thick, 0);    // Change this...
+            }
+        } else {
+            DEVICE* character = getChar(text[i]);
+            if (character) {
+                character->setLayer(layer);
+                toReturn->add( DEVICEPTR(character, AFFINE(pen)) );
+                pen += VECTOR(width + thick, 0);    // Change this...
+            }
         }
-        
-//        pen += VECTOR(character->bb.width() + thick, 0);    // Change this...
     }
     
     return toReturn;
-//    DEVICEPTR(toReturn, AFFINE(-toReturn->bb.width()/2, -toReturn->bb.height()/2));
-    
-//    return nullptr;
 }
 DEVICEPTR FONT::getText(std::string text, int anchorx, int anchory) {
     DEVICE* toReturn = getTextPrivate(text);
