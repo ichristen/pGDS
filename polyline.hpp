@@ -15,6 +15,8 @@
 #include "vector.hpp"
 #include "math.hpp"
 
+class POLYLINE;
+
 class BOUNDINGBOX {
 public:
     VECTOR ur;
@@ -23,7 +25,9 @@ public:
     
     BOUNDINGBOX();
     BOUNDINGBOX(VECTOR a);
-    BOUNDINGBOX(VECTOR a, VECTOR b);    // Makes the smallest bounding box that contains both a and b (a != ur, b != ll, generally).
+    BOUNDINGBOX(VECTOR a, VECTOR b);                // Makes the smallest bounding box that contains both a and b (a != ur, b != ll, generally).
+    BOUNDINGBOX(VECTOR c, GLdouble w);              // Makes a box with width `w` and height `w` centered at `c`.
+    BOUNDINGBOX(VECTOR c, GLdouble w, GLdouble h);  // Makes a box with width `w` and height `h` centered at `c`.
     
     GLdouble width() const;
     GLdouble height() const;
@@ -34,6 +38,18 @@ public:
     VECTOR south() const;
     VECTOR east() const;
     VECTOR west() const;
+    
+    VECTOR n() const;
+    VECTOR s() const;
+    VECTOR e() const;
+    VECTOR w() const;
+    
+    VECTOR nw() const;
+    VECTOR ne() const;
+    VECTOR sw() const;
+    VECTOR se() const;
+    
+    POLYLINE draw() const;
     
 //    VECTOR north() const;
 //    VECTOR south() const;
@@ -116,6 +132,11 @@ public:
     
     VECTOR  operator[](int i)       const;
     bool    insert(int i, VECTOR v);
+    bool    erase(int i);
+    void    clear();
+//    void        erase();
+//    void        erase(int i);
+//    void        erase(int i, int j);
     
     void add(VECTOR v);
     void add(POLYLINE p);
@@ -209,6 +230,12 @@ public:
     
     size_t size()                       const;
     bool isEmpty()                      const;
+    
+    POLYLINES getLayer(uint16_t l) const;
+    bool removeLayer(uint16_t l);
+    bool setLayer(uint16_t to);
+    bool setLayer(uint16_t from, uint16_t to);
+    bool exchangeLayers(uint16_t l1, uint16_t l2);
     
     POLYLINES   operator/ (double s)    const;
     POLYLINES   operator* (double s)    const;

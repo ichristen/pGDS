@@ -714,10 +714,198 @@ void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTI
     }
 }
 
+POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat, GLdouble mult) {
+    VECTOR bl = b.v + b.dv.perpCCW()*r;
+    VECTOR br = b.v + b.dv.perpCW()*r;
+    VECTOR el = e.v + e.dv.perpCCW()*r;
+    VECTOR er = e.v + e.dv.perpCW()*r;
+    
+    VECTOR ll = -(bl - el);
+    VECTOR lr = -(bl - er);
+    VECTOR rl = -(br - el);
+    VECTOR rr = -(br - er);
+    
+//    bl.printNL();
+//    br.printNL();
+//    el.printNL();
+//    er.printNL();
+//
+//    ll.printNL();
+//    lr.printNL();
+//    rl.printNL();
+//    rr.printNL();
+    
+    // Straight Cases...
+    VECTOR blr = bl + lr.perpCW().unit()*r;
+    VECTOR elr = er + lr.perpCW().unit()*r;
+    GLdouble angblr = (getArcAngle(bl, b.v, blr));
+    GLdouble angelr = (getArcAngle(er, e.v, elr));
+//    GLdouble angelr = std::abs(getArcAngle(er, elr, e.v));
+    GLdouble Llr = ( std::abs(angblr) + std::abs(angelr) )*r + lr.magn();
+    
+    VECTOR brl = br + rl.perpCCW().unit()*r;
+    VECTOR erl = el + rl.perpCCW().unit()*r;
+    GLdouble angbrl = (getArcAngle(br, b.v, brl));
+    GLdouble angerl = (getArcAngle(el, e.v, erl));
+//    GLdouble angerl = std::abs(getArcAngle(el, erl, e.v));
+    GLdouble Lrl = ( std::abs(angbrl) + std::abs(angerl) )*r + rl.magn();
+    
+    // Diagonal Cases...
+    GLdouble asin2rll = asin(2*r/ll.magn());
+//    printf("ANG1 = %f pi\n", 2*asin2rll/TAU);
+    VECTOR bll = bl + ll.perpCW().unit().rotate(asin2rll)*r;
+    VECTOR ell = el - ll.perpCW().unit().rotate(asin2rll)*r;
+    GLdouble angbll = (getArcAngle(bl, b.v, bll)); // + asin2rll;
+    GLdouble angell = (getArcAngle(el, e.v, ell)); // + asin2rll;
+//    GLdouble angell = std::abs(getArcAngle(er, elr, e.v)) + asin2rll;
+    GLdouble Lll = ( std::abs(angbll) + std::abs(angell) )*r + sqrt(ll.magn2() - 4*r*r);
+    
+    GLdouble asin2rrr = -asin(2*r/rr.magn());
+//    printf("ANG2 = %f pi\n", 2*asin2rrr/TAU);
+    VECTOR brr = br - rr.perpCW().unit().rotate(asin2rrr)*r;
+    VECTOR err = er + rr.perpCW().unit().rotate(asin2rrr)*r;
+    GLdouble angbrr = (getArcAngle(br, b.v, brr)); // + asin2rrr;
+    GLdouble angerr = (getArcAngle(er, e.v, err)); // + asin2rrr;
+//    GLdouble angerr = std::abs(getArcAngle(el, erl, e.v)) + asin2rrr;
+    GLdouble Lrr = ( std::abs(angbrr) + std::abs(angerr) )*r + sqrt(rr.magn2() - 4*r*r);
+    
+//    // Straight Cases...
+//    VECTOR blr = bl + lr.perpCW().unit()*r;
+//    VECTOR elr = er + lr.perpCW().unit()*r;
+//    GLdouble angblr = (getArcAngle(bl, b.v, blr));
+//    GLdouble angelr = (getArcAngle(er, e.v, elr));
+//    //    GLdouble angelr = std::abs(getArcAngle(er, elr, e.v));
+//    GLdouble Llr = ( std::abs(angblr) + std::abs(angelr) )*r + lr.magn();
+//
+//    VECTOR brl = br + rl.perpCW().unit()*r;
+//    VECTOR erl = el + rl.perpCW().unit()*r;
+//    GLdouble angbrl = (getArcAngle(br, b.v, brl));
+//    GLdouble angerl = (getArcAngle(el, e.v, erl));
+//    //    GLdouble angerl = std::abs(getArcAngle(el, erl, e.v));
+//    GLdouble Lrl = ( std::abs(angbrl) + std::abs(angerl) )*r + rl.magn();
+//
+//    // Diagonal Cases...
+//    GLdouble asin2rll = asin(2*r/ll.magn());
+//    GLdouble angbll = (getArcAngle(bl, b.v, brl)) + asin2rll;
+//    GLdouble angell = (getArcAngle(er, e.v, erl)) + asin2rll;
+//    //    GLdouble angell = std::abs(getArcAngle(er, elr, e.v)) + asin2rll;
+//    GLdouble Lll = ( std::abs(angbll) + std::abs(angell) )*r + sqrt(ll.magn2() - 4*r*r);
+//
+//    GLdouble asin2rrr = -asin(2*r/rr.magn());
+//    GLdouble angbrr = (getArcAngle(br, b.v, blr)) + asin2rrr;
+//    GLdouble angerr = (getArcAngle(el, e.v, elr)) + asin2rrr;
+//    //    GLdouble angerr = std::abs(getArcAngle(el, erl, e.v)) + asin2rrr;
+//    GLdouble Lrr = ( std::abs(angbrr) + std::abs(angerr) )*r + sqrt(rr.magn2() - 4*r*r);
+    
+    // Now find the shortest case...
+    GLdouble Lmin = min(min(Llr, Lrl), min(Lll, Lrr));
+    
+    POLYLINES toReturn;
+    
+    GLdouble longWidth = mult*(b.w + e.w)/2.;
+    
+    GLdouble angb, ange;
+    
+    if      (Lll == Lmin) { angb = angbll; ange = angell; }
+    else if (Llr == Lmin) { angb = angblr; ange = angelr; }
+    else if (Lrl == Lmin) { angb = angbrl; ange = angerl; }
+    else if (Lrr == Lmin) { angb = angbrr; ange = angerr; }
+    else { throw std::runtime_error("connectThickenShortestDistance(CONNECTION^2, GLdouble r^2): Something went horribly wrong..."); }
+    
+//    angb = angbrr; ange = angerr;
+//    angb = angblr; ange = angelr;
+//    angb = angbll; ange = angell;
+    
+    // And make the connections...
+    CONNECTION b1 = bendRadius(b, r, angb);
+    CONNECTION e1 = bendRadius(e, r, ange);
+    
+    connectThickenAndAdd(&toReturn, b, -b1, CIRCULAR);  // Change this to thicken the arc?
+    connectThickenAndAdd(&toReturn, e, -e1, CIRCULAR);
+    
+    if (Lmin > 2*adiabat) {
+        CONNECTION b2 = b1 + adiabat; b2.w = longWidth;
+        CONNECTION e2 = e1 + adiabat; e2.w = longWidth;
+        
+        if (b2.w < 0) {
+            for (int i = -1; i < 2; i += 2) {
+                POLYLINE p;
+                
+                p.add(b2.v + b2.dv.perpCCW()*i*(-b2.w/2));
+                p.add(b2.v + b2.dv.perpCCW()*i*(-b2.w/2 + PADDING));
+                p.add(e2.v - e2.dv.perpCCW()*i*(-e2.w/2 + PADDING));
+                p.add(e2.v - e2.dv.perpCCW()*i*(-e2.w/2));
+                
+                p.close();
+                
+                if (p.area() < 0) { p.reverse(); }
+                
+                toReturn.add(p);
+            }
+        } else {
+            POLYLINE p;
+
+            p.add(b2.left());
+            p.add(b2.right());
+            p.add(e2.left());
+            p.add(e2.right());
+
+            p.close();
+
+            toReturn.add(p);
+        }
+        
+//        p.print();
+//
+//        thicken(p, longWidth,  1, 100).print();
+//
+//        toReturn.add(thicken(p, longWidth,  1, 100));
+//        toReturn.add(thicken(p, longWidth, -1, 100));
+//        connectThickenAndAdd(&toReturn, b2, e2, CIRCULAR);
+//        connectThickenAndAdd(&toReturn, b2, e2, CIRCULAR);
+        
+        connectThickenAndAdd(&toReturn, b1, -b2, CIRCULAR);
+        connectThickenAndAdd(&toReturn, e1, -e2, CIRCULAR);
+    } else {
+        connectThickenAndAdd(&toReturn, b1, e1, CIRCULAR);
+    }
+    
+    return toReturn;
+}
+
 POLYLINE thicken(POLYLINE open, GLdouble width, int side, GLdouble minstep) {
     return thicken(open, [width] (GLdouble t) -> GLdouble { return width; }, side, minstep);
 }
 POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, int side, GLdouble minstep) {
+    bool closed = open.isClosed;
+    
+    if (closed) {
+        printf("CLOSED!!!\n");
+        
+        if (open[0] != open[-1]) { open.add(open[0]); }
+        
+        VECTOR v0 = open[-2];
+        VECTOR v1 = open[0];
+        VECTOR v2 = open[1];
+        
+        open.open();
+        
+        open.insert(0, v0);
+        open.add(v2);
+        
+//        VECTOR d = ( (v1-v2).unit() - (v1-v0).unit() ).unit();
+//
+//        v0.printNL();
+//        v1.printNL();
+//        v2.printNL();
+//        d.printNL();
+//
+//        open.open();
+//
+//        open.setBeginDirection( d );
+//        open.setEndDirection(  -d );
+    }
+    
     POLYLINE toReturn = POLYLINE(open.size()*2).setLayer(open.layer);
     
     if (open.size() >= 2) {
@@ -725,6 +913,15 @@ POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, int 
     }
     
 //    toReturn.print();
+    
+    if (closed) {
+        int mid = toReturn.size()/2;
+        
+        toReturn.erase(-1);
+        toReturn.erase(mid);
+        toReturn.erase(mid-1);
+        toReturn.erase(0);
+    }
     
     toReturn.close();
 //    printf("recursing! - AREATHICKEN: %f\n", toReturn.area());

@@ -564,6 +564,42 @@ DEVICE* FONT::getChar(char c) {
             p.close();
             
             toReturn->add(p);
+        } else if (c == '[') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(left+4*chamfer, bot-thick/2);
+            p += VECTOR(left+1*chamfer, bot-thick/2);
+            p += VECTOR(left+1*chamfer, top+thick/2);
+            p += VECTOR(left+4*chamfer, top+thick/2);
+            
+            toReturn->add(thicken(p, thick));
+        } else if (c == ']') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(right-5*chamfer, bot-thick/2);
+            p += VECTOR(right-1*chamfer, bot-thick/2);
+            p += VECTOR(right-1*chamfer, top+thick/2);
+            p += VECTOR(right-5*chamfer, top+thick/2);
+            
+            toReturn->add(thicken(p, thick));
+        } else if (c == '(') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(left+4*chamfer, bot-thick/2);
+            p += VECTOR(left+2*chamfer, bot-thick/2);
+            p += VECTOR(left+1*chamfer, bot+chamfer-thick/2);
+            p += VECTOR(left+1*chamfer, top-chamfer+thick/2);
+            p += VECTOR(left+2*chamfer, top+thick/2);
+            p += VECTOR(left+4*chamfer, top+thick/2);
+            
+            toReturn->add(thicken(p, thick));
+        } else if (c == ')') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(right-5*chamfer, bot-thick/2);
+            p += VECTOR(right-2*chamfer, bot-thick/2);
+            p += VECTOR(right-1*chamfer, bot+chamfer-thick/2);
+            p += VECTOR(right-1*chamfer, top-chamfer+thick/2);
+            p += VECTOR(right-2*chamfer, top+thick/2);
+            p += VECTOR(right-5*chamfer, top+thick/2);
+            
+            toReturn->add(thicken(p, thick));
         }
         
         

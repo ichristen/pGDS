@@ -192,8 +192,8 @@ public:
     AFFINE(GLdouble a_, GLdouble b_, GLdouble c_, GLdouble d_, VECTOR v);                       // Returns the matrix `[ a, b; c, d ]` with an additional translation by `v`.
     AFFINE(GLdouble a_, GLdouble b_, GLdouble c_, GLdouble d_, GLdouble e_=0, GLdouble f_=0);   // Returns the matrix `[ a, b; c, d ]` with an additional translation by `[ e_, f_ ]`.
 
-    AFFINE(CONNECTION from, CONNECTION to);         // Returns the (unique) affine transformtion that shifts from one `CONNECTION` frame to another.
-    AFFINE(BOUNDINGBOX from, BOUNDINGBOX to);       // Returns the (unique) affine transformtion that shifts from one `BOUNDINGBOX` frame to another.
+    AFFINE(CONNECTION from, CONNECTION to);                     // Returns the (unique) affine transformtion that shifts from one `CONNECTION` frame to another.
+    AFFINE(BOUNDINGBOX from, BOUNDINGBOX to, int noskew=0);    // Returns the (unique) affine transformtion that shifts from one `BOUNDINGBOX` frame to another. If `noskew=0`, the relative scaling of x and y can be different. If `noskew=1`, the transformed box can be larger than the target box. If `noskew=1`, the transformed box can be smaller than the target box.
 
     bool isIdentity()                       const;  // Returns whether the matrix component is the identity and the vector offset is zero.
     bool isZero()                           const;  // Returns whether all coeficients are zero.
@@ -215,8 +215,10 @@ public:
     AFFINE operator*(GLdouble s)            const;  // Returns the product of this transformation with the linear transformation that scales by `s`, i.e. the matrix [ s, 0; 0, s ].
     AFFINE operator/(GLdouble s)            const;  // Returns the product of this transformation with the linear transformation that scales by `1/s`.
 
-    DEVICEPTR operator+(DEVICE* ptr)        const;  // Returns a device(ptr) transformed by this `AFFINE`.
-    DEVICEPTR operator+(DEVICEPTR ptr)      const;
+//    DEVICEPTR operator*(DEVICE* ptr)        const;  // Returns a device(ptr) transformed by this `AFFINE`.
+//    DEVICEPTR operator*(DEVICEPTR ptr)      const;
+    
+//    POLYLINES operator*(POLYLINES);
     
     AFFINE operator+=(VECTOR v);                    // Increases translation by `v`.
     AFFINE operator-=(VECTOR v);                    // Increases translation by `-v`.

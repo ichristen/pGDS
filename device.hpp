@@ -32,9 +32,12 @@ struct VECTORINT {  // Vectors are stored as integers in GDSII. This helper stru
     int32_t x;
     int32_t y;
     
+    VECTORINT();
     VECTORINT(VECTOR v, GLdouble scalar);
     VECTORINT(VECTOR v, GLdouble scalar, AFFINE m);
 };
+
+VECTOR int2vec(VECTORINT vi, GLdouble scalar);
 
 struct GDSDATE {    // Helper struture encapsulating the GDSII date structure.
     int16_t year;
@@ -155,6 +158,12 @@ public:
     void add(DEVICE* device, AFFINE m=AFFINE(), char c=0);  // Same as above.
     void add(CONNECTION connection);                        // Add a `CONNECTION`. If a `CONNECTION` of this name already exists, replace the existing `CONNECTION`.
     
+    POLYLINES getLayer(uint16_t l1) const;
+    POLYLINES getLayer(uint16_t l1, uint16_t l2) const;
+//    POLYLINES removeLayer(uint16_t l);
+//    POLYLINES setLayer(uint16_t from, uint16_t to);
+//    POLYLINES exchangeLayers(uint16_t l1, uint16_t l2);
+    
     void setLayer(uint16_t layer);
     void setConnectionName(std::string prev, std::string next);
     void eraseConnection(std::string name);
@@ -184,6 +193,8 @@ public:
     
     bool exportLibraryGDS(std::string fname, bool flatten=true);    // Export as .gds...
     bool exportLibraryGDS(FILE* f, bool flatten=true);              // Generally for internal use only...
+    
+//    POLYLINES getLayer(uint8_t l);
     
 private:
     bool exportStructureGDS(FILE* f);                               // For internal use only...

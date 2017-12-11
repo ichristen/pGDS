@@ -204,12 +204,18 @@ AFFINE::AFFINE(CONNECTION from, CONNECTION to) {
     
     operator=(AFFINE(radians, to.v)*AFFINE(-from.v));
 }
-AFFINE::AFFINE(BOUNDINGBOX from, BOUNDINGBOX to) {
+AFFINE::AFFINE(BOUNDINGBOX from, BOUNDINGBOX to, int noskew) {
     if (from.area() && to.area()) {
         GLdouble sx =  to.width()/from.width();
         GLdouble sy = to.height()/from.height();
         
-        operator=( AFFINE(to.ll) * AFFINE(sx,0,0,sy) * AFFINE(-from.ll) );
+        if          (noskew == 0) {
+            operator=( AFFINE(to.center()) * AFFINE(sx,0,0,sy) * AFFINE(-from.center()) );
+        } else if   ( (noskew == 1 && sx > sy) || (noskew ==  -1 && sx < sy) ) {
+            operator=( AFFINE(to.center()) * AFFINE(sx,0,0,sx) * AFFINE(-from.center()) );
+        } else {
+            operator=( AFFINE(to.center()) * AFFINE(sy,0,0,sy) * AFFINE(-from.center()) );
+        }
     } else {
         a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;   // Identity...
     }
@@ -285,8 +291,8 @@ AFFINE AFFINE::operator-(VECTOR v)      const { return AFFINE(a, b, c, d, e-v.x,
 AFFINE AFFINE::operator*(GLdouble s)    const { return copy() *= s; }
 AFFINE AFFINE::operator/(GLdouble s)    const { return copy() /= s; }
 
-//DEVICEPTR AFFINE::operator+(DEVICE* ptr)    const { return DEVICEPTR(ptr, *this); }
-//DEVICEPTR AFFINE::operator+(DEVICEPTR ptr)  const { return ptr * (*this); }
+//DEVICEPTR AFFINE::operator*(DEVICE* ptr)    const { return DEVICEPTR(ptr, *this); }
+//DEVICEPTR AFFINE::operator*(DEVICEPTR ptr)  const { return ptr * (*this); }
 
 AFFINE AFFINE::operator+=(VECTOR v) {   e += v.x; f += v.y; return *this; }
 AFFINE AFFINE::operator-=(VECTOR v) {   e -= v.x; f -= v.y; return *this; }

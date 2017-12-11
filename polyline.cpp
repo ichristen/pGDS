@@ -14,6 +14,16 @@ BOUNDINGBOX::BOUNDINGBOX(VECTOR a, VECTOR b) {
     ll = VECTOR(min(a.x, b.x), min(a.y, b.y));
     initialized = true;
 }
+BOUNDINGBOX::BOUNDINGBOX(VECTOR c, GLdouble w) {
+    ur = c + VECTOR(w/2, w/2);
+    ll = c - VECTOR(w/2, w/2);
+    initialized = true;
+}
+BOUNDINGBOX::BOUNDINGBOX(VECTOR c, GLdouble w, GLdouble h) {
+    ur = c + VECTOR(w/2, h/2);
+    ll = c - VECTOR(w/2, h/2);
+    initialized = true;
+}
 GLdouble BOUNDINGBOX::width() const {
     if (initialized) {  return ur.x - ll.x; }
     else {              return 0; }
@@ -29,6 +39,10 @@ VECTOR BOUNDINGBOX::center() const {    return (ur + ll)/2; }
 //VECTOR south() const;
 //VECTOR east() const;
 //VECTOR west() const;
+
+POLYLINE BOUNDINGBOX::draw() const {
+    return rect(ur, ll).setLayer(0);
+}
 
 BOUNDINGBOX BOUNDINGBOX::copy() const {
     return BOUNDINGBOX(ur, ll);
@@ -79,7 +93,7 @@ bool BOUNDINGBOX::enlarge(VECTOR v) {
 }
 bool BOUNDINGBOX::enlarge(BOUNDINGBOX bb) {
     if (initialized) {
-        return enlarge(bb.ur) || enlarge(bb.ll);
+        return enlarge(bb.ur) + enlarge(bb.ll) > 0;
     } else {
         *this = bb;
         
@@ -266,7 +280,10 @@ void POLYLINE::recomputeBoundingBox() {
     bb.clear();
     
     for (int i = 0; i < points.size(); i++){
+//        bb.print();
+//        points[i].print();
         bb.enlarge(points[i]);
+//        bb.print();
     }
 }
 
@@ -292,13 +309,28 @@ VECTOR POLYLINE::operator[](int i) const {
     }
 }
 bool POLYLINE::insert(int i, VECTOR v) {
-    if (i < 0 || i > points.size()) {
-        return false;
-    } else {
+    i = (i + points.size()) % (points.size());
+//    if (i < 0 || i > points.size()) {
+//        return false;
+//    } else {
         if (isReversed) {   points.insert(points.begin() + points.size() - i, v); }
         else {              points.insert(points.begin() + i, v); }
         return true;
-    }
+//    }
+}
+bool POLYLINE::erase(int i) {
+    i = (i + points.size()) % (points.size());
+//    if (i < 0 || i > points.size()) {
+//        return false;
+//    } else {
+        if (isReversed) {   points.erase(points.begin() + points.size() - i); }
+        else {              points.erase(points.begin() + i); }
+        return true;
+//    }
+}
+void POLYLINE::clear() {
+    points.clear();
+    bb.clear();
 }
 
 //void POLYLINE::operator=(POLYLINE other) {
@@ -749,20 +781,20 @@ void POLYLINE::print() const {
     
     if (isEmpty()) {
 #ifdef MATLAB_MEX_FILE
-        mexPrintf("Empty POLYLINE\n");
+        mexPrintf("Empty POLYLINE on layer [%i]\n", layer);
 #else
-        printf("Empty POLYLINE\n");
+        printf("Empty POLYLINE on layer [%i]\n", layer);
 #endif
     } else {
         
 #ifdef MATLAB_MEX_FILE
         if (isClosed) { mexPrintf("Closed"); } else { mexPrintf("Open"); }
         
-        mexPrintf(" POLYLINE with points: \n");
+        mexPrintf(" POLYLINE on layer [%i] with points: \n", layer);
 #else
         if (isClosed) { printf("Closed"); } else { printf("Open"); }
         
-        printf(" POLYLINE with points: \n");
+        printf(" POLYLINE on layer [%i] with points: \n", layer);
 #endif
         
         if (isReversed) {
@@ -827,6 +859,11 @@ void POLYLINES::recomputeBoundingBox() {
     for (int i = 0; i < polylines.size(); i++){
         polylines[i].recomputeBoundingBox();
         bb.enlarge(polylines[i].bb);
+        
+        printf("\n");
+        
+        polylines[i].bb.print();
+        bb.print();
     }
 }
 
@@ -835,6 +872,37 @@ size_t      POLYLINES::size()                   const {
 }
 bool        POLYLINES::isEmpty()                const {
     return polylines.size() == 0;
+}
+
+POLYLINES   POLYLINES::getLayer(uint16_t l) const {
+    POLYLINES pnew;
+    
+    std::copy_if(polylines.begin(), polylines.end(), std::back_inserter(pnew.polylines),
+                 [l] (const POLYLINE& p) -> bool { return p.layer == l; });
+    
+    return pnew;
+}
+bool        POLYLINES::removeLayer(uint16_t l) {
+    polylines.erase(std::remove_if(polylines.begin(), polylines.end(),
+                                   [l] (POLYLINE& p) { return p.layer == l; }), polylines.end());
+    return true;
+}
+bool        POLYLINES::setLayer(uint16_t from, uint16_t to) {
+    std::for_each(polylines.begin(), polylines.end(),
+                  [from, to] (POLYLINE& p) { if (p.layer == from) { p.layer = to; } });
+    return true;
+}
+bool        POLYLINES::setLayer(uint16_t to) {
+    std::for_each(polylines.begin(), polylines.end(), [to] (POLYLINE& p) { p.layer = to; });
+    return true;
+}
+bool        POLYLINES::exchangeLayers(uint16_t l1, uint16_t l2) {
+    std::for_each(polylines.begin(), polylines.end(),
+                  [l1, l2] (POLYLINE& p) {
+                      if       (p.layer == l1) { p.layer = l2; }
+                      else if  (p.layer == l2) { p.layer = l1; };
+                  });
+    return true;
 }
 
 POLYLINES   POLYLINES::operator/ (double s)     const { return copy() /= s; }
