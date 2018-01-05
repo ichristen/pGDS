@@ -12,7 +12,7 @@
 
 POLYLINE rect(VECTOR u, VECTOR v);
 //POLYLINE rect(GLdouble x, GLdouble y, GLdouble w, GLdouble h);
-POLYLINE rect(VECTOR c, GLdouble w, GLdouble h, int anchorx=0, int anchory=0);
+POLYLINE rect(VECTOR c, GLdouble w, GLdouble h=0, int anchorx=0, int anchory=0);
 //POLYLINE rect(VECTOR c, VECTOR s, int anchorx=0, int anchory=0);
 
 POLYLINE circle(GLdouble r, VECTOR c=VECTOR(), int steps=0);
@@ -63,7 +63,7 @@ POLYLINE connect(CONNECTION b, CONNECTION e, CONNECTIONTYPE type=CIRCULAR, int n
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1);
 void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1);
 
-POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat=10, GLdouble mult=2);
+POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat=10, GLdouble mult=3);
 
 POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, int side=0, GLdouble minstep=1);
 POLYLINE thicken(POLYLINE open, GLdouble width, int side=0, GLdouble minstep=1);

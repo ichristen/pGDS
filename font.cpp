@@ -553,13 +553,62 @@ DEVICE* FONT::getChar(char c) {
             toReturn->add(thicken(p, thick));
         } else if (c == '.') {
             toReturn->add(rect(VECTOR(width/2 - thick/2, 0), VECTOR(width/2 + thick/2, thick)));
-        } else if (c == ',') {
+        } else if (c == ':') {
+            toReturn->add(rect(VECTOR(width/2 - thick/2,   thick), VECTOR(width/2 + thick/2, 2*thick)));
+            toReturn->add(rect(VECTOR(width/2 - thick/2, 4*thick), VECTOR(width/2 + thick/2, 5*thick)));
+        } else if (c == ';') {
             POLYLINE p = POLYLINE();
             
-            p += VECTOR(width/2-thick/2, thick);
+            p += VECTOR(width/2-thick/2, 2*thick);
+            p += VECTOR(width/2+thick/2, 2*thick);
             p += VECTOR(width/2+thick/2, thick);
-            p += VECTOR(width/2+thick/2, 0);
-            p += VECTOR(width/2-thick/2, -thick);
+            p += VECTOR(width/2-thick/2, 0);
+            p.reverse();
+            p.close();
+            
+            toReturn->add(p);
+            
+            toReturn->add(rect(VECTOR(width/2 - thick/2, 4*thick), VECTOR(width/2 + thick/2, 5*thick)));
+        }   else if (c == ',') {
+            POLYLINE p = POLYLINE();
+            
+            p += VECTOR(width/2-thick/2, 2*thick);
+            p += VECTOR(width/2+thick/2, 2*thick);
+            p += VECTOR(width/2+thick/2, thick);
+            p += VECTOR(width/2-thick/2, 0);
+            p.reverse();
+            p.close();
+            
+            toReturn->add(p);
+        }  else if (c == '"') {
+            POLYLINE p = POLYLINE();
+            
+            p += VECTOR(width/2-thick/2 - thick, height);
+            p += VECTOR(width/2+thick/2 - thick, height);
+            p += VECTOR(width/2+thick/2 - thick, height-2*thick);
+            p += VECTOR(width/2-thick/2 - thick, height-2*thick);
+            p.reverse();
+            p.close();
+            
+            toReturn->add(p);
+            
+            POLYLINE p2 = POLYLINE();
+            
+            p2 += VECTOR(width/2-thick/2 + thick, height);
+            p2 += VECTOR(width/2+thick/2 + thick, height);
+            p2 += VECTOR(width/2+thick/2 + thick, height-2*thick);
+            p2 += VECTOR(width/2-thick/2 + thick, height-2*thick);
+            p2.reverse();
+            p2.close();
+            
+            toReturn->add(p2);
+        }  else if (c == '&' + 1) { // '
+            POLYLINE p = POLYLINE();
+            
+            p += VECTOR(width/2-thick/2, height);
+            p += VECTOR(width/2+thick/2, height);
+            p += VECTOR(width/2+thick/2, height-2*thick);
+            p += VECTOR(width/2-thick/2, height-2*thick);
             p.reverse();
             p.close();
             
@@ -611,11 +660,30 @@ DEVICE* FONT::getChar(char c) {
     return nullptr;
 }
 
-DEVICE* FONT::getTextPrivate(std::string text) {
-    DEVICE* toReturn = new DEVICE(text);
+std::vector<std::string> split_string(const std::string& str,
+                                      const std::string& delimiter)
+{
+    std::vector<std::string> strings;
+    
+    std::string::size_type pos = 0;
+    std::string::size_type prev = 0;
+    while ((pos = str.find(delimiter, prev)) != std::string::npos)
+    {
+        strings.push_back(str.substr(prev, pos - prev));
+        prev = pos + 1;
+    }
+    
+    // To get the last substring (or only, if delimiter is not found)
+    strings.push_back(str.substr(prev));
+    
+    return strings;
+}
+
+void FONT::getTextPrivate(std::string text, DEVICE* toReturn) {
+//    DEVICE* toReturn = new DEVICE(text);
     
     VECTOR pen;
-    
+        
     for (int i = 0; i < text.size(); i++) {
         if (text[i] == '_' && i < text.size()-1) {
             i++;
@@ -636,11 +704,23 @@ DEVICE* FONT::getTextPrivate(std::string text) {
         }
     }
     
-    return toReturn;
+//    return toReturn;
 }
 DEVICEPTR FONT::getText(std::string text, int anchorx, int anchory) {
-    DEVICE* toReturn = getTextPrivate(text);
+    DEVICE* toReturn = getDevice(text);
     
+    if (!toReturn->initialized()) {
+        std::vector<std::string> strings = split_string(text, "\n");
+
+        if (strings.size() > 1) {
+            for (int i = 0; i < strings.size(); i++) {
+                toReturn->add(getText(strings[i], anchorx, anchory) * AFFINE(0, -i*(height+2*thick)));
+            }
+        } else {
+            getTextPrivate(text, toReturn);
+        }
+    }
+        
     VECTOR shift;
     
     if      (anchorx >  0) { shift.x = -toReturn->bb.width(); }      // Right,

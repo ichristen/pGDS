@@ -30,6 +30,8 @@ POLYLINE rect(VECTOR u, VECTOR v) {
 //    return rect(VECTOR(x,y), VECTOR(x+w, y+h));
 //}
 POLYLINE rect(VECTOR c, GLdouble w, GLdouble h, int anchorx, int anchory) {
+    if (h == 0) { h = w; }
+    
     return rect(c - VECTOR((1+anchorx)*w/2, (1+anchory)*h/2), c + VECTOR((1-anchorx)*w/2, (1-anchory)*h/2));
 }
 //POLYLINE rect(VECTOR c, VECTOR s, int anchorx=0, int anchory=0) {
@@ -178,7 +180,7 @@ POLYLINE parametricCylindrical( std::function<GLdouble(GLdouble t)> lambdaR,
 }
 
 POLYLINE parabola(GLdouble x0, GLdouble x1, VECTOR focus, VECTOR vertex, int steps) {
-    return parabola(x0, x1, 1/(4 * (vertex-focus).magn()), vertex, (vertex-focus).unit(), steps);
+    return parabola(x0, x1, 1/(4 * (focus-vertex).magn()), vertex, (focus-vertex).unit(), steps);
 }
 POLYLINE parabola(GLdouble x0, GLdouble x1, GLdouble a, VECTOR center, VECTOR direction, int steps) {
     if (!steps) { steps = ceil(std::abs(x0 - x1)) + 10; }
@@ -715,6 +717,8 @@ void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTI
 }
 
 POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat, GLdouble mult) {
+    POLYLINES toReturn;
+    
     VECTOR bl = b.v + b.dv.perpCCW()*r;
     VECTOR br = b.v + b.dv.perpCW()*r;
     VECTOR el = e.v + e.dv.perpCCW()*r;
@@ -734,6 +738,12 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    lr.printNL();
 //    rl.printNL();
 //    rr.printNL();
+    
+    if ((e.v - b.v).magn() < 2*r) {
+        connectThickenAndAdd(&toReturn, b, e, CIRCULAR);
+        
+        return toReturn;
+    }
     
     // Straight Cases...
     VECTOR blr = bl + lr.perpCW().unit()*r;
@@ -800,7 +810,7 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     // Now find the shortest case...
     GLdouble Lmin = min(min(Llr, Lrl), min(Lll, Lrr));
     
-    POLYLINES toReturn;
+//    printf("min( %f, ")
     
     GLdouble longWidth = mult*(b.w + e.w)/2.;
     
@@ -845,10 +855,10 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
         } else {
             POLYLINE p;
 
-            p.add(b2.left());
             p.add(b2.right());
-            p.add(e2.left());
+            p.add(b2.left());
             p.add(e2.right());
+            p.add(e2.left());
 
             p.close();
 

@@ -18,16 +18,19 @@
 class POLYLINE;
 
 class BOUNDINGBOX {
+private:
+    bool initialized;
 public:
     VECTOR ur;
     VECTOR ll;
-    bool initialized;
     
     BOUNDINGBOX();
     BOUNDINGBOX(VECTOR a);
     BOUNDINGBOX(VECTOR a, VECTOR b);                // Makes the smallest bounding box that contains both a and b (a != ur, b != ll, generally).
     BOUNDINGBOX(VECTOR c, GLdouble w);              // Makes a box with width `w` and height `w` centered at `c`.
     BOUNDINGBOX(VECTOR c, GLdouble w, GLdouble h);  // Makes a box with width `w` and height `h` centered at `c`.
+    
+    bool isInitialized() const;
     
     GLdouble width() const;
     GLdouble height() const;
@@ -113,6 +116,8 @@ private:
     
     GLuint fillList         = 0;
     GLuint outlineList      = 0;
+    
+    int returnValidIndex(int i);
     
 public:
     std::vector<VECTOR> points;         // Make private eventually?
@@ -258,7 +263,7 @@ public:
     POLYLINES&  booleanEquals(POLYLINE p, BOOLOPERATION op);
     
     POLYLINES&  operator&=(POLYLINE p);         // Boolean AND equals
-    POLYLINES&  operator|=(POLYLINE p);         // Boolean OR equals
+    POLYLINES&  operator|=(POLYLINE p);         // Boolean OR  equals
     POLYLINES&  operator^=(POLYLINE p);         // Boolean XOR equals
     
     

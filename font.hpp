@@ -75,7 +75,7 @@ public:
 #endif
 private:
     DEVICE* getChar(char c);
-    DEVICE* getTextPrivate(std::string text);
+    void getTextPrivate(std::string text, DEVICE* toReturn);
     
 public:
     DEVICEPTR getText(std::string text, int anchorx=0, int anchory=0);  // Returns device containing text. Anchor determines location of origin (e.g. `anchorx == -1 ==>` origin is on the leftmost part of resulting device; `anchorx == 0 ==>` origin is at center; etc).

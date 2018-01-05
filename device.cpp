@@ -495,10 +495,11 @@ bool DEVICE::importGDS(std::string fname) {
 
     uint64_t user2dbUnits =    0;
     uint64_t db2metricUnits =  0;
-    
-    std::vector<VECTORINT> intPoints;
 
     while (true) {
+        
+        std::vector<VECTORINT> intPoints;
+        
         fread(&header, sizeof(uint32_t), 1, f);
         
         header = endianSwap(header);
@@ -540,7 +541,8 @@ bool DEVICE::importGDS(std::string fname) {
         }
 
         if (size*length > bufsize) {
-            bufsize *= 2;
+            while (size*length > bufsize) { bufsize *= 2; }
+            
             free(buffer);
             buffer = malloc(bufsize);
         }
@@ -607,7 +609,10 @@ bool DEVICE::importGDS(std::string fname) {
 //                intPoints.clear();
 //                intPoints.resize(length/size);
 //                intPoints.resize(length/size/2 - 1, VECTORINT());
-                intPoints.reserve(length/size/2 - 1);
+//                printf("SIZE0=%i\n", intPoints.size());
+//                intPoints.reserve(length/size/2 - 1);
+                intPoints.resize(length/size/2 - 1, VECTORINT());
+//                printf("SIZE1=%i\n", intPoints.size());
                 memcpy(&(intPoints[0]), buffer, length - 2*size);
                 
                 std::transform(intPoints.begin(), intPoints.begin() + length/size/2 - 1,
