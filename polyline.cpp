@@ -70,13 +70,13 @@ bool BOUNDINGBOX::isEmpty() {
     return !initialized;
 }
 bool BOUNDINGBOX::doesContain(VECTOR v) {
-    return initialized && (v.x <= ur.x && v.x >= ll.x) && (v.y <= ur.y && v.y >= ll.y);
+    return initialized && (v.x <= ur.x + ERROR && v.x >= ll.x - ERROR) && (v.y <= ur.y + ERROR && v.y >= ll.y - ERROR);
 }
 bool BOUNDINGBOX::doesContainX(GLdouble x) {
-    return initialized && (x <= ur.x && x >= ll.x);
+    return initialized && (x <= ur.x + ERROR  && x >= ll.x - ERROR);
 }
 bool BOUNDINGBOX::doesContainY(GLdouble y) {
-    return initialized && (y <= ur.y && y >= ll.y);
+    return initialized && (y <= ur.y + ERROR  && y >= ll.y - ERROR);
 }
 bool BOUNDINGBOX::doesContain(BOUNDINGBOX bb) {
     return initialized && doesContain(bb.ur) && doesContain(bb.ll);
@@ -213,12 +213,16 @@ void BOUNDINGBOX::print()                    const {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int POLYLINE::returnValidIndex(int i) {
+int POLYLINE::returnValidIndex(int i) const {
+//    printf("%i\n", isClosed);
+//    printf("%i\n", (i < 0 || i >= points.size()));
+//    printf("%i\n", !isClosed && (i < 0 || i >= points.size()));
+    
     if (!isClosed && (i < 0 || i >= points.size())) {
         return -1;
     }
     
-    return (i + points.size()) % (points.size());
+    return (i + (int)points.size()) % (points.size());
 }
 POLYLINE::POLYLINE(size_t size_) {
     points.reserve(size_);
@@ -228,14 +232,19 @@ POLYLINE::POLYLINE(size_t size_) {
 POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
     printf("WARNING: POLYLINE(POLYLINE p, int b, int e) is currently slightly bugged (with begin/end calculation).\n");
     
-    printf("b=%i\n", b);
-    printf("e=%i\n", e);
+//    printf("s=%i\n", p.size());
+//
+//    printf("b=%i\n", b);
+//    printf("e=%i\n", e);
     
-    b = returnValidIndex(b);
-    e = returnValidIndex(e);
+    b = p.returnValidIndex(b);
+    e = p.returnValidIndex(e);
     
-    if (b == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Beginning point invalid"); }
-    if (e == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Ending point invalid"); }
+//    printf("b=%i\n", b);
+//    printf("e=%i\n", e);
+    
+    if (b == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Beginning point invalid."); }
+    if (e == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Ending point invalid."); }
     
     isClosed = false;   // p.isClosed;
     isReversed = false;
@@ -314,42 +323,30 @@ POLYLINE POLYLINE::clip(int b, int e) {
 
 
 VECTOR POLYLINE::operator[](int i) const {
-    if (points.size()) {
-        throw std::runtime_error("POLYLINE::operator[](int): This POLYLINE has no points to reference[]...");
-    }
+    if (!points.size()) { throw std::runtime_error("POLYLINE::operator[](int): This POLYLINE has no points to reference[]..."); }
     
-    if (!isClosed && (i < 0 || i >= points.size())) {
-        throw std::runtime_error("POLYLINE::operator[](int): Out of range...");
-    }
+    if ((i = returnValidIndex(i)) == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Out of range..."); }
     
-    i = (i + points.size()) % (points.size());
-
     if (isReversed) {                   return points[points.size() - i - 1]; }
     else {                              return points[i]; }
 }
 bool POLYLINE::insert(int i, VECTOR v) {
-    if (!isClosed && (i < 0 || i >= points.size())) {
-        return false;
-    } else {
-        i = (i + points.size()) % (points.size());
+    if (i == points.size()) {   add(v); return true; }
+    
+    if ((i = returnValidIndex(i)) == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Out of range..."); }
         
-        if (operator[](i) == v) { return false; }
-        
-        if (isReversed) {   points.insert(points.begin() + points.size() - i, v); }
-        else {              points.insert(points.begin() + i, v); }
-        return true;
-    }
+    if (operator[](i) == v) { return false; }
+    
+    if (isReversed) {   points.insert(points.begin() + points.size() - i, v); }
+    else {              points.insert(points.begin() + i, v); }
+    return true;
 }
 bool POLYLINE::erase(int i) {
-    if (!isClosed && (i < 0 || i >= points.size())) {
-        return false;
-    } else {
-        i = (i + points.size()) % (points.size());
+    if ((i = returnValidIndex(i)) == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Out of range..."); }
         
-        if (isReversed) {   points.erase(points.begin() + points.size() - i); }
-        else {              points.erase(points.begin() + i); }
-        return true;
-    }
+    if (isReversed) {   points.erase(points.begin() + points.size() - i); }
+    else {              points.erase(points.begin() + i); }
+    return true;
 }
 void POLYLINE::clear() {
     points.clear();
@@ -370,11 +367,6 @@ POLYLINE POLYLINE::operator-() {        // Revist whether area should be calcula
 POLYLINE& POLYLINE::reverse() {
     area_ = -area();
     isReversed = !isReversed;
-    
-//    VECTOR temp = begin;
-//    
-//    begin = end;
-//    end = temp;
     
     return *this;
 }
@@ -537,7 +529,7 @@ POLYLINE& POLYLINE::operator+=(POLYLINE p) {
 //            print();
             
             if (size()) {
-                add = (p[0] == operator[](-1));
+                add = (p[0] == operator[]((int)size()-1));
 //                printf("p[0] = ");  p[0].printNL();
 //                printf("p[-1] = "); p[-1].printNL();
 //                printf("operator[](0) = ");  operator[](0).printNL();
@@ -1008,7 +1000,7 @@ POLYLINES&  POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
 POLYLINES   POLYLINES::boolean(POLYLINES p, BOOLOPERATION op) const { return copy().booleanEquals(p, op); }
 POLYLINES&  POLYLINES::booleanEquals(POLYLINES p, BOOLOPERATION op) {
     if (size()*p.size() > 100) {
-        printf("POLYLINES::booleanEquals(POLYLINES, BOOLOPERATION): There are this.size() * other.size() = %lu * %lu = %lu comparisons to make.\nMaybe it's time to implement Bentley–Ottmann\n", size(), p.size(), size()*p.size());
+        printf("POLYLINES::booleanEquals(POLYLINES, BOOLOPERATION): There are this.size() * other.size() = %lu * %lu = %lu comparisons to make.\nMaybe it's time to implement Bentley–Ottmann?\n", size(), p.size(), size()*p.size());
     }
     
     if (op == OR) {

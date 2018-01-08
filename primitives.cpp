@@ -382,8 +382,8 @@ POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps) {
     }
     toReturn.add(e);
     
-    toReturn.begin =    (b-c).perpCCW().unit()*sign(ang);
-    toReturn.end =      (e-c).perpCCW().unit()*sign(ang);
+    toReturn.setBeginDirection( (b-c).perpCCW().unit()*sign(ang) );
+    toReturn.setEndDirection(   (e-c).perpCCW().unit()*sign(ang) );
     
     return toReturn;
 }
@@ -418,8 +418,8 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
 //    }
     POLYLINE toReturn;
     
-    toReturn.begin = i.dv;
-    toReturn.end = -f.dv;
+    toReturn.setBeginDirection(i.dv);
+    toReturn.setEndDirection(-f.dv);
     
 //    printf("toReturn.begin=");  toReturn.begin.printNL();
 //    printf("toReturn.end=");    toReturn.end.printNL();
@@ -445,8 +445,8 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
             toReturn += f.v;
         }
         
-        toReturn.begin =    i.dv;
-        toReturn.end =      -f.dv;
+        toReturn.setBeginDirection(i.dv);
+        toReturn.setEndDirection(-f.dv);
         
         return toReturn;
     }
@@ -588,8 +588,8 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
     
     //    printf("AREA: %f\n", toReturn.area());
     
-    toReturn.begin = i.dv;
-    toReturn.end = -f.dv;
+    toReturn.setBeginDirection(i.dv);
+    toReturn.setEndDirection(-f.dv);
     
     return toReturn;
 }
@@ -925,9 +925,9 @@ POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, int 
 //    toReturn.print();
     
     if (closed) {
-        int mid = toReturn.size()/2;
+        int mid = (int)toReturn.size()/2;
         
-        toReturn.erase(-1);
+        toReturn.erase((int)toReturn.size()-1);
         toReturn.erase(mid);
         toReturn.erase(mid-1);
         toReturn.erase(0);
@@ -946,8 +946,8 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
     GLdouble thisLength = 0;// = minstep;
     
     if (i == open->size()-1) {
-        if (!open->end.isZero()) {  u = open->end; }
-        else {                      u = (open->points[open->size()-1] - open->points[open->size()-2]).unit(); }
+        if (!open->getEndDirection().isZero()) {    open->setEndDirection(u); }
+        else {  u = (open->points[open->size()-1] - open->points[open->size()-2]).unit(); }
         
 //        printf("open->end.isZero()=%i; u=", open->end.isZero());
 //        u.printNL();
@@ -956,8 +956,8 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
         
         offset = (*lambda)(1)/2;
     } else if (i == 0) {
-        if (!open->begin.isZero()) {    u = open->begin; }
-        else {                          u = (open->points[1] - open->points[0]).unit(); }
+        if (!open->getBeginDirection().isZero()) {  open->setBeginDirection(u); }
+        else {  u = (open->points[1] - open->points[0]).unit(); }
         
 //        printf("open->begin.isZero()=%i; u=", open->begin.isZero());
 //        u.printNL();

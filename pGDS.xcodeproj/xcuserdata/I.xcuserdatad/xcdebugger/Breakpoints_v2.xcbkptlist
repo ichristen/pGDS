@@ -26,7 +26,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "eodevices.cpp"
-            timestampString = "536794479.1457"
+            timestampString = "537085809.956454"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "340"
@@ -42,28 +42,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "eodevices.cpp"
-            timestampString = "536794479.145839"
+            timestampString = "537085809.956533"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "179"
-            endingLineNumber = "179"
-            landmarkName = "LNX_LOSS()"
+            startingLineNumber = "255"
+            endingLineNumber = "255"
+            landmarkName = "LNX_EO()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "eodevices.cpp"
-            timestampString = "536794479.145908"
+            filePath = "boolean.cpp"
+            timestampString = "537085809.9566"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "255"
-            endingLineNumber = "255"
-            landmarkName = "LNX_EO()"
+            startingLineNumber = "523"
+            endingLineNumber = "523"
+            landmarkName = "splitPolylines(POLYLINE a, POLYLINE b, BOOLOPERATION op)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

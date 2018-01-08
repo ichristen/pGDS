@@ -111,13 +111,16 @@ class POLYLINE {
 private:
     bool isReversed         = false;
     
+    VECTOR begin;                       // For unclosed polylines, this defines the *direction* of the beginning and end.
+    VECTOR end;
+    
     double area_            = 0;
     double length_          = 0;
     
     GLuint fillList         = 0;
     GLuint outlineList      = 0;
     
-    int returnValidIndex(int i);
+    int returnValidIndex(int i) const;
     
 public:
     std::vector<VECTOR> points;         // Make private eventually?
@@ -128,9 +131,7 @@ public:
     
 public:
     bool isClosed           = false;
-    
-    VECTOR begin;                       // For unclosed polylines, this defines the *direction* of the beginning and end.
-    VECTOR end;                         // When a polyline is reversed, begin still corresponds to the internal first index.
+                       // When a polyline is reversed, begin still corresponds to the internal first index.
     
     POLYLINE(size_t size_=200);
     POLYLINE(POLYLINE p, int b, int e);

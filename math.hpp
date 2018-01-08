@@ -11,6 +11,7 @@
 #include <OpenGL/OpenGL.h>
 
 #define EPSILON     .01
+//#define EPSILON     .000000001
 #define ERROR       .000000001
 
 #define MINRADIUS   20

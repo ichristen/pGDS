@@ -117,7 +117,8 @@ bool intersect(VECTOR a1, VECTOR a2, VECTOR b1, VECTOR b2, VECTOR** i) {
     // Lastly, calculate intersection of y = aslope*(x-a1.x) + a1.y and y = bslope*(x-b1.x) + b1.y.
     GLdouble x = (a1.x*aslope - b1.x*bslope - a1.y + b1.y)/(aslope - bslope);   // Check this;
     
-    if ( (x >= min(a1.x, a2.x) && x <= max(a1.x, a2.x)) && (x >= min(b1.x, b2.x) && x <= max(b1.x, b2.x)) ) {
+    if ( (x >= min(a1.x, a2.x) - ERROR && x <= max(a1.x, a2.x) + ERROR) &&
+         (x >= min(b1.x, b2.x) - ERROR && x <= max(b1.x, b2.x) + ERROR) ) {
         *i = new VECTOR(x, aslope*(x-a1.x) + a1.y);
         return true;
     }
@@ -131,7 +132,7 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
     std::vector<POLYLINE> finalClosedPolylines;
     std::map<VECTOR, std::vector<POLYLINE*>> ssp;
     
-    if (std::abs(a.area()) < EPSILON || std::abs(b.area()) < EPSILON) {               // If one of the shapes is empty...
+    if (std::abs(a.area()) < ERROR || std::abs(b.area()) < ERROR) {               // If one of the shapes is empty...
         switch (op) {
             case OR:
             case XOR:
@@ -223,8 +224,7 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
             
             for (int j = 0; j < ssp[firstIntersection].size(); j++) {
                 
-                printf("{ %i, %i } - 0x%i - ", i, j, ssp[firstIntersection][j]);
-                firstIntersection.printNL();
+                printf("{ %i, %i } - 0x%i - ", i, j, (long)ssp[firstIntersection][j]); firstIntersection.printNL();
                 
                 if (ssp[firstIntersection][j]) {  // If this POLYLINE* is not null, then follow the path...
                     POLYLINE* firstPath = ssp[firstIntersection][j];
@@ -249,11 +249,15 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
                             int mostLeftk = -1;
                             GLdouble mostLeftAngle = TAU;
                             
+                            printf("currentPath:\n");
+                            currentPath->print();
+                            
                             for (int k = 0; k < nextPaths.size(); k++) {
-                                printf("nextPaths[%i] = 0x%i\n", k, nextPaths[k]);
+                                printf("nextPaths[%i] = 0x%li:\n", k, (long)nextPaths[k]);
                                 
                                 if (nextPaths[k]) {
-                                    nextPaths[k]->getBeginPoint().printNL();
+                                    nextPaths[k]->print();
+//                                    nextPaths[k]->getBeginPoint().printNL();
                                     
                                     printf("nextPaths[k]->getBeginPoint(): "); nextPaths[k]->getBeginPoint().printNL();
                                     printf("currentIntersection: "); currentIntersection.printNL();
@@ -261,7 +265,6 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
                                 
                                 if (nextPaths[k] && nextPaths[k]->getBeginPoint() == currentIntersection) {
                                     //                                    VECTOR out = nextPaths[k]->getBeginDirection();
-                                    
                                     VECTOR out = (nextPaths[k]->operator[](1) - nextPaths[k]->operator[](0)).unit();
                                     
                                     printf("nextPaths[k][0]  = "); nextPaths[k]->operator[](0).printNL();
@@ -274,10 +277,10 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
                                     
                                     GLdouble angle = acos( -(in * out) );
                                     
-                                    printf("ANG: %f", angle);
+                                    printf("ANG: %.20f ", angle);
                                     
-                                    if (angle != PI) {    // If the angle doesn't go back on itself...
-                                                          //                                        if (in.perpCCW() * out < 0) {   // If the vector is to the right...
+                                    if (angle > 0.00001) {       // If the angle doesn't go back on itself...
+                                                            //                                        if (in.perpCCW() * out < 0) {   // If the vector is to the right...
                                         if (in.perpCCW() * out < 0) {   // If the vector is to the right...
                                             angle = TAU - angle;
                                         }
@@ -324,7 +327,7 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
                         
                         printf("AREA!: %f", finalPath.area());
                         
-                        if (std::abs(finalPath.area()) > EPSILON) {
+                        if (std::abs(finalPath.area()) > sqrt(ERROR)) {
                             if (reverseAtEnd) { finalClosedPolylines.push_back(-finalPath); }
                             else {              finalClosedPolylines.push_back(finalPath); }
                         }
@@ -429,10 +432,11 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
             }
         }
     } else {        // New, probably O(n) algorithm
-                    // Find the segments in a...
+        
         a += a[0];  // Duplicate the first point for simplicity
         b += b[0];
         
+        // Find the segments in a and b...
         std::vector<SEGMENT> asegments = getMonotonicInsideSegmentsFromPolyline(a, interesting);
         std::vector<SEGMENT> bsegments = getMonotonicInsideSegmentsFromPolyline(b, interesting);
         
@@ -449,8 +453,22 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
             bsegments[i].bb.print();
         }
         
+        if (asegments.size()*bsegments.size() > 100) {
+            printf("POLYLINES::booleanEquals(POLYLINES, BOOLOPERATION): There are asegments.size() * bsegments.size() = %lu * %lu = %lu comparisons to make.\nMaybe it's time to implement Bentley–Ottmann?\n", asegments.size(), bsegments.size(), asegments.size()*bsegments.size());
+        }
+        
         for (int i = 0; i < asegments.size(); i++) {
             for (int j = 0; j < bsegments.size(); j++) {
+                printf("\n\n*Checking intersection between\n**asegments[%i] = %i -> %i, %i:\n", i, asegments[i].b, asegments[i].e, asegments[i].forward);
+                
+                a.print();
+                POLYLINE(a, asegments[i].b, asegments[i].e); //.print();
+                       
+                printf("**and bsegments[%i] = %i -> %i, %i:\n", j, bsegments[j].b, bsegments[j].e, bsegments[j].forward);
+                
+                b.print();
+                POLYLINE(b, bsegments[j].b, bsegments[j].e); //.print();
+                
                 if (asegments[i].bb.doesIntersect(bsegments[j].bb)) {   // If the bounding boxes intersect...
                     BOUNDINGBOX superInteresting = asegments[i].bb & bsegments[j].bb;
                     
@@ -468,8 +486,8 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                     
                     
                     int bdir =  (bsegments[j].forward)?(1):(-1);
-                    int bbeg =  (bsegments[j].forward)?(bsegments[i].b):(bsegments[j].e);
-                    int bend =  (bsegments[j].forward)?(bsegments[i].e):(bsegments[j].b);
+                    int bbeg =  (bsegments[j].forward)?(bsegments[j].b):(bsegments[j].e);
+                    int bend =  (bsegments[j].forward)?(bsegments[j].e):(bsegments[j].b);
                     int bi =    bbeg;
                     
                     while (bi != bend && b[bi+bdir].x < superInteresting.ll.x) { bi += bdir; }
@@ -503,7 +521,7 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                         printf(" to "); b[bi].printNL();
                         
                         if ( intersect(a[ai-adir], a[ai], b[bi-bdir], b[bi], &intersection) ) {   // If they intersect... (note this line can be improved)
-//                            printf("intersection: 0x%i\n", intersection);
+                            printf("intersection: 0x%i\n", intersection);
                             
                             if (intersection) {                                         // ...and there are not infintely-many intersections (if there are infintely-many intersections, null is returned).
                                 printf("Line intersection at ");
@@ -526,17 +544,18 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                                     }
                                     
                                     if (asegments[i].forward) { aend++; ai++; printf("ai++;\n"); }
+//                                    else { aend++; }
                                     
                                     // Then add the index to the list of cuts.
                                     acuts.push_back(aindex);
                                 }
                                 
-                                if      (*intersection == b[i]) {   bcuts.push_back(i); }
-                                else if (*intersection == b[i+1]) { bcuts.push_back(i+1); }
+                                if      (*intersection == b[bi-bdir]) { bcuts.push_back(bi-bdir); }
+                                else if (*intersection == b[bi]) {      bcuts.push_back(bi); }
                                 else {
                                     int bindex = max(bi, bi-bdir);
                                     
-                                    // Add the intersection to a if it isn't already there...
+                                    // Add the intersection to b if it isn't already there...
                                     b.insert(bindex, *intersection);
                                     
                                     // ...and incriment the indices that will be shifted by its presence.
@@ -548,6 +567,7 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                                     }
                                     
                                     if (bsegments[j].forward) { bend++; bi++; printf("bi++;\n"); }
+//                                    else { bend++; }
                                     
                                     //                                    bi += bdir;
                                     
@@ -562,8 +582,8 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                         
                         if (ai == aend && bi == bend) { break; }
                         
-                        if      (a[ai-adir].x < b[bi-bdir].x) { ai += adir; }   // If a is lagging...
-                        else if (a[ai-adir].x > b[bi-bdir].x) { bi += bdir; }   // If b is lagging...
+                        if      (a[ai-adir].x < b[bi-bdir].x && ai != aend) { ai += adir; }   // If a is lagging...
+                        else if (a[ai-adir].x > b[bi-bdir].x && bi != bend) { bi += bdir; }   // If b is lagging...
                         else {                                                  // If a and b are tied..
                             if      (ai == aend) { bi += bdir; }  // If a has ended, incriment b...
                             else if (bi == bend) { ai += adir; }  // If b has ended, incriment a...
@@ -631,93 +651,98 @@ void cutPolyline(POLYLINE& a, POLYLINE& b, std::vector<int> acuts, BOOLOPERATION
         int l = x2-x1+1;
         
         if (l <= 0) {
-            l += a.size() + 1;  // Not sure about the +1...
+            l += a.size();  // Not sure about the +1...
         }
         
-        VECTOR testPoint;
-        
-        printf("l = %i\n", l);
-        
-        if (l > 2) {
-            testPoint = a[x1+1]; // (*toAdd)[1];
-        } else if (l == 2) {
-            testPoint = (a[x1] + a[x2]) / 2;
+        if ((l == 2 && a[x1] == a[x2]) || l < 2) {
+            // Empty polyline
         } else {
-//            throw std::runtime_error("splitPolylines(POLYLINE^2, OP): Did not expect a polyline with less than two points...");
-        }
+            VECTOR testPoint;
         
-        bool isInside = b.contains(testPoint);
+            printf("l = %i\n", l);
         
-        POLYLINE* toAdd1;
-        POLYLINE* toAdd2;
+            if (l > 2) {
+                testPoint = a[x1+1]; // (*toAdd)[1];
+            } else if (l == 2) {
+                testPoint = (a[x1] + a[x2]) / 2;
+            }
+//            else {
+//                throw std::runtime_error("splitPolylines(POLYLINE^2, OP): Did not expect a polyline with less than two points...");
+//            }
         
-//        a.print();
+            bool isInside = b.contains(testPoint);
         
-        if (aPos && bPos) {
-            
-            switch (op) {
-                case AND:   // Adds reversed segment only if inside other.
-                    if (isInside) {
-//                        printf("Inside...\n");
+            POLYLINE* toAdd1;
+            POLYLINE* toAdd2;
+        
+    //        a.print();
+        
+            if (aPos && bPos) {
+                
+                switch (op) {
+                    case AND:   // Adds reversed segment only if inside other.
+                        if (isInside) {
+    //                        printf("Inside...\n");
+                            
+                            toAdd1 = new POLYLINE(a, x1, x2);
+                            
+    //                        printf("0x%i\n", toAdd1);
+    //
+    //                        //                        toAdd1->reverse();
+    //
+    //                        printf("BEGIN - "); toAdd1->getBeginPoint().printNL();
+    //                        printf("END   - "); toAdd1->getEndPoint().printNL();
+                            
+                            sortedSplitPolylines[toAdd1->getBeginPoint()].push_back(toAdd1);
+//                            sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
+                        } //else { printf("Not inside...\n"); }
+                        break;
                         
+                    case OR:    // Adds all segments, adds an additional reversed segment if inside other.
                         toAdd1 = new POLYLINE(a, x1, x2);
                         
-//                        printf("0x%i\n", toAdd1);
-//                        
-//                        //                        toAdd1->reverse();
-//                        
-//                        printf("BEGIN - "); toAdd1->getBeginPoint().printNL();
-//                        printf("END   - "); toAdd1->getEndPoint().printNL();
+                        sortedSplitPolylines[toAdd1->getBeginPoint()].push_back(toAdd1);
+//                        sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
+                        
+                        if (isInside) {
+                            toAdd2 = new POLYLINE(a, x1, x2);
+                            
+                            toAdd2->reverse();
+                            
+                            sortedSplitPolylines[toAdd2->getBeginPoint()].push_back(toAdd2);
+//                            sortedSplitPolylines[toAdd2->getEndPoint()  ].push_back(toAdd2);
+                        }
+                        
+                        break;
+                        
+                    case XOR:   // Adds all segments, reverses if inside other.
+                        toAdd1 = new POLYLINE(a, x1, x2);
+                        
+                        if (isInside) { toAdd1->reverse(); }
                         
                         sortedSplitPolylines[toAdd1->getBeginPoint()].push_back(toAdd1);
-                        sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
-                    } //else { printf("Not inside...\n"); }
-                    break;
-                    
-                case OR:    // Adds all segments, adds an additional reversed segment if inside other.
+//                        sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
+                        
+                        break;
+                }
+                
+            } else if (aPos) {  // Adds segment if not inside other.
+                if (!isInside) {
                     toAdd1 = new POLYLINE(a, x1, x2);
                     
                     sortedSplitPolylines[toAdd1->getBeginPoint()].push_back(toAdd1);
-                    sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
-                    
-                    if (isInside) {
-                        toAdd2 = new POLYLINE(a, x1, x2);
-                        
-                        toAdd2->reverse();
-                        
-                        sortedSplitPolylines[toAdd2->getBeginPoint()].push_back(toAdd2);
-                        sortedSplitPolylines[toAdd2->getEndPoint()  ].push_back(toAdd2);
-                    }
-                    
-                    break;
-                    
-                case XOR:   // Adds all segments, reverses if inside other.
+//                    sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
+                }
+            } else if (bPos) {  // Adds segment if inside other.
+                if (isInside) {
                     toAdd1 = new POLYLINE(a, x1, x2);
                     
-                    if (isInside) { toAdd1->reverse(); }
-                    
                     sortedSplitPolylines[toAdd1->getBeginPoint()].push_back(toAdd1);
-                    sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
-                    
-                    break;
+//                    sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
+                }
+            } else {
+                throw std::runtime_error("splitPolylines(POLYLINE^2, OP): Previous check should have accounded for all negative case...");
             }
-            
-        } else if (aPos) {  // Adds segment if not inside other.
-            if (!isInside) {
-                toAdd1 = new POLYLINE(a, x1, x2);
-                
-                sortedSplitPolylines[toAdd1->getBeginPoint()].push_back(toAdd1);
-                sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
-            }
-        } else if (bPos) {  // Adds segment if inside other.
-            if (isInside) {
-                toAdd1 = new POLYLINE(a, x1, x2);
-                
-                sortedSplitPolylines[toAdd1->getBeginPoint()].push_back(toAdd1);
-                sortedSplitPolylines[toAdd1->getEndPoint()  ].push_back(toAdd1);
-            }
-        } else {
-            throw std::runtime_error("splitPolylines(POLYLINE^2, OP): Previous check should have accounded for all negative case...");
         }
     }
 }

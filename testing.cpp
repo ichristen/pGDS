@@ -33,8 +33,8 @@ void testBooleans() {
                 b = rect(VECTOR(-2,-2), 4);
                 break;
             case 2:
-                a = circle(2, VECTOR( 1, 1), 8);
-                b = circle(2, VECTOR(-1,-1), 8);
+                a = circle(3, VECTOR( 1, 1), 81);
+                b = circle(2, VECTOR(-1,-1), 80);
                 break;
             case 3:
                 a = circle(3, VECTOR( 1, 1), 10);
