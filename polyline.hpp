@@ -15,6 +15,8 @@
 #include "vector.hpp"
 #include "math.hpp"
 
+//#define POLYLINE_DEBUG 1
+
 class POLYLINE;
 
 class BOUNDINGBOX {

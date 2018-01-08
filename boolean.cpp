@@ -35,8 +35,10 @@ bool intersect(VECTOR a1, VECTOR a2, VECTOR b1, VECTOR b2, VECTOR** i) {
     
 //    printf("3 ... ");
     
-    if (a1.x == a2.x && b1.x == b2.x) { // If a and b are vertical
-                                        //        if (a1.x == b1.x) {
+    bool avert = a1.x < a2.x + ERROR && a1.x > a2.x - ERROR;
+    bool bvert = b1.x < b2.x + ERROR && b1.x > b2.x - ERROR;
+    
+    if (avert && bvert) {
         GLdouble mina = min(a1.y, a2.y);
         GLdouble maxa = max(a1.y, a2.y);
         
@@ -52,17 +54,12 @@ bool intersect(VECTOR a1, VECTOR a2, VECTOR b1, VECTOR b2, VECTOR** i) {
         }
         
         return true;
-        //        } else {
-        //            throw std::runtime_error("intersect(VECTOR^4, VECTOR*): a and b are vertical, but not on the same line. Bounding box check should have caught this.");
-        //        }
-    } else if (a1.x == a2.x) {
+    } else if (avert) {
         if (a1.x <= max(b1.x, b2.x) && a1.x >= min(b1.x, b2.x)) {
-            //            GLdouble bslope = (b1.y - b2.y)/(b1.x - b2.x);
+            GLdouble y = (a1.x-b1.x)*(b2.y - b1.y)/(b2.x - b1.x) + b1.y;
             
-            GLdouble by = (a1.x-b1.x)*(b1.y - b2.y)/(b1.x - b2.x) + b1.y;
-            
-            if (by <= max(a1.y, a2.y) && by >= min(a1.y, a2.y)) {
-                *i = new VECTOR(a1.x, by);
+            if (y <= max(a1.y, a2.y) && y >= min(a1.y, a2.y)) {
+                *i = new VECTOR(a1.x, y);
                 return true;
             } else {
                 return false;
@@ -70,21 +67,16 @@ bool intersect(VECTOR a1, VECTOR a2, VECTOR b1, VECTOR b2, VECTOR** i) {
         } else {
             return false;
         }
-    } else if (b1.x == b2.x) {
+    } else if (bvert) {
         if (b1.x <= max(a1.x, a2.x) && b1.x >= min(a1.x, a2.x)) {
-            //            GLdouble aslope = (a1.y - a2.y)/(a1.x - a2.x);
+            GLdouble y = (b1.x-a1.x)*(a2.y - a1.y)/(a2.x - a1.x) + a1.y;
             
-            GLdouble ay = (b1.x-a1.x)*(a1.y - a2.y)/(a1.x - a2.x) + a1.y;
-            
-            if (ay <= max(b1.y, b2.y) && ay >= min(b1.y, b2.y)) {
-                *i = new VECTOR(b1.x, ay);
+            if (y <= max(b1.y, b2.y) && y >= min(b1.y, b2.y)) {
+                *i = new VECTOR(b1.x, y);
                 return true;
             } else {
                 return false;
             }
-            
-            //            *i = new VECTOR(b1.x, aslope*(b1.x-a1.x) + a1.y);
-            //            return true;
         } else {
             return false;
         }
@@ -92,8 +84,8 @@ bool intersect(VECTOR a1, VECTOR a2, VECTOR b1, VECTOR b2, VECTOR** i) {
     
 //    printf("4 ... ");
     
-    GLdouble aslope = (a1.y - a2.y)/(a1.x - a2.x);
-    GLdouble bslope = (b1.y - b2.y)/(b1.x - b2.x);
+    GLdouble aslope = (a2.y - a1.y)/(a2.x - a1.x);
+    GLdouble bslope = (b2.y - b1.y)/(b2.x - b1.x);
     
     if (aslope == bslope) {             // If a and b have the same slope
         if (a1 == b1 || a1 == b2) {     // Check to see if endpoints match...
@@ -109,7 +101,7 @@ bool intersect(VECTOR a1, VECTOR a2, VECTOR b1, VECTOR b2, VECTOR** i) {
         }
         
         *i = nullptr;
-        return true;                            // Otherwise, there are infintely many points of intersection, because the bounding boxes connect.
+        return true;    // Otherwise, there are infintely many points of intersection, because the bounding boxes connect.
     }
     
 //    printf("5 ... ");
@@ -152,9 +144,11 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
     
     BOUNDINGBOX interesting = a.bb & b.bb;
     
+#ifdef BOOLEAN_DEBUG
     a.bb.print();
     b.bb.print();
     interesting.print();
+#endif
     
     if (interesting.isEmpty()) {                // If there is no intersection whatsoever...
         noIntersectionNoContainmentLogic(a, b, finalClosedPolylines, op);
@@ -194,7 +188,6 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
         } else if  (!aSmaller && a.bb.doesContain(b.bb)) {  // If b might be inside a
             noIntersectionPossibleContainment(b, a, finalClosedPolylines, op);
         } else {                                            // No possible intersection
-//            printf("FISH!!!");
             noIntersectionNoContainmentLogic(a, b, finalClosedPolylines, op);
                                                             // Don't fill finalClosedPolylines
         }
@@ -218,96 +211,94 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
             VECTOR firstIntersection = keys[i];
             VECTOR currentIntersection;
             
+#ifdef BOOLEAN_DEBUG
             printf("{ %i } - ", i);    firstIntersection.printNL(); printf("\n");
-            
-            // Check if intersecting.size() = 4?
+#endif
             
             for (int j = 0; j < ssp[firstIntersection].size(); j++) {
+#ifdef BOOLEAN_DEBUG
+                printf("{ %i, %i } - 0x%li - ", i, j, (long)ssp[firstIntersection][j]); firstIntersection.printNL();
+#endif
                 
-                printf("{ %i, %i } - 0x%i - ", i, j, (long)ssp[firstIntersection][j]); firstIntersection.printNL();
-                
-                if (ssp[firstIntersection][j]) {  // If this POLYLINE* is not null, then follow the path...
+                if (ssp[firstIntersection][j]) {                            // If this POLYLINE* is not null, then follow the path...
                     POLYLINE* firstPath = ssp[firstIntersection][j];
                     
-                    if (firstPath->getBeginPoint() == firstIntersection) { // If the first point in our path is this intersection...
-                        POLYLINE finalPath;                     // ...Then let's follow this path.
+                    if (firstPath->getBeginPoint() == firstIntersection) {  // If the first point in our path is this intersection...
+                        POLYLINE finalPath;                                 // ...Then let's follow this path.
                         
                         currentIntersection = firstPath->getEndPoint();
                         
                         finalPath += *firstPath;
                         
-                        ssp[firstIntersection][j] = nullptr;    // firstPath has been 'used' and is removed.
+                        ssp[firstIntersection][j] = nullptr;                // firstPath has been 'used' and is removed.
                         
                         POLYLINE* currentPath = firstPath;
                         
                         while (currentIntersection != firstIntersection) {
                             std::vector<POLYLINE*> nextPaths = ssp[currentIntersection];
-                            
-                            //                            VECTOR in = currentPath->getEndDirection();
                             VECTOR in = (currentPath->operator[]((int)currentPath->size()-1) - currentPath->operator[]((int)currentPath->size()-2)).unit();
                             
                             int mostLeftk = -1;
                             GLdouble mostLeftAngle = TAU;
                             
+#ifdef BOOLEAN_DEBUG
                             printf("currentPath:\n");
                             currentPath->print();
+#endif
                             
                             for (int k = 0; k < nextPaths.size(); k++) {
+#ifdef BOOLEAN_DEBUG
                                 printf("nextPaths[%i] = 0x%li:\n", k, (long)nextPaths[k]);
                                 
                                 if (nextPaths[k]) {
                                     nextPaths[k]->print();
-//                                    nextPaths[k]->getBeginPoint().printNL();
-                                    
                                     printf("nextPaths[k]->getBeginPoint(): "); nextPaths[k]->getBeginPoint().printNL();
                                     printf("currentIntersection: "); currentIntersection.printNL();
                                 }
+#endif
                                 
                                 if (nextPaths[k] && nextPaths[k]->getBeginPoint() == currentIntersection) {
-                                    //                                    VECTOR out = nextPaths[k]->getBeginDirection();
                                     VECTOR out = (nextPaths[k]->operator[](1) - nextPaths[k]->operator[](0)).unit();
                                     
+                                    GLdouble angle = acos( -(in * out) );
+#ifdef BOOLEAN_DEBUG
                                     printf("nextPaths[k][0]  = "); nextPaths[k]->operator[](0).printNL();
                                     printf("nextPaths[k][1]  = "); nextPaths[k]->operator[](1).printNL();
                                     printf("nextPaths[k][2]  = "); nextPaths[k]->operator[](2).printNL();
                                     
                                     printf("IN   = "); in.printNL();
                                     printf("OUT  = "); out.printNL();
-                                    //                                    printf("OUT2 = "); (nextPaths[k]->operator[](1) - nextPaths[k]->operator[](0)).unit().printNL();
-                                    
-                                    GLdouble angle = acos( -(in * out) );
                                     
                                     printf("ANG: %.20f ", angle);
-                                    
+#endif
                                     if (angle > 0.00001) {       // If the angle doesn't go back on itself...
-                                                            //                                        if (in.perpCCW() * out < 0) {   // If the vector is to the right...
                                         if (in.perpCCW() * out < 0) {   // If the vector is to the right...
                                             angle = TAU - angle;
                                         }
                                         
+#ifdef BOOLEAN_DEBUG
                                         printf("ang = %f\n", angle);
+#endif
                                         
                                         if (angle < mostLeftAngle) {
                                             mostLeftAngle = angle;
                                             mostLeftk = k;
                                         }
                                     }
-                                } else {
-                                    printf("Something is wrong...\n");
                                 }
+//                                else {
+//                                    printf("Something is wrong...\n");
+//                                }
                             }
                             
-                            if (mostLeftk >= 0) {
-                                // Choose the leftmost path...
-                                
+                            if (mostLeftk >= 0) {   // Choose the leftmost path...
                                 currentPath = nextPaths[mostLeftk];
                                 
-                                currentPath->print();
-                                
                                 finalPath += *currentPath;
-                                
+#ifdef BOOLEAN_DEBUG
+                                currentPath->print();
                                 printf("mostLeftk=%i\n\n", mostLeftk);
-                                
+#endif
                                 ssp[currentIntersection][mostLeftk] = nullptr;    // This path has been 'used' and is removed.
                                 
                                 currentIntersection = currentPath->getEndPoint();
@@ -315,18 +306,19 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
                                 printf("This should not have happened...");
                                 currentIntersection = firstIntersection;
                             }
-                            
+#ifdef BOOLEAN_DEBUG
                             printf("FIRST:   "); firstIntersection.printNL();
                             printf("CURRENT: "); currentIntersection.printNL();
+#endif
                         }
                         
                         finalPath.close();
                         finalPath.recomputeBoundingBox();
-                        
+#ifdef BOOLEAN_DEBUG
                         finalPath.print();
                         
                         printf("AREA!: %f", finalPath.area());
-                        
+#endif
                         if (std::abs(finalPath.area()) > sqrt(ERROR)) {
                             if (reverseAtEnd) { finalClosedPolylines.push_back(-finalPath); }
                             else {              finalClosedPolylines.push_back(finalPath); }
@@ -340,17 +332,17 @@ std::vector<POLYLINE> booleanOp(POLYLINE a, POLYLINE b, BOOLOPERATION op) {
         
         for (std::set<POLYLINE*>::iterator it = values.begin(); it != values.end(); ++it) {
             delete (*it);
-            
-            //            free(*it);      // Free all of the temporary polylines.
         }
     }
     
-//    printf("\nThere are %i resulting polylines:\n\n", (int)finalClosedPolylines.size());
-//    for (int i = 0; i < finalClosedPolylines.size(); i++) {
-//        finalClosedPolylines[i].print();
-//    }
-//    
-//    printf("Finished printing...\n\n");
+#ifdef BOOLEAN_DEBUG
+    printf("\nThere are %i resulting polylines:\n\n", (int)finalClosedPolylines.size());
+    for (int i = 0; i < finalClosedPolylines.size(); i++) {
+        finalClosedPolylines[i].print();
+    }
+    
+    printf("Finished printing...\n\n");
+#endif
     
     return finalClosedPolylines;
 }
@@ -365,22 +357,21 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
     
     bool aPos = a.area() > 0;
     bool bPos = b.area() > 0;
-    
-    //    printf("a.area() = %f\n", a.area());
-    //    printf("b.area() = %f\n", b.area());
-    //
-    //    switch (op) {
-    //        case AND:   printf("OP = AND\n");   break;
-    //        case OR:    printf("OP = OR\n");    break;
-    //        case XOR:   printf("OP = XOR\n");   break;
-    //    }
-    
+#ifdef BOOLEAN_DEBUG
+    printf("a.area() = %f\n", a.area());
+    printf("b.area() = %f\n", b.area());
+
+    switch (op) {
+        case AND:   printf("OP = AND\n");   break;
+        case OR:    printf("OP = OR\n");    break;
+        case XOR:   printf("OP = XOR\n");   break;
+    }
+#endif
     if ( !((aPos && bPos) || ((aPos || bPos) && op == AND)) ) {
         throw std::runtime_error("splitPolylines(POLYLINE^2, OP): Only ++ AND, OR, XOR, or -+ AND are acceptable for splitPolylines");
     }
     
     // First, find all intersections...
-    //
     std::vector<int> acuts;
     std::vector<int> bcuts;
     
@@ -388,23 +379,16 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
     
     BOUNDINGBOX interesting = a.bb & b.bb;
     
-    if (false) {    // Old, naive O(n^2) algorithm
+    if (/* DISABLES CODE */ (false)) {    // Old, naive O(n^2) algorithm
         if (!interesting.isEmpty()) {
             for (int i = 0; i < a.size(); i++) {
                 for (int j = 0; j < b.size(); j++) {
                     
-//                    printf("\n\nIntersecting a[%i] -> a[%i], b[%i] -> b[%i] ... ", i, i+1, j, j+1);
-                    
                     if ( intersect(a[i], a[i+1], b[j], b[j+1], &intersection) ) {   // If they intersect...
                         if (intersection) {                                         // ...and there are not infintely-many intersections (if there are infintely-many intersections, null is returned).
-                            intersection->printNL();
-                            
                             if      (*intersection == a[i]) {   acuts.push_back(i); }
                             else if (*intersection == a[i+1]) { acuts.push_back(i+1); }
                             else {
-//                                a[i].printNL();
-//                                a[i+1].printNL();
-                                
                                 a.insert(i+1, *intersection);
                                 for (int k = 0; k < acuts.size(); k++) { if (acuts[k] > i) { acuts[k]++; } }
                                 acuts.push_back(i+1);
@@ -413,16 +397,10 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                             if      (*intersection == b[j]) {   bcuts.push_back(j); }
                             else if (*intersection == b[j+1]) { bcuts.push_back(j+1); }
                             else {
-//                                b[j].printNL();
-//                                b[j+1].printNL();
-                                
                                 b.insert(j+1, *intersection);
                                 for (int k = 0; k < bcuts.size(); k++) { if (bcuts[k] > j) { bcuts[k]++; } }
                                 bcuts.push_back(j+1);
                             }
-                            
-//                            a.print();
-//                            b.print();
                             
                             delete intersection;
                             intersection = nullptr;
@@ -440,6 +418,7 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
         std::vector<SEGMENT> asegments = getMonotonicInsideSegmentsFromPolyline(a, interesting);
         std::vector<SEGMENT> bsegments = getMonotonicInsideSegmentsFromPolyline(b, interesting);
         
+#ifdef BOOLEAN_DEBUG
         printf("\nThere are %lu asegments...\n", asegments.size());
         
         for (int i = 0; i < asegments.size(); i++) {
@@ -452,6 +431,7 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
             printf("bsegments from %i to %i with bounding box\n", bsegments[i].b, bsegments[i].e);
             bsegments[i].bb.print();
         }
+#endif
         
         if (asegments.size()*bsegments.size() > 100) {
             printf("POLYLINES::booleanEquals(POLYLINES, BOOLOPERATION): There are asegments.size() * bsegments.size() = %lu * %lu = %lu comparisons to make.\nMaybe it's time to implement Bentley–Ottmann?\n", asegments.size(), bsegments.size(), asegments.size()*bsegments.size());
@@ -459,6 +439,7 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
         
         for (int i = 0; i < asegments.size(); i++) {
             for (int j = 0; j < bsegments.size(); j++) {
+#ifdef BOOLEAN_DEBUG
                 printf("\n\n*Checking intersection between\n**asegments[%i] = %i -> %i, %i:\n", i, asegments[i].b, asegments[i].e, asegments[i].forward);
                 
                 a.print();
@@ -468,12 +449,15 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                 
                 b.print();
                 POLYLINE(b, bsegments[j].b, bsegments[j].e); //.print();
+#endif
                 
                 if (asegments[i].bb.doesIntersect(bsegments[j].bb)) {   // If the bounding boxes intersect...
                     BOUNDINGBOX superInteresting = asegments[i].bb & bsegments[j].bb;
                     
+#ifdef BOOLEAN_DEBUG
                     printf("\ndoesIntersect!\n");
                     superInteresting.print();
+#endif
                     
                     int adir =  (asegments[i].forward)?(1):(-1);
                     int abeg =  (asegments[i].forward)?(asegments[i].b):(asegments[i].e);
@@ -494,6 +478,7 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                     
                     if (bi == bbeg) { bi += bdir; }
                     
+#ifdef BOOLEAN_DEBUG
                     printf("ai: %i\n", ai);
                     printf("bi: %i\n", bi);
                     
@@ -510,22 +495,26 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                     printf("bdir: %i\n", bdir);
                     
                     printf("sx: %f\n", superInteresting.ur.x);
+#endif
                     
-                    // (a[ai].x <= superInteresting.ur.x || b[bi].x <= superInteresting.ur.x)
                     while ( (a[ai-adir].x <= superInteresting.ur.x && b[bi-bdir].x <= superInteresting.ur.x) ) {
-                        //                    while ( (a[ai-adir].x <= superInteresting.ur.x && b[bi-bdir].x <= superInteresting.ur.x) && !(ai == aend && bi == bend)) {
-                        
+#ifdef BOOLEAN_DEBUG
                         printf("Checking intersection between the aline from "); a[ai-adir].print();
                         printf(" to "); a[ai].print();
                         printf(" and the bline from "); b[bi-bdir].print();
                         printf(" to "); b[bi].printNL();
+#endif
                         
                         if ( intersect(a[ai-adir], a[ai], b[bi-bdir], b[bi], &intersection) ) {   // If they intersect... (note this line can be improved)
-                            printf("intersection: 0x%i\n", intersection);
+#ifdef BOOLEAN_DEBUG
+                            printf("intersection: 0x%li\n", (long)intersection);
+#endif
                             
                             if (intersection) {                                         // ...and there are not infintely-many intersections (if there are infintely-many intersections, null is returned).
+#ifdef BOOLEAN_DEBUG
                                 printf("Line intersection at ");
                                 intersection->printNL();
+#endif
                                 
                                 if      (*intersection == a[ai-adir]) { acuts.push_back(ai-adir); }
                                 else if (*intersection == a[ai]) {      acuts.push_back(ai); }
@@ -543,8 +532,12 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                                         if (asegments[k].e >= aindex) { asegments[k].e++; }
                                     }
                                     
-                                    if (asegments[i].forward) { aend++; ai++; printf("ai++;\n"); }
-//                                    else { aend++; }
+                                    if (asegments[i].forward) {
+                                        aend++; ai++;
+#ifdef BOOLEAN_DEBUG
+                                        printf("ai++;\n");
+#endif
+                                    }
                                     
                                     // Then add the index to the list of cuts.
                                     acuts.push_back(aindex);
@@ -566,10 +559,12 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                                         if (bsegments[k].e >= bindex) { bsegments[k].e++; }
                                     }
                                     
-                                    if (bsegments[j].forward) { bend++; bi++; printf("bi++;\n"); }
-//                                    else { bend++; }
-                                    
-                                    //                                    bi += bdir;
+                                    if (bsegments[j].forward) {
+                                        bend++; bi++;
+#ifdef BOOLEAN_DEBUG
+                                        printf("bi++;\n");
+#endif
+                                    }
                                     
                                     // Then add the index to the list of cuts.
                                     bcuts.push_back(bindex);
@@ -582,8 +577,8 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                         
                         if (ai == aend && bi == bend) { break; }
                         
-                        if      (a[ai-adir].x < b[bi-bdir].x && ai != aend) { ai += adir; }   // If a is lagging...
-                        else if (a[ai-adir].x > b[bi-bdir].x && bi != bend) { bi += bdir; }   // If b is lagging...
+                        if      (a[ai].x < b[bi].x && ai != aend) { ai += adir; }   // If a is lagging...
+                        else if (a[ai].x > b[bi].x && bi != bend) { bi += bdir; }   // If b is lagging...
                         else {                                                  // If a and b are tied..
                             if      (ai == aend) { bi += bdir; }  // If a has ended, incriment b...
                             else if (bi == bend) { ai += adir; }  // If b has ended, incriment a...
@@ -593,6 +588,7 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                             }
                         }
                         
+#ifdef BOOLEAN_DEBUG
                         printf("ai: %i\n", ai);
                         printf("bi: %i\n", bi);
                         
@@ -606,14 +602,12 @@ std::map<VECTOR, std::vector<POLYLINE*>> splitPolylines(POLYLINE a, POLYLINE b, 
                         printf("bx2: %f\n", b[bi].x);
                         
                         printf("sx: %f\n", superInteresting.ur.x);
+#endif
                     }
                 }
             }
         }
     }
-    
-//    a.print();
-//    b.print();
     
     cutPolyline(a, b, acuts, op, sortedSplitPolylines);
     cutPolyline(b, a, bcuts, op, sortedSplitPolylines);
@@ -627,6 +621,7 @@ void cutPolyline(POLYLINE& a, POLYLINE& b, std::vector<int> acuts, BOOLOPERATION
     bool aPos = a.area() > 0;
     bool bPos = b.area() > 0;
     
+#ifdef BOOLEAN_DEBUG
     printf("\n\n");
     
     for (int i = 0; i < acuts.size(); i++) {
@@ -634,19 +629,22 @@ void cutPolyline(POLYLINE& a, POLYLINE& b, std::vector<int> acuts, BOOLOPERATION
     }
     
     a.print();
+#endif
     
     // Second, cleave the polylines into peices, based on the points of intersection.
     
     for (int i = 0; i < acuts.size(); i++) {
         
-        printf("i1 = %i\n", i);
-        printf("i2 = %lu\n", (i+1) % acuts.size());
-        
         int x1 = acuts[i];
         int x2 = acuts[ (i+1) % acuts.size() ];
         
+#ifdef BOOLEAN_DEBUG
+        printf("i1 = %i\n", i);
+        printf("i2 = %lu\n", (i+1) % acuts.size());
+        
         printf("x1 = %i\n", x1);
         printf("x2 = %i\n", x2);
+#endif
         
         int l = x2-x1+1;
         
@@ -659,7 +657,9 @@ void cutPolyline(POLYLINE& a, POLYLINE& b, std::vector<int> acuts, BOOLOPERATION
         } else {
             VECTOR testPoint;
         
+#ifdef BOOLEAN_DEBUG
             printf("l = %i\n", l);
+#endif
         
             if (l > 2) {
                 testPoint = a[x1+1]; // (*toAdd)[1];
@@ -875,7 +875,9 @@ std::vector<VECTOR> intersections(std::map<VECTOR, std::vector<POLYLINE*>> m) {
     
     for (std::map<VECTOR, std::vector<POLYLINE*>>::iterator it = m.begin(); it != m.end(); ++it) {
         toReturn.push_back(it->first);
+#ifdef BOOLEAN_DEBUG
         printf("key! "); it->first.printNL();
+#endif
     }
     
     return toReturn;
@@ -884,7 +886,7 @@ std::vector<VECTOR> intersections(std::map<VECTOR, std::vector<POLYLINE*>> m) {
 std::vector<SEGMENT> getMonotonicInsideSegmentsFromPolyline(POLYLINE p, BOUNDINGBOX interesting) {
     std::vector<SEGMENT> segments;
     
-#ifdef DEBUG
+#ifdef BOOLEAN_DEBUG
     printf("\ngetMonotonicInsideSegmentsFromPolyline!\n");
     
     p.print();
@@ -892,7 +894,7 @@ std::vector<SEGMENT> getMonotonicInsideSegmentsFromPolyline(POLYLINE p, BOUNDING
 #endif
     
     if (interesting.isInitialized()) {
-#ifdef DEBUG
+#ifdef BOOLEAN_DEBUG
         p[0].printNL();
 #endif
         
@@ -902,7 +904,7 @@ std::vector<SEGMENT> getMonotonicInsideSegmentsFromPolyline(POLYLINE p, BOUNDING
         SEGMENT current;
         
         if (inside) {
-#ifdef DEBUG
+#ifdef BOOLEAN_DEBUG
             printf("First point inside!\n");
 #endif
             current.b = 0;

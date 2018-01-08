@@ -1,6 +1,6 @@
 //#define USE_FT_FONT 1
 #define USE_GL_RENDER 1
-#define DEBUG 1
+//#define DEBUG 1
 
 #include "testdevices.hpp"
 #include "diamonddevices.hpp"
@@ -12,6 +12,11 @@ int main(int argc, const char * argv[]) {
 //    mainDiamondDevice(1);
 //    mainEODevice(1);
     testBooleans();
+    
+#ifdef DEBUG
+    printf("DEBUG defined!");
+#endif
+    
 //    symmetricallyCoupledFilter();
     
 //    auto start = std::chrono::steady_clock::now();

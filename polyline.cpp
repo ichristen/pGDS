@@ -230,7 +230,7 @@ POLYLINE::POLYLINE(size_t size_) {
     layer = 0; // MATERIAL::currentLayer;
 }
 POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
-    printf("WARNING: POLYLINE(POLYLINE p, int b, int e) is currently slightly bugged (with begin/end calculation).\n");
+//    printf("WARNING: POLYLINE(POLYLINE p, int b, int e) is currently slightly bugged (with begin/end calculation).\n");
     
 //    printf("s=%i\n", p.size());
 //
@@ -251,8 +251,6 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
     
     if (b == e) {
         points.push_back(p[b]);
-        
-        print();
     } else if (b < e) {
         points.reserve(e-b+1);
         
@@ -274,8 +272,6 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
         } else {
             end = ( (p[e] - p[e-1]).unit() + (p[e+1] - p[e]).unit() ).unit() * ( (p.isReversed)?(-1):(1) ); // Check if e±1 is the same point?
         }
-        
-        print();
     } else if (b > e) {
         if (p.isClosed) {
             points.reserve(p.size()-e+b+1);
@@ -291,8 +287,6 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
             
             begin = ( (p[b] - p[b-1]).unit() + (p[b+1] - p[b]).unit() ).unit() * ( (p.isReversed)?(-1):(1) ); // Check if b±1 is the same point?
             end =   ( (p[e] - p[e-1]).unit() + (p[e+1] - p[e]).unit() ).unit() * ( (p.isReversed)?(-1):(1) ); // Check if e±1 is the same point?
-            
-            print();
         } else {
             // Don't know what to do...
             throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Unable to clip an open polyline with e < b.");
