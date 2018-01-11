@@ -54,10 +54,6 @@ VECTOR BOUNDINGBOX::ne() const { return ur; }
 VECTOR BOUNDINGBOX::sw() const { return ll; }
 VECTOR BOUNDINGBOX::se() const { return VECTOR(ur.x, ll.y); }
 
-POLYLINE BOUNDINGBOX::draw() const {
-    return rect(ur, ll).setLayer(0);
-}
-
 BOUNDINGBOX BOUNDINGBOX::copy() const {
     return BOUNDINGBOX(ur, ll);
 }
@@ -66,19 +62,19 @@ void BOUNDINGBOX::clear() {
     ll.zero();
     initialized = false;
 }
-bool BOUNDINGBOX::isEmpty() {
+bool BOUNDINGBOX::isEmpty() const {
     return !initialized;
 }
-bool BOUNDINGBOX::doesContain(VECTOR v) {
+bool BOUNDINGBOX::doesContain(VECTOR v) const {
     return initialized && (v.x <= ur.x + ERROR && v.x >= ll.x - ERROR) && (v.y <= ur.y + ERROR && v.y >= ll.y - ERROR);
 }
-bool BOUNDINGBOX::doesContainX(GLdouble x) {
+bool BOUNDINGBOX::doesContainX(GLdouble x) const {
     return initialized && (x <= ur.x + ERROR  && x >= ll.x - ERROR);
 }
-bool BOUNDINGBOX::doesContainY(GLdouble y) {
+bool BOUNDINGBOX::doesContainY(GLdouble y) const {
     return initialized && (y <= ur.y + ERROR  && y >= ll.y - ERROR);
 }
-bool BOUNDINGBOX::doesContain(BOUNDINGBOX bb) {
+bool BOUNDINGBOX::doesContain(BOUNDINGBOX bb) const {
     return initialized && doesContain(bb.ur) && doesContain(bb.ll);
 }
 
@@ -211,6 +207,10 @@ void BOUNDINGBOX::print()                    const {
 #endif
 }
 
+POLYLINE BOUNDINGBOX::draw() const {
+    return rect(ur, ll).setLayer(0);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int POLYLINE::returnValidIndex(int i) const {
@@ -227,7 +227,7 @@ int POLYLINE::returnValidIndex(int i) const {
 POLYLINE::POLYLINE(size_t size_) {
     points.reserve(size_);
     
-    layer = 0; // MATERIAL::currentLayer;
+    layer = MATERIAL::currentLayer;
 }
 POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
 //    printf("WARNING: POLYLINE(POLYLINE p, int b, int e) is currently slightly bugged (with begin/end calculation).\n");
@@ -256,7 +256,6 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
         
         if (p.isReversed) { std::copy(p.points.rbegin() + b, p.points.rbegin() + e + 1, std::back_inserter(points)); }  // Check the + 1...
         else {              std::copy(p.points.begin()  + b, p.points.begin()  + e + 1, std::back_inserter(points)); }
-        
 //        printf("SIZE: %i", points.size());
         
         if (b == 0 && !p.isClosed) {
@@ -279,8 +278,7 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
             if (p.isReversed) {
                 std::copy(p.points.rbegin() + b,    p.points.rend(),            std::back_inserter(points));
                 std::copy(p.points.rbegin(),        p.points.rbegin() + e + 1,  std::back_inserter(points));
-            }
-            else {
+            } else {
                 std::copy(p.points.begin() + b,     p.points.end(),             std::back_inserter(points));
                 std::copy(p.points.begin(),         p.points.begin() + e + 1,   std::back_inserter(points));
             }
@@ -292,6 +290,9 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
             throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Unable to clip an open polyline with e < b.");
         }
     }
+    
+    while (points.size() > 1 && points[0]               == points[1]) {                 points.erase(points.begin()); }
+    while (points.size() > 1 && points[points.size()-1] == points[points.size()-2]) {   points.erase(points.end()-1); }
     
     layer = p.layer;
 }
@@ -435,17 +436,20 @@ POLYLINE& POLYLINE::operator/=(double s) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [s](VECTOR v) -> VECTOR { return v/s; });
     bb /= s;
+    area_ /= s;
     return *this;
 }
 POLYLINE& POLYLINE::operator*=(double s) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [s](VECTOR v) -> VECTOR { return v*s; });
     bb *= s;
+    area_ *= s;
     return *this;
 }
 POLYLINE& POLYLINE::operator*=(AFFINE m) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [m](VECTOR v) -> VECTOR { return v*m; });
+    area_ = 0;
     recomputeBoundingBox();
     return *this;
 }
@@ -663,6 +667,7 @@ std::vector<int> POLYLINE::getIntersectionsIndex(GLdouble x) const {
     return sortedReturn;
 }
 bool POLYLINE::contains(VECTOR v) const {
+    if (!bb.doesContain(v)) { return false; }
     if (isClosed) {
         std::vector<GLdouble> y = getIntersections(v.x);
         
@@ -676,6 +681,22 @@ bool POLYLINE::contains(VECTOR v) const {
         
         return i % 2;
     }
+    return false;
+}
+bool POLYLINE::boundaryContains(VECTOR v) const {
+    if (!bb.doesContain(v)) { return false; }
+    
+    int s = size() - ((isClosed)?(1):(2));
+    
+    for (int i = 0; i < s; i++) {
+        if (BOUNDINGBOX(operator[](i), operator[](i+1)).doesContain(v)) {
+            if (operator[](i+1) == v) { return true; }
+            
+            GLdouble y = (v.x - operator[](i).x)*(operator[](i+1).y - operator[](i).y)/(operator[](i+1).x - operator[](i).x) + operator[](i).y;
+            if (v.y > y - ERROR && v.y < y + ERROR) { return true; }
+        }
+    }
+    
     return false;
 }
 
@@ -949,11 +970,21 @@ POLYLINES   POLYLINES::boolean(POLYLINE p, BOOLOPERATION op) const { return copy
 POLYLINES&  POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
 //    for (int i = 0; i < polylines.size(); i++) { polylines[i].boolean(p, op); }
     
+    switch (op) {
+        case AND: printf("OP = AND\n"); break;
+        case OR:  printf("OP = OR\n"); break;
+        case XOR: printf("OP = XOR\n"); break;
+    }
+    
     if (op == OR) {
         POLYLINES pUnique(p);
         
+        printf("Attempting to OR polyline with AREA = %f\n", p.area());
+        
         for (int i = 0; i < polylines.size(); i++) {
             pUnique.booleanEquals(-polylines[i], AND);  // Cut away any intersections.
+            
+            printf("Polyline has AREA = %f after subtracting polyline with AREA = %f\n", pUnique.area(), (-polylines[i]).area());
         }
         
         add(pUnique);   // And add this new polyline(s).
@@ -962,14 +993,28 @@ POLYLINES&  POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
         
         clear();
         
+//        POLYLINES temptemp(p);
+//        POLYLINES temptemptemp(p);
+        
         switch (op) {
             default:
                 throw std::runtime_error("Expected OR to have been caught previously...");
             case AND:
                 for (int i = 0; i < temp.size(); i++) {
-                    printf("ATTEMPT: %i\n", i);
+                    printf("ATTEMPT: temp[%i].area() = %f, and p.area() = %f\n", i, temp[i].area(), p.area());
                     add(temp[i].boolean(p, AND));
+//                    temptemp.booleanEquals(temp[i], AND);
+                    
+//                    temptemptemp = temptemp.copy();
+//
+//                    temptemp.clear();
+//
+//                    for (int j = 0; j < temptemptemp.size(); j++) {
+//                        temptemp.add(temptemptemp[j].boolean(temp[i], AND));
+//                    }
                 }
+                
+//                add(temptemp);
                 
                 break;
             case XOR:
@@ -997,10 +1042,19 @@ POLYLINES&  POLYLINES::booleanEquals(POLYLINES p, BOOLOPERATION op) {
         printf("POLYLINES::booleanEquals(POLYLINES, BOOLOPERATION): There are this.size() * other.size() = %lu * %lu = %lu comparisons to make.\nMaybe it's time to implement Bentley–Ottmann?\n", size(), p.size(), size()*p.size());
     }
     
+    switch (op) {
+        case AND: printf("OP = AND\n"); break;
+        case OR:  printf("OP = OR\n"); break;
+        case XOR: printf("OP = XOR\n"); break;
+    }
+    
     if (op == OR) {
         POLYLINES pUnique(p);
         
+        printf("Attempting to OR polyline with AREA = %f\n", p.area());
+        
         for (int i = 0; i < polylines.size(); i++) {
+            printf("Subtracting polyline with AREA = %f\n", (-polylines[i]).area());
             pUnique.booleanEquals(-polylines[i], AND);  // Cut away any intersections.
         }
         
@@ -1014,10 +1068,16 @@ POLYLINES&  POLYLINES::booleanEquals(POLYLINES p, BOOLOPERATION op) {
             default:
                 throw std::runtime_error("Expected OR to have been caught previously...");
             case AND:
-                for (int i = 0; i < temp.size(); i++) {
+                for (int i = 0; i < temp.size(); i++) {     // Not algorithmically correct?
+                    POLYLINES temptemp(temp[i]);
+                    
                     for (int j = 0; j < p.polylines.size(); j++) {
-                        add(temp[i].boolean(p.polylines[j], AND));
+//                    for (int j = p.polylines.size()-1; j >= 0; j--) {
+                        temptemp.booleanEquals(p.polylines[j], AND);
+                        printf("AREA = %f", temptemp.area());
                     }
+                    
+                    add(temptemp);
                 }
                 
                 break;

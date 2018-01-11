@@ -660,15 +660,12 @@ DEVICE* FONT::getChar(char c) {
     return nullptr;
 }
 
-std::vector<std::string> split_string(const std::string& str,
-                                      const std::string& delimiter)
-{
+std::vector<std::string> split_string(const std::string& str, const std::string& delimiter) {   // Code stolen from StackOverflow, I think... Find the link...
     std::vector<std::string> strings;
     
     std::string::size_type pos = 0;
     std::string::size_type prev = 0;
-    while ((pos = str.find(delimiter, prev)) != std::string::npos)
-    {
+    while ((pos = str.find(delimiter, prev)) != std::string::npos) {
         strings.push_back(str.substr(prev, pos - prev));
         prev = pos + 1;
     }
@@ -707,14 +704,18 @@ void FONT::getTextPrivate(std::string text, DEVICE* toReturn) {
 //    return toReturn;
 }
 DEVICEPTR FONT::getText(std::string text, int anchorx, int anchory) {
-    DEVICE* toReturn = getDevice(text);
+    DEVICE* toReturn = getDevice(text + " layer " + std::to_string(layer));
+    
+    bool multiline = false;
     
     if (!toReturn->initialized()) {
         std::vector<std::string> strings = split_string(text, "\n");
 
         if (strings.size() > 1) {
+            multiline = true;
+            
             for (int i = 0; i < strings.size(); i++) {
-                toReturn->add(getText(strings[i], anchorx, anchory) * AFFINE(0, -i*(height+2*thick)));
+                toReturn->add(getText(strings[i], -1, -1) * AFFINE(0, -(i - (strings.size())/2.)*(height+2*thick)));
             }
         } else {
             getTextPrivate(text, toReturn);
@@ -723,9 +724,11 @@ DEVICEPTR FONT::getText(std::string text, int anchorx, int anchory) {
         
     VECTOR shift;
     
-    if      (anchorx >  0) { shift.x = -toReturn->bb.width(); }      // Right,
-    else if (anchorx == 0) { shift.x = -toReturn->bb.width()/2; }    // Center,
-                                                                    // Otherwise left.
+//    if (!multiline) {
+        if      (anchorx >  0) { shift.x = -toReturn->bb.width(); }      // Right,
+        else if (anchorx == 0) { shift.x = -toReturn->bb.width()/2; }    // Center,
+                                                                        // Otherwise left.
+//    }
     
     if      (anchory >  0) { shift.y = -toReturn->bb.height(); }     // Top,
     else if (anchory == 0) { shift.y = -toReturn->bb.height()/2; }   // Mid,

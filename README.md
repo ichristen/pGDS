@@ -12,7 +12,7 @@ Todo.
 * Any proprietary designs should be suffixed with `devices.(cpp|hpp|m)` or otherwise blacklisted in `.gitignore`.
 
 ## Long-Term Plans
- - [x] Integration with a scripting language (`MATLAB`; perhaps `Lua` in the future).
+ - [x] Integration with a scripting language (currently `MATLAB`; perhaps `Lua` or `Scheme` in the future).
  - [ ] Finish `OpenGL` visualization.
  - [ ] Write a `C++` engine to process updates to `MATLAB` scripts in realtime.
  - [ ] Integration with Atom.
@@ -20,10 +20,10 @@ Todo.
  - [ ] VR Support!
 
 ## Optimization Plans
-  - [ ] Finish `~O(n)` boolean code.
+  - [x] Finish `~O(n)` boolean code (still needs debugging).
   - [ ] Improve path thickening algorithm.
   - [ ] Write Bentley–Ottmann-like many-polyline boolean code.
-  - [ ] Use references (`&`, `const&`) more to reduce the amount of internal copying between functions.
+  - [x] Use references (`&`, `const&`) more to reduce the amount of internal copying between functions.
   - [ ] Multithreading?
 
 <!-- ## Mac/Unix Dependencies -->

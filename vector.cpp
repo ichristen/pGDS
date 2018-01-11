@@ -443,8 +443,8 @@ CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang) {
     
     GLdouble radius = length/ang;
     
-    if (radius < 0) {   return bendRadius(start, -radius, -ang); }
-    else {              return bendRadius(start,  radius,  ang); }
+    if (radius < 0) {   return bendRadius(start, -radius, ang); }
+    else {              return bendRadius(start,  radius, ang); }
 }
 CONNECTION bendLeft(CONNECTION start, GLdouble radius) {    return bendRadius(start, radius, TAU/4); }
 CONNECTION bendRight(CONNECTION start, GLdouble radius) {   return bendRadius(start, radius, -TAU/4); }

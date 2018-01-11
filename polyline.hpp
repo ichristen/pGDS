@@ -54,8 +54,6 @@ public:
     VECTOR sw() const;
     VECTOR se() const;
     
-    POLYLINE draw() const;
-    
 //    VECTOR north() const;
 //    VECTOR south() const;
 //    VECTOR east() const;
@@ -64,12 +62,12 @@ public:
     BOUNDINGBOX copy() const;
     void clear();
     
-    bool isEmpty();
+    bool isEmpty() const;
     
-    bool doesContain(VECTOR v);         // Checks whether the bounding box contains v.
-    bool doesContainX(GLdouble x);
-    bool doesContainY(GLdouble y);
-    bool doesContain(BOUNDINGBOX bb);
+    bool doesContain(VECTOR v) const;         // Checks whether the bounding box contains v.
+    bool doesContainX(GLdouble x) const;
+    bool doesContainY(GLdouble y) const;
+    bool doesContain(BOUNDINGBOX bb) const;
     
     bool enlarge(VECTOR v);             // Insist that the boundary box contain v. Returns whether enlargement was neccessary.
     bool enlarge(BOUNDINGBOX bb);       // Insist that the boundary box contain b. Returns whether enlargement was neccessary.
@@ -98,6 +96,8 @@ public:
     bool operator==(BOUNDINGBOX bb) const;
     
     void print()                    const;
+    
+    POLYLINE draw() const;
 };
 
 //bool intersect(VECTOR a1, VECTOR a2, VECTOR b1, VECTOR b2, VECTOR** i);
@@ -201,6 +201,7 @@ public:
     bool isEmpty() const;
     
     bool contains(VECTOR v) const;  // Note that this imperfectly considers the boundary...
+    bool boundaryContains(VECTOR v) const;
     std::vector<GLdouble>   getIntersections(GLdouble x)        const;  // Returns y values of intersections.
     std::vector<int>        getIntersectionsIndex(GLdouble x)   const;  // Returns index values of intersections. For intersections that are not the ends of a line segment, the lowest index of the segment is returned).
     

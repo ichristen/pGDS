@@ -123,15 +123,15 @@ void DEVICE::add(DEVICE* device, AFFINE m, char c) {
     add(DEVICEPTR(device, m), c);
 }
 void DEVICE::add(CONNECTION connection) {
-    if (connections.find(connection.name) == connections.end()) {    // If a connections of this key has not yet been added...
+    if (connections.find(connection.name) == connections.end()) {    // If a connection of this key has not yet been added...
         connections[connection.name] = connection;
     } else {
-        if (connections[connection.name] == connection) {
-            // Do nothing.
-        } else {
-            connection.name = connection.name + std::string("-");
-            add(connection);        // Change the key such that it does work... (change in the future?)
-        }
+//        if (connections[connection.name] == connection) {
+//            // Do nothing.
+//        } else {
+//            connection.name = connection.name + std::string("-");
+//            add(connection);        // Change the key such that it does work... (change in the future?)
+//        }
     }
 }
 
@@ -143,7 +143,10 @@ POLYLINES DEVICE::getLayer(uint16_t l1, uint16_t l2) const {
     
 //    toReturn.print();
     
-    for (int i = 0; i < devices.size(); i++){ toReturn.add( devices[i].device->getLayer(l1) * devices[i].transformation ); }
+    for (int i = 0; i < devices.size(); i++){   toReturn.add( devices[i].device->getLayer(l1) * devices[i].transformation ); }
+//    for (int i = 0; i < polylines.size(); i++){
+//        if (polylines[i].layer == l1) {         toReturn.add( polylines[i] ); }
+//    }
     
     if (l1 != l2) { toReturn.setLayer(l2); }
     
@@ -219,7 +222,8 @@ void DEVICE::print() {
 
 bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
     for (int i = 0; i < polylines.polylines.size(); i++) {
-        if (polylines.polylines[i].isCCW()) {
+        if (!polylines.polylines[i].isCCW()) { polylines.polylines[i].reverse(); }
+//        if () {
             // BOUNDARY
             putc(0x00, f);
             putc(0x04, f);              // LENGTH = 4 bytes
@@ -351,7 +355,7 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
             }
 #endif
         }
-    }
+//    }
 
     if (!transformation.isZero()) {
         for (int i = 0; i < devices.size(); i++) {

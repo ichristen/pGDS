@@ -10,12 +10,12 @@
 int main(int argc, const char * argv[]) {
 //    mainDevice(1);
 //    mainDiamondDevice(1);
-//    mainEODevice(1);
-    testBooleans();
+    mainEODevice(1);
+//    testBooleans();
     
-#ifdef DEBUG
-    printf("DEBUG defined!");
-#endif
+//#ifdef DEBUG
+//    printf("DEBUG defined!");
+//#endif
     
 //    symmetricallyCoupledFilter();
     
