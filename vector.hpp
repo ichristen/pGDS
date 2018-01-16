@@ -111,7 +111,8 @@ public:
     VECTOR v;           // Position of the connection,
     VECTOR dv;          // Direction of the connection,
     GLdouble w;         // Width of connection. If negative, +/- `PADDING` is drawn around connection.
-
+    
+    
     int16_t l;          // Layer.
 
     std::string name;   // Name of connection.

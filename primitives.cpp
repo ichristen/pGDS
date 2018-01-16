@@ -101,7 +101,7 @@ POLYLINE ellipse(VECTOR focus1, VECTOR focus2, GLdouble L) {
 
 // PATHS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW, int steps) {
+POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW, int steps, GLdouble stepMultiplier) {
     GLdouble t1 = fmod(t1_, TAU);   // What happens in t1 or t2 are negative?
     GLdouble t2 = fmod(t2_, TAU);
     
@@ -124,7 +124,7 @@ POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW, int steps) {
     }
     
     if (!steps) {
-        steps = ceil(dt/acos(1 - EPSILON/r));
+        steps = ceil(dt/acos(1 - EPSILON/r))*stepMultiplier;
     }
     
     AFFINE m = AFFINE(dt/steps);
@@ -348,7 +348,7 @@ GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
     return ang;
 }
 
-POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps) {
+POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps, GLdouble stepMutliplier) {
     GLdouble ang = getArcAngle(c, b, e, chooseShortest);
     GLdouble r = (b - c).magn();
     
@@ -357,7 +357,7 @@ POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps) {
 //    printf("ang: %f\n", ang);
     
     if (!steps) {
-        steps = ceil(std::abs(ang)/acos(1 - EPSILON/r));
+        steps = ceil(std::abs(ang)/acos(1 - EPSILON/r))*stepMutliplier;
     }
     
 //    printf("steps: %i\n", steps);
@@ -412,7 +412,7 @@ bool intersect(CONNECTION a, CONNECTION b, VECTOR** i, bool onlyForward) {
     return true;
 }
 
-POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsDuringLinear) {
+POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsDuringLinear, GLdouble stepMutliplier) {
 //    if (b.type != e.type) {
 //        
 //    }
@@ -551,8 +551,8 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
 //                            cf.printNL();
 //                            f.v.printNL();
                             
-                            toReturn.add(arc(ci, i.v, m, (m-i.v)*i.dv > 0));
-                            toReturn.add(arc(cf, m, f.v, (m-f.v)*f.dv > 0));
+                            toReturn.add(arc(ci, i.v, m, (m-i.v)*i.dv > 0, 0, stepMutliplier));
+                            toReturn.add(arc(cf, m, f.v, (m-f.v)*f.dv > 0, 0, stepMutliplier));
                             
 //                            toReturn += i.v;
 //                            toReturn += ci;
@@ -655,7 +655,7 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
     
     for (int j = 0; j < polylines.size(); j++) {
         for (int i = (outer)?(-1):(0); i < 2; i += 2) {
-            addto->add(thicken(polylines[j], lambda, i, minstep).setLayer(b.l));
+            addto->add(thicken(polylines[j], lambda, PADDING*i, minstep).setLayer(b.l));
         }
     }
 }
@@ -683,7 +683,7 @@ void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTI
         lambda = [w] (GLdouble t) -> GLdouble { return w; };
     }
     
-    POLYLINE p = connect(b, e, type, (b.w != e.w)?((int)((e.v-b.v).magn()/minstep) + 2):(0));
+    POLYLINE p = connect(b, e, type, (b.w != e.w)?((int)((e.v-b.v).magn()/minstep) + 2):(0));   //
     
     //    printf("p.begin="); p.begin.printNL();
     //    printf("p.end=");   p.end.printNL();
@@ -711,7 +711,7 @@ void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTI
     
     for (int j = 0; j < polylines.size(); j++) {
         for (int i = (outer)?(-1):(0); i < 2; i += 2) {
-            addto->add(thicken(polylines[j], lambda, i, minstep).setLayer(b.l));
+            addto->add(thicken(polylines[j], lambda, i*PADDING, minstep).setLayer(b.l));
         }
     }
 }
@@ -891,10 +891,10 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     return toReturn;
 }
 
-POLYLINE thicken(POLYLINE open, GLdouble width, int side, GLdouble minstep) {
+POLYLINE thicken(POLYLINE open, GLdouble width, GLdouble side, GLdouble minstep) {
     return thicken(open, [width] (GLdouble t) -> GLdouble { return width; }, side, minstep);
 }
-POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, int side, GLdouble minstep) {
+POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, GLdouble side, GLdouble minstep) {
     bool closed = open.isClosed;
     
     if (closed) {
@@ -946,7 +946,7 @@ POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, int 
     
     return toReturn;
 }
-void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLdouble t)>* lambda, int side, GLdouble minstep, int i, GLdouble currentLength) {
+void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLdouble t)>* lambda, GLdouble side, GLdouble minstep, int i, GLdouble currentLength) {
     VECTOR u;
     VECTOR v;
     
@@ -996,10 +996,10 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
 //    dir.printNL();
     
     if (offset > 0) {
-        switch (side) {
-            case -1:    closed->add(open->points[i] + dir*(offset + PADDING));   break;
-            case 0:     closed->add(open->points[i] + dir*offset);               break;
-            case 1:     closed->add(open->points[i] - dir*offset);               break;
+        switch (sign(side)) {
+            case -1:    closed->add(open->points[i] + dir*(offset - side));     break;
+            case 0:     closed->add(open->points[i] + dir*offset);              break;
+            case 1:     closed->add(open->points[i] - dir*offset);              break;
         }
     }
 
@@ -1009,12 +1009,33 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
     }
     
     if (offset > 0) {
-        switch (side) {
-            case -1:    closed->add(open->points[i] + dir*offset);               break;
-            case 0:     closed->add(open->points[i] - dir*offset);               break;
-            case 1:     closed->add(open->points[i] - dir*(offset + PADDING));   break;
+        switch (sign(side)) {
+            case -1:    closed->add(open->points[i] + dir*offset);              break;
+            case 0:     closed->add(open->points[i] - dir*offset);              break;
+            case 1:     closed->add(open->points[i] - dir*(offset + side));     break;
         }
     }
 }
+
+POLYLINES rfThicken(POLYLINE open, GLdouble width, GLdouble gap, GLdouble groundWidth, uint16_t layer, uint16_t groundlayer) {
+    POLYLINES toReturn;
+    
+    toReturn.add(thicken(open, width, 0).setLayer(layer));
+    toReturn.add(thicken(open, width+2*gap,  TRANSPADDING).setLayer(layer));
+    toReturn.add(thicken(open, width+2*gap, -TRANSPADDING).setLayer(layer));
+    
+    return toReturn;
+}
+POLYLINES rfThicken(POLYLINE open, RFTYPE type) {
+    switch (type) {
+        case UPPER:             return rfThicken(open, RF_WID, RF_GAP, RF_GND, RF_LAY);
+        case UPPERwithGROUND:   return rfThicken(open, RF_WID, RF_GAP, RF_GND, RF_LAY, 2);
+    }
+}
+POLYLINES rfConnectThicken(CONNECTION b, CONNECTION e, RFTYPE type) {
+    return rfThicken(connect(b, e), type);
+}
+
+
 
 
