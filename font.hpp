@@ -74,7 +74,7 @@ public:
     void recalculate();                         // NotImplemented; to be used if certain variables (`thick`, `space`, etc) are changed after characters have been generated.
 #endif
 private:
-    DEVICE* getChar(char c);
+    DEVICE* getChar(unsigned char c);
     void getTextPrivate(std::string text, DEVICE* toReturn);
     
 public:

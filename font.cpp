@@ -58,7 +58,7 @@ void FONT::recalculate() {
     throw std::runtime_error("FONT::recalculate(): Not written yet...");
 }
 
-DEVICE* FONT::getChar(char c) {
+DEVICE* FONT::getChar(unsigned char c) {
     if (chars.find(c) == chars.end()) {
         if (c == 10) {          // Handle newline.
             return nullptr;
@@ -74,7 +74,8 @@ DEVICE* FONT::getChar(char c) {
         GLdouble left = thick/2;
         GLdouble right = width - thick/2;
         
-        GLdouble chamfer = width/8;
+//        GLdouble chamfer = width/8;
+        GLdouble chamfer = width/6;
         
         uint16_t cl = MATERIAL::currentLayer;
         
@@ -649,8 +650,45 @@ DEVICE* FONT::getChar(char c) {
             p += VECTOR(right-5*chamfer, top+thick/2);
             
             toReturn->add(thicken(p, thick));
+        } else if (c == '@') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(0,      mid-width/2);
+            p += VECTOR(width,  mid);
+            p += VECTOR(0,      mid+width/2);
+            
+            printf("HERE!");
+            
+            p.reverse();
+            p.close();
+            toReturn->add(p);
+        } else if (c == '#') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(width,  mid+width/2);
+            p += VECTOR(0,      mid);
+            p += VECTOR(width,  mid-width/2);
+            
+            
+            printf("THERE!");
+            
+            p.close();
+            toReturn->add(p);
+        } else if (c == 0x1E) {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(width/2,    mid+width/2);
+            p += VECTOR(0,          mid-width/2);
+            p += VECTOR(width,      mid-width/2);
+            
+            p.close();
+            toReturn->add(p);
+        } else if (c == 0x1F) {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(width/2,    mid-width/2);
+            p += VECTOR(width,      mid+width/2);
+            p += VECTOR(0,          mid+width/2);
+            
+            p.close();
+            toReturn->add(p);
         }
-        
         
         MATERIAL::currentLayer = cl;
         

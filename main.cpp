@@ -6,11 +6,24 @@
 #include "diamonddevices.hpp"
 #include "eodevices.hpp"
 #include "testing.hpp"
+#include "harvarddevices.hpp"
 
 int main(int argc, const char * argv[]) {
+//    if (argc == 0) { printf("pGDS: Nothing to do..."); }
+//    else if (argc == 2) {
+//        std::string gdsstr(argv[0]);
+//        std::string outstr(argv[1]);
+//
+//        DEVICE* gds = getDevice(gdsstr);
+//        gds->importGDS(gdsstr);
+//
+//
+//    } else { printf("pGDS: Number of arguments not understood..."); }
+    
 //    mainDevice(1);
 //    mainDiamondDevice(1);
-    mainEODevice(1);
+//    mainEODevice(1);
+    LNX_HARV_6();
 //    testBooleans();
     
 //#ifdef DEBUG

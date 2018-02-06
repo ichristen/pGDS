@@ -15,8 +15,8 @@
 #define ERROR       .000000001
 
 #define MINRADIUS   20
-//#define PADDING     2
-#define PADDING         1
+#define PADDING     2
+//#define PADDING         1
 #define TRANSPADDING    30
 
 #define TAU         6.283185307179586476925286766559005768394338798750211641949

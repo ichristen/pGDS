@@ -812,13 +812,13 @@ DEVICEPTR::DEVICEPTR(DEVICEPTR const &device_, AFFINE transformation_) { device 
 
 DEVICEPTR DEVICEPTR::operator+(VECTOR v)    const { return DEVICEPTR(device, transformation + v); }
 DEVICEPTR DEVICEPTR::operator-(VECTOR v)    const { return DEVICEPTR(device, transformation - v); }
-DEVICEPTR DEVICEPTR::operator*(AFFINE m)    const { return DEVICEPTR(device, transformation * m); }
+DEVICEPTR DEVICEPTR::operator*(AFFINE m)    const { return DEVICEPTR(device, m * transformation); }
 DEVICEPTR DEVICEPTR::operator*(GLdouble s)  const { return DEVICEPTR(device, transformation * s); }
 DEVICEPTR DEVICEPTR::operator/(GLdouble s)  const { return DEVICEPTR(device, transformation / s); }
 
 DEVICEPTR DEVICEPTR::operator+=(VECTOR v) {         transformation += v; return *this; }
 DEVICEPTR DEVICEPTR::operator-=(VECTOR v) {         transformation -= v; return *this; }
-DEVICEPTR DEVICEPTR::operator*=(AFFINE m) {         transformation *= m; return *this; }
+DEVICEPTR DEVICEPTR::operator*=(AFFINE m) {         transformation = m * transformation; return *this; }
 DEVICEPTR DEVICEPTR::operator*=(GLdouble s) {       transformation *= s; return *this; }
 DEVICEPTR DEVICEPTR::operator/=(GLdouble s) {       transformation /= s; return *this; }
 

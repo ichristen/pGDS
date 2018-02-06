@@ -29,6 +29,9 @@
 		084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 084F2B791F5B3BE800C604EB /* window.cpp */; };
 		0885CA461FD0862E005FE296 /* SFML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0885CA451FD0862E005FE296 /* SFML.framework */; };
 		0885CA481FD086B3005FE296 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EB1F4CE0170054FD31 /* main.cpp */; };
+		0886D2212027E76F00C48D4C /* harvarddevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0886D21F2027E76F00C48D4C /* harvarddevices.cpp */; };
+		08A4483C201666A800C8B564 /* tesselation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A4483A201666A800C8B564 /* tesselation.cpp */; };
+		08A4483D201666B200C8B564 /* tesselation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A4483A201666A800C8B564 /* tesselation.cpp */; };
 		08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
 		08A8D1721F5B203C00DC4F70 /* pgdsNSOpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */; };
 		08D51B461F90342200091ECB /* testing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1161F4CFCCD0054FD31 /* testing.cpp */; };
@@ -81,8 +84,8 @@
 		080BC5D41F06A292003BDE67 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		080BC5D61F06A29D003BDE67 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		080BC5D81F06A2AE003BDE67 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		08156FAC1FA79A34009702F5 /* diamonddevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = diamonddevices.cpp; sourceTree = SOURCE_ROOT; };
-		08156FAD1FA79A34009702F5 /* diamonddevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = diamonddevices.hpp; sourceTree = SOURCE_ROOT; };
+		08156FAC1FA79A34009702F5 /* diamonddevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = diamonddevices.cpp; path = ../pGDSdevices/diamonddevices.cpp; sourceTree = SOURCE_ROOT; };
+		08156FAD1FA79A34009702F5 /* diamonddevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = diamonddevices.hpp; path = ../pGDSdevices/diamonddevices.hpp; sourceTree = SOURCE_ROOT; };
 		083CC0D81F4CE0170054FD31 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "pGDS/macOS OpenGL/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
 		083CC0DB1F4CE0170054FD31 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "pGDS/macOS OpenGL/Info.plist"; sourceTree = SOURCE_ROOT; };
 		083CC0DD1F4CE0170054FD31 /* device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = device.hpp; sourceTree = SOURCE_ROOT; };
@@ -100,10 +103,10 @@
 		083CC0EE1F4CE0170054FD31 /* polyline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = polyline.cpp; sourceTree = SOURCE_ROOT; };
 		083CC0EF1F4CE0170054FD31 /* primitives.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitives.cpp; sourceTree = SOURCE_ROOT; };
 		083CC0F21F4CE0170054FD31 /* vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vector.cpp; sourceTree = SOURCE_ROOT; };
-		083CC1101F4CE0C00054FD31 /* eodevices.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = eodevices.hpp; sourceTree = SOURCE_ROOT; };
-		083CC1111F4CE0C00054FD31 /* testdevices.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = testdevices.hpp; sourceTree = SOURCE_ROOT; };
-		083CC1121F4CE0C00054FD31 /* eodevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eodevices.cpp; sourceTree = SOURCE_ROOT; };
-		083CC1131F4CE0C00054FD31 /* testdevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testdevices.cpp; sourceTree = SOURCE_ROOT; };
+		083CC1101F4CE0C00054FD31 /* eodevices.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = eodevices.hpp; path = ../pGDSdevices/eodevices.hpp; sourceTree = SOURCE_ROOT; };
+		083CC1111F4CE0C00054FD31 /* testdevices.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = testdevices.hpp; path = ../pGDSdevices/testdevices.hpp; sourceTree = SOURCE_ROOT; };
+		083CC1121F4CE0C00054FD31 /* eodevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = eodevices.cpp; path = ../pGDSdevices/eodevices.cpp; sourceTree = SOURCE_ROOT; };
+		083CC1131F4CE0C00054FD31 /* testdevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = testdevices.cpp; path = ../pGDSdevices/testdevices.cpp; sourceTree = SOURCE_ROOT; };
 		083CC1161F4CFCCD0054FD31 /* testing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testing.cpp; sourceTree = SOURCE_ROOT; };
 		083CC1171F4CFCCD0054FD31 /* testing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = testing.hpp; sourceTree = SOURCE_ROOT; };
 		083CC1191F4CFCED0054FD31 /* boolean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = boolean.cpp; sourceTree = SOURCE_ROOT; };
@@ -111,6 +114,10 @@
 		084F2B791F5B3BE800C604EB /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = SOURCE_ROOT; };
 		084F2B7A1F5B3BE800C604EB /* window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = window.hpp; sourceTree = SOURCE_ROOT; };
 		0885CA451FD0862E005FE296 /* SFML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SFML.framework; path = ../../../../Library/Frameworks/SFML.framework; sourceTree = "<group>"; };
+		0886D21F2027E76F00C48D4C /* harvarddevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = harvarddevices.cpp; path = ../../pGDSdevices/harvarddevices.cpp; sourceTree = "<group>"; };
+		0886D2202027E76F00C48D4C /* harvarddevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = harvarddevices.hpp; path = ../../pGDSdevices/harvarddevices.hpp; sourceTree = "<group>"; };
+		08A4483A201666A800C8B564 /* tesselation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tesselation.cpp; sourceTree = SOURCE_ROOT; };
+		08A4483B201666A800C8B564 /* tesselation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = tesselation.hpp; sourceTree = SOURCE_ROOT; };
 		08A8D16D1F58D16200DC4F70 /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = engine.cpp; sourceTree = SOURCE_ROOT; };
 		08A8D16E1F58D16200DC4F70 /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = engine.hpp; sourceTree = SOURCE_ROOT; };
 		08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = pgdsNSOpenGLView.mm; path = macOS/pgdsNSOpenGLView.mm; sourceTree = SOURCE_ROOT; };
@@ -179,9 +186,11 @@
 			children = (
 				08156FAD1FA79A34009702F5 /* diamonddevices.hpp */,
 				083CC1101F4CE0C00054FD31 /* eodevices.hpp */,
+				0886D2202027E76F00C48D4C /* harvarddevices.hpp */,
 				083CC1111F4CE0C00054FD31 /* testdevices.hpp */,
 				08156FAC1FA79A34009702F5 /* diamonddevices.cpp */,
 				083CC1121F4CE0C00054FD31 /* eodevices.cpp */,
+				0886D21F2027E76F00C48D4C /* harvarddevices.cpp */,
 				083CC1131F4CE0C00054FD31 /* testdevices.cpp */,
 			);
 			name = Devices;
@@ -227,6 +236,7 @@
 				083CC0E11F4CE0170054FD31 /* math.hpp */,
 				083CC0E21F4CE0170054FD31 /* polyline.hpp */,
 				083CC0E31F4CE0170054FD31 /* primitives.hpp */,
+				08A4483B201666A800C8B564 /* tesselation.hpp */,
 				083CC1171F4CFCCD0054FD31 /* testing.hpp */,
 				083CC0E61F4CE0170054FD31 /* vector.hpp */,
 				084F2B7A1F5B3BE800C604EB /* window.hpp */,
@@ -238,6 +248,7 @@
 				083CC0ED1F4CE0170054FD31 /* math.cpp */,
 				083CC0EE1F4CE0170054FD31 /* polyline.cpp */,
 				083CC0EF1F4CE0170054FD31 /* primitives.cpp */,
+				08A4483A201666A800C8B564 /* tesselation.cpp */,
 				083CC1161F4CFCCD0054FD31 /* testing.cpp */,
 				083CC0F21F4CE0170054FD31 /* vector.cpp */,
 				084F2B791F5B3BE800C604EB /* window.cpp */,
@@ -334,6 +345,7 @@
 				08D51B4D1F90342200091ECB /* material.cpp in Sources */,
 				08D51B4E1F90342200091ECB /* eodevices.cpp in Sources */,
 				08D51B4F1F90342200091ECB /* primitives.cpp in Sources */,
+				08A4483D201666B200C8B564 /* tesselation.cpp in Sources */,
 				08D51B511F90342200091ECB /* pgdsNSOpenGLView.mm in Sources */,
 				08D51B521F90342200091ECB /* window.cpp in Sources */,
 				08D51B531F90342200091ECB /* engine.cpp in Sources */,
@@ -353,9 +365,11 @@
 				083CC11B1F4CFCED0054FD31 /* boolean.cpp in Sources */,
 				083CC1011F4CE0170054FD31 /* font.cpp in Sources */,
 				083CC1091F4CE0170054FD31 /* vector.cpp in Sources */,
+				08A4483C201666A800C8B564 /* tesselation.cpp in Sources */,
 				083CC1031F4CE0170054FD31 /* material.cpp in Sources */,
 				083CC1141F4CE0C00054FD31 /* eodevices.cpp in Sources */,
 				083CC1061F4CE0170054FD31 /* primitives.cpp in Sources */,
+				0886D2212027E76F00C48D4C /* harvarddevices.cpp in Sources */,
 				083CC1021F4CE0170054FD31 /* main.cpp in Sources */,
 				08A8D1721F5B203C00DC4F70 /* pgdsNSOpenGLView.mm in Sources */,
 				084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */,
