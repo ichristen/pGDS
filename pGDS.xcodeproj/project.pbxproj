@@ -34,6 +34,7 @@
 		08A4483D201666B200C8B564 /* tesselation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A4483A201666A800C8B564 /* tesselation.cpp */; };
 		08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
 		08A8D1721F5B203C00DC4F70 /* pgdsNSOpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */; };
+		08C820EF202D4C4300D9E032 /* quantumdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08C820ED202D4C4300D9E032 /* quantumdevices.cpp */; };
 		08D51B461F90342200091ECB /* testing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1161F4CFCCD0054FD31 /* testing.cpp */; };
 		08D51B471F90342200091ECB /* testdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1131F4CE0C00054FD31 /* testdevices.cpp */; };
 		08D51B481F90342200091ECB /* polyline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EE1F4CE0170054FD31 /* polyline.cpp */; };
@@ -122,6 +123,8 @@
 		08A8D16E1F58D16200DC4F70 /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = engine.hpp; sourceTree = SOURCE_ROOT; };
 		08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = pgdsNSOpenGLView.mm; path = macOS/pgdsNSOpenGLView.mm; sourceTree = SOURCE_ROOT; };
 		08A8D1741F5B207500DC4F70 /* pgdsNSOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pgdsNSOpenGLView.h; path = macOS/pgdsNSOpenGLView.h; sourceTree = SOURCE_ROOT; };
+		08C820ED202D4C4300D9E032 /* quantumdevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = quantumdevices.cpp; path = ../../pGDSdevices/quantumdevices.cpp; sourceTree = "<group>"; };
+		08C820EE202D4C4300D9E032 /* quantumdevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = quantumdevices.hpp; path = ../../pGDSdevices/quantumdevices.hpp; sourceTree = "<group>"; };
 		08D51B601F90342300091ECB /* pGDS OpenGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "pGDS OpenGL"; sourceTree = BUILT_PRODUCTS_DIR; };
 		08FBFB851F00AF9300C35A59 /* pGDS.app */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = pGDS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -188,10 +191,12 @@
 				083CC1101F4CE0C00054FD31 /* eodevices.hpp */,
 				0886D2202027E76F00C48D4C /* harvarddevices.hpp */,
 				083CC1111F4CE0C00054FD31 /* testdevices.hpp */,
+				08C820EE202D4C4300D9E032 /* quantumdevices.hpp */,
 				08156FAC1FA79A34009702F5 /* diamonddevices.cpp */,
 				083CC1121F4CE0C00054FD31 /* eodevices.cpp */,
 				0886D21F2027E76F00C48D4C /* harvarddevices.cpp */,
 				083CC1131F4CE0C00054FD31 /* testdevices.cpp */,
+				08C820ED202D4C4300D9E032 /* quantumdevices.cpp */,
 			);
 			name = Devices;
 			sourceTree = "<group>";
@@ -359,6 +364,7 @@
 			files = (
 				083CC1181F4CFCCD0054FD31 /* testing.cpp in Sources */,
 				083CC1151F4CE0C00054FD31 /* testdevices.cpp in Sources */,
+				08C820EF202D4C4300D9E032 /* quantumdevices.cpp in Sources */,
 				08156FAE1FA79A34009702F5 /* diamonddevices.cpp in Sources */,
 				083CC1051F4CE0170054FD31 /* polyline.cpp in Sources */,
 				083CC1041F4CE0170054FD31 /* math.cpp in Sources */,

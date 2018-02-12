@@ -112,7 +112,6 @@ public:
     VECTOR dv;          // Direction of the connection,
     GLdouble w;         // Width of connection. If negative, +/- `PADDING` is drawn around connection.
     
-    
     int16_t l;          // Layer.
 
     std::string name;   // Name of connection.
@@ -158,14 +157,26 @@ public:
     VECTOR left()                       const;  // Returns the position of the left side of the connection (forward is the direction of the connection).
     VECTOR right()                      const;  // Returns the position of the right side of the connection.
 
+    GLdouble getAng()                   const;  // Get the angle of the connection with standard notation.
+    
     void render()                       const;  // Draws an arrow with appropriate location, width and direction using OpenGL2.
 };
 
-CONNECTION bendRadius(CONNECTION start, GLdouble radius, GLdouble ang);
+//GLdouble getAng(VECTOR u, VECTOR v);
+
+CONNECTION bendRadius(CONNECTION start, GLdouble ang, GLdouble radius=MINRADIUS);
 CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang=0);
 
 CONNECTION bendLeft(CONNECTION start, GLdouble radius);
 CONNECTION bendRight(CONNECTION start, GLdouble radius);
+
+CONNECTION bendTowards(CONNECTION start, GLdouble ang, GLdouble radius);
+CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius);
+
+//bool intersect(CONNECTION c1, CONNECTION c2, VECTOR** i);
+
+CONNECTION bendHorizontal(CONNECTION start, GLdouble horizontal);
+CONNECTION bendVertical(CONNECTION start,   GLdouble vertical);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -245,8 +256,11 @@ AFFINE mirrorYeX();     // Transformation that mirrors across the line `y = x`.
 AFFINE mirrorYemX();    // Transformation that mirrors across the line `y = -x`.
 AFFINE zeroAFFINE();    // Zero matrix with no translation.
 
+bool intersect(CONNECTION a, CONNECTION b, VECTOR** i, bool onlyForward=false);     // Get the intersection point of the lines originating from `CONNECTION`s `a` and `b`. If `onlyForward`, do not consider intersections strictly 'behind' the `CONNECTIONS`. `*i` is set to `NULL` if no intersection exists.
+
 //#include "material.hpp"
 #include "polyline.hpp"
 //#include "device.hpp"
+//#include "primitives.hpp"
 
 #endif

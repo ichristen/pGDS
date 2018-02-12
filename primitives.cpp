@@ -335,13 +335,15 @@ GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
     if (dir == 0) {
 //        dir = 1;
         ang = -PI;
-        printf("Arcs are equidistant, choosing CCW as shortest...\n");
+        printf("Arcs are equidistant, choosing CCW as shortest...\n");      // Change this!
     } else {
         ang = dir*acos(((b - c).unit()) * ((e - c).unit()));
+//        ang = acos(((b - c).unit()) * ((e - c).unit()));
     }
     
     if (!chooseShortest) {
-        if (ang > 0) {  ang -= TAU; }
+        if (ang > 0) {  } // ang -= TAU; }
+//        if (ang > 0) { ang -= TAU; }
         else {          ang += TAU; }
     }
     
@@ -386,30 +388,6 @@ POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps, GLdou
     toReturn.setEndDirection(   (e-c).perpCCW().unit()*sign(ang) );
     
     return toReturn;
-}
-
-bool intersect(CONNECTION a, CONNECTION b, VECTOR** i, bool onlyForward) {
-    if (a.dv == b.dv || a.dv == -b.dv) { *i = nullptr; return false; }  // Lines are parallel, no valid intersection...
-    
-    if (a.dv.x == 0 && b.dv.x == 0) {   // If both are vertical...
-        throw std::runtime_error("intersect(CONNECTION^2, VECTOR**, bool): Both-vertical case should have been caught by parallel check...");
-    } else if (a.dv.x == 0) {           // If `a` is vertical...
-        *i = new VECTOR( a.v.x, (b.dv.y / b.dv.x) * (a.v.x - b.v.x) + b.v.y );
-    } else if (b.dv.x == 0) {           // If `b` is vertical...
-        *i = new VECTOR( b.v.x, (a.dv.y / a.dv.x) * (b.v.x - a.v.x) + a.v.y );
-    } else {                            // If neither `a` nor `b` are vertical...
-        GLdouble x = ( (a.dv.y / a.dv.x) * a.v.x - (b.dv.y / b.dv.x) * b.v.x - a.v.y + b.v.y ) / ( (a.dv.y / a.dv.x) - (b.dv.y / b.dv.x) );
-        
-        *i = new VECTOR( x, (a.dv.y / a.dv.x) * (x - a.v.x) + a.v.y );
-    }
-    
-    if (onlyForward) {
-        if ( (**i - a.v) * a.dv <= 0 || (**i - b.v) * b.dv <= 0 ) {
-            delete *i;  *i = nullptr; return false;
-        }
-    }
-    
-    return true;
 }
 
 POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsDuringLinear, GLdouble stepMutliplier) {
@@ -745,18 +723,21 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
         return toReturn;
     }
     
+//    bool chooseshortest = false;
+    bool chooseshortest = b.dv * e.dv < 0;
+    
     // Straight Cases...
     VECTOR blr = bl + lr.perpCW().unit()*r;
     VECTOR elr = er + lr.perpCW().unit()*r;
-    GLdouble angblr = (getArcAngle(bl, b.v, blr));
-    GLdouble angelr = (getArcAngle(er, e.v, elr));
+    GLdouble angblr = (getArcAngle(bl, b.v, blr, chooseshortest));
+    GLdouble angelr = (getArcAngle(er, e.v, elr, chooseshortest));
 //    GLdouble angelr = std::abs(getArcAngle(er, elr, e.v));
     GLdouble Llr = ( std::abs(angblr) + std::abs(angelr) )*r + lr.magn();
     
     VECTOR brl = br + rl.perpCCW().unit()*r;
     VECTOR erl = el + rl.perpCCW().unit()*r;
-    GLdouble angbrl = (getArcAngle(br, b.v, brl));
-    GLdouble angerl = (getArcAngle(el, e.v, erl));
+    GLdouble angbrl = (getArcAngle(br, b.v, brl, chooseshortest));
+    GLdouble angerl = (getArcAngle(el, e.v, erl, chooseshortest));
 //    GLdouble angerl = std::abs(getArcAngle(el, erl, e.v));
     GLdouble Lrl = ( std::abs(angbrl) + std::abs(angerl) )*r + rl.magn();
     
@@ -765,8 +746,8 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    printf("ANG1 = %f pi\n", 2*asin2rll/TAU);
     VECTOR bll = bl + ll.perpCW().unit().rotate(asin2rll)*r;
     VECTOR ell = el - ll.perpCW().unit().rotate(asin2rll)*r;
-    GLdouble angbll = (getArcAngle(bl, b.v, bll)); // + asin2rll;
-    GLdouble angell = (getArcAngle(el, e.v, ell)); // + asin2rll;
+    GLdouble angbll = (getArcAngle(bl, b.v, bll, chooseshortest)); // + asin2rll;
+    GLdouble angell = (getArcAngle(el, e.v, ell, chooseshortest)); // + asin2rll;
 //    GLdouble angell = std::abs(getArcAngle(er, elr, e.v)) + asin2rll;
     GLdouble Lll = ( std::abs(angbll) + std::abs(angell) )*r + sqrt(ll.magn2() - 4*r*r);
     
@@ -774,10 +755,20 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    printf("ANG2 = %f pi\n", 2*asin2rrr/TAU);
     VECTOR brr = br - rr.perpCW().unit().rotate(asin2rrr)*r;
     VECTOR err = er + rr.perpCW().unit().rotate(asin2rrr)*r;
-    GLdouble angbrr = (getArcAngle(br, b.v, brr)); // + asin2rrr;
-    GLdouble angerr = (getArcAngle(er, e.v, err)); // + asin2rrr;
+    GLdouble angbrr = (getArcAngle(br, b.v, brr, chooseshortest)); // + asin2rrr;
+    GLdouble angerr = (getArcAngle(er, e.v, err, chooseshortest)); // + asin2rrr;
 //    GLdouble angerr = std::abs(getArcAngle(el, erl, e.v)) + asin2rrr;
     GLdouble Lrr = ( std::abs(angbrr) + std::abs(angerr) )*r + sqrt(rr.magn2() - 4*r*r);
+    
+    if (isnan(Llr)) { Llr = INFINITY; }
+    if (isnan(Lrl)) { Lrl = INFINITY; }
+    if (isnan(Lll)) { Lll = INFINITY; }
+    if (isnan(Lrr)) { Lrr = INFINITY; }
+    
+//    Llr = INFINITY;
+//    Lrl = INFINITY;
+////    Lll = INFINITY;
+//    Lrr = INFINITY;
     
 //    // Straight Cases...
 //    VECTOR blr = bl + lr.perpCW().unit()*r;
@@ -816,6 +807,8 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     
     GLdouble angb, ange;
     
+//    Lll += 1;
+    
     if      (Lll == Lmin) { angb = angbll; ange = angell; }
     else if (Llr == Lmin) { angb = angblr; ange = angelr; }
     else if (Lrl == Lmin) { angb = angbrl; ange = angerl; }
@@ -827,8 +820,8 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    angb = angbll; ange = angell;
     
     // And make the connections...
-    CONNECTION b1 = bendRadius(b, r, angb);
-    CONNECTION e1 = bendRadius(e, r, ange);
+    CONNECTION b1 = bendRadius(b, angb, r);
+    CONNECTION e1 = bendRadius(e, ange, r);
     
     if (mult <= 0) {
         POLYLINE fin = connect(b, -b1);

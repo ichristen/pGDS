@@ -822,9 +822,18 @@ DEVICEPTR DEVICEPTR::operator*=(AFFINE m) {         transformation = m * transfo
 DEVICEPTR DEVICEPTR::operator*=(GLdouble s) {       transformation *= s; return *this; }
 DEVICEPTR DEVICEPTR::operator/=(GLdouble s) {       transformation /= s; return *this; }
 
-GLdouble DEVICEPTR::area() {                  return device->area() * transformation.det(); }
+CONNECTION DEVICEPTR::operator[](std::string connectionName)    const {
+    return device->operator[](connectionName) * transformation;
+}
+CONNECTION DEVICEPTR::getConnection(std::string connectionName) const {
+    return operator[](connectionName);
+}
 
-DEVICEPTR DEVICEPTR::copy() const {           return DEVICEPTR(device, transformation); }
+GLdouble DEVICEPTR::area() {                        return device->area() * transformation.det(); }
+
+BOUNDINGBOX DEVICEPTR::bb() const {                 return transformation * device->bb; };  // Write BB * AFFINE?
+
+DEVICEPTR DEVICEPTR::copy() const {                 return DEVICEPTR(device, transformation); }
 
 void DEVICEPTR::print() const {
     printf("DEVICEPTR consisting of DEVICE: {\n");

@@ -186,7 +186,8 @@ public:
     DEVICEPTR operator/(GLdouble s) const;  // Returns a pointer to this device, scaled by `1/s`.
     DEVICEPTR operator*(AFFINE m)   const;  // Returns a pointer to this device, transformed by `m`.
     
-    CONNECTION operator[](std::string connectionName)   const;      // Returns the `CONNECTION` corresponding to `connectionName`. If no correspondence, returns empty `CONNECTION`.
+    CONNECTION operator[](std::string connectionName)       const;  // Returns the `CONNECTION` corresponding to `connectionName`. If no correspondence, returns empty `CONNECTION`.
+    CONNECTION getConnection(std::string connectionName)    const;  // Same as above.
     
     void print();                                                   // Prints the device description, along with the contained `POLYLINE`s and `DEVICEPTR`s.
     void printConnectionNames();                                    // Prints the names of the contained `CONNECTION`s.
@@ -231,9 +232,14 @@ public:
     DEVICEPTR operator*=(GLdouble s);       // Same as above.
     DEVICEPTR operator/=(GLdouble s);       // Same as above.
     
+    CONNECTION operator[](std::string connectionName)       const;  // Returns the `CONNECTION` corresponding to `connectionName`. If no correspondence, returns empty `CONNECTION`.
+    CONNECTION getConnection(std::string connectionName)    const;  // Same as above.
+    
     DEVICEPTR copy()                const;  // Makes a copy of this transformation of the device pointer.
     
     GLdouble area();                        // Returns the area of the device, multiplied by a scaling factor corresponding with the affine `transformation`.
+    
+    BOUNDINGBOX bb()                const;  // Returns the transformed bounding box of the device.
     
     void print()                    const;  // Prints the transformation and the pointed device.
 };
