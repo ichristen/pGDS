@@ -449,6 +449,10 @@ POLYLINE& POLYLINE::operator*=(double s) {
 POLYLINE& POLYLINE::operator*=(AFFINE m) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [m](VECTOR v) -> VECTOR { return v*m; });
+    
+    begin = m.linearTimes(begin);
+    end =   m.linearTimes(end);
+    
     area_ = 0;
     recomputeBoundingBox();
     return *this;

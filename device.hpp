@@ -235,6 +235,11 @@ public:
     CONNECTION operator[](std::string connectionName)       const;  // Returns the `CONNECTION` corresponding to `connectionName`. If no correspondence, returns empty `CONNECTION`.
     CONNECTION getConnection(std::string connectionName)    const;  // Same as above.
     
+    AFFINE getTransformation()      const;  // Getter for transformation.
+    void setTransformation(AFFINE m);       // Setter for transformation.
+    
+    bool isEmpty()                  const;  // Returns whether device == nullptr.
+    
     DEVICEPTR copy()                const;  // Makes a copy of this transformation of the device pointer.
     
     GLdouble area();                        // Returns the area of the device, multiplied by a scaling factor corresponding with the affine `transformation`.

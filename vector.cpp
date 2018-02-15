@@ -450,7 +450,12 @@ CONNECTION bendTowards(CONNECTION start, GLdouble ang, GLdouble radius) {
     return bendTowards(start, VECTOR(ang), radius);
 }
 CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius) {
-    return bendRadius(start, acos(start.dv * towards.unit()), radius);
+    bool dir = start.dv.perpCCWdot(towards) > 0;
+    
+//    printf("%f\n", acos(start.dv * towards.unit()));
+//    printf("%f\n", ((dir)?(-1):(1)) * acos(start.dv * towards.unit()));
+    
+    return bendRadius(start, ((dir)?(-1):(1)) * acos(start.dv * towards.unit()), radius);
 }
 
 CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang) {

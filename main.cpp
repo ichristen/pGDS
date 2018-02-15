@@ -24,7 +24,7 @@ int main(int argc, const char * argv[]) {
 //    mainDevice(1);
 //    mainDiamondDevice(1);
 //    mainEODevice(1);
-    LNXEO();
+    LNXEOQ();
 //    LNX_HARV_6();
 //    testBooleans();
     

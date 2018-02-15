@@ -209,6 +209,10 @@ CONNECTION DEVICE::operator[](std::string connectionName)   const {
         return connections.at(connectionName);  // `CONNECTION` corresponding to `connectionName`.
     }
 }
+CONNECTION DEVICE::getConnection(std::string connectionName) const {
+    return operator[](connectionName);
+}
+
 
 void DEVICE::print() {
     printf("DEVICE with description: {\n");
@@ -828,6 +832,11 @@ CONNECTION DEVICEPTR::operator[](std::string connectionName)    const {
 CONNECTION DEVICEPTR::getConnection(std::string connectionName) const {
     return operator[](connectionName);
 }
+
+AFFINE DEVICEPTR::getTransformation()   const {     return transformation; }
+void DEVICEPTR::setTransformation(AFFINE m) {       transformation = m; }
+
+bool DEVICEPTR::isEmpty()               const {     return !device; }
 
 GLdouble DEVICEPTR::area() {                        return device->area() * transformation.det(); }
 

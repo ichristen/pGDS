@@ -26,6 +26,26 @@ POLYLINE rect(VECTOR u, VECTOR v) {
     
     return toReturn;
 }
+POLYLINE rect(VECTOR u, VECTOR v, GLdouble p) {
+    POLYLINE toReturn = POLYLINE(4);
+    
+    if (p != 0) {
+        
+        VECTOR d =  (u - v).unit() * (p * sqrt(2));
+        
+//        d.printNL();
+        
+        VECTOR a =  d.rotate(-TAU/8);
+        VECTOR b =  d.rotate(TAU/8);
+        
+        toReturn.add(u + a);
+        toReturn.add(u + b);
+        toReturn.add(v - a);
+        toReturn.add(v - b);
+    }
+    
+    return toReturn;
+}
 //POLYLINE rect(GLdouble x, GLdouble y, GLdouble w, GLdouble h) {
 //    return rect(VECTOR(x,y), VECTOR(x+w, y+h));
 //}
@@ -434,8 +454,14 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
     switch (type) {
         case QBEZIER:
         case CBEZIER:
-        case LINEAR:
             throw std::runtime_error("CONNECTIONTYPE not currently supported...");
+            
+        case LINEAR:
+            toReturn.add(i.v);
+            toReturn.add(f.v);
+            
+            toReturn.setBeginDirection(i.dv);
+            toReturn.setEndDirection(f.dv);
             
             break;
         case MONOCIRCULAR:
