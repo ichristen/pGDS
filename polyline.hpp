@@ -147,6 +147,7 @@ public:
 //    void        erase(int i, int j);
     
     void add(VECTOR v);
+    void addToPrev(VECTOR v);
     void add(POLYLINE p);
     
     void recomputeBoundingBox();

@@ -300,6 +300,9 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
 void POLYLINE::add(VECTOR v){
     operator+=(v);
 }
+void POLYLINE::addToPrev(VECTOR v){
+    operator+=(getEndPoint() + v);
+}
 void POLYLINE::add(POLYLINE p){
     operator+=(p);
 }

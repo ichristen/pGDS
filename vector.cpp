@@ -350,7 +350,7 @@ CONNECTION::CONNECTION(VECTOR v_, VECTOR dv_, GLdouble w_, std::string name_, in
 }
 bool CONNECTION::isEmpty() const { return v.isZero() && dv ==  VECTOR(1,0) && w == 1 && name == "default"; }
 CONNECTION CONNECTION::operator=(CONNECTION c) {        v = c.v; dv = c.dv; w = c.w; name = c.name; l = c.l; return *this; }
-CONNECTION CONNECTION::operator-()          const {     return CONNECTION(v, -dv, w, name); }
+CONNECTION CONNECTION::operator-()          const {     return CONNECTION(v, -dv, w, name, l); }
 
 //CONNECTION CONNECTION::operator+(VECTOR v_) const { return CONNECTION(v + v_, dv, w, name); }
 //CONNECTION CONNECTION::operator-(VECTOR v_) const { return CONNECTION(v - v_, dv, w, name); }
