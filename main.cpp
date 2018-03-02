@@ -8,6 +8,7 @@
 #include "testing.hpp"
 #include "harvarddevices.hpp"
 #include "quantumdevices.hpp"
+#include "vapordevices.hpp"
 
 int main(int argc, const char * argv[]) {
 //    if (argc == 0) { printf("pGDS: Nothing to do..."); }
@@ -24,9 +25,11 @@ int main(int argc, const char * argv[]) {
 //    mainDevice(1);
 //    mainDiamondDevice(1);
 //    mainEODevice(1);
-    LNXEOQ();
+//    LNXEOQ();
 //    LNX_HARV_6();
 //    testBooleans();
+//    LNX_LOSS_2();
+    VAPORTEST();
     
 //#ifdef DEBUG
 //    printf("DEBUG defined!");

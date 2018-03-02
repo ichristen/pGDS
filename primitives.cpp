@@ -910,6 +910,25 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     return toReturn;
 }
 
+POLYLINES thicken(POLYLINES open, GLdouble width, GLdouble side, GLdouble minstep) {
+    POLYLINES toReturn;
+    
+    for (int i = 0; i < open.size(); i++) {
+        toReturn.add(thicken(open[i], [width] (GLdouble t) -> GLdouble { return width; }, side, minstep));
+    }
+    
+    return toReturn;
+}
+POLYLINES thicken(POLYLINES open, std::function<GLdouble(GLdouble t)> lambda, GLdouble side, GLdouble minstep) {
+    POLYLINES toReturn;
+    
+    for (int i = 0; i < open.size(); i++) {
+        toReturn.add(thicken(open[i], lambda, side, minstep));
+    }
+    
+    return toReturn;
+}
+
 POLYLINE thicken(POLYLINE open, GLdouble width, GLdouble side, GLdouble minstep) {
     return thicken(open, [width] (GLdouble t) -> GLdouble { return width; }, side, minstep);
 }
@@ -976,9 +995,6 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
         if (!open->getEndDirection().isZero()) {    u = open->getEndDirection(); }
         else {  u = (open->points[open->size()-1] - open->points[open->size()-2]).unit(); }
         
-//        printf("open->end.isZero()=%i; u=", open->end.isZero());
-//        u.printNL();
-        
         v = u;
         
         offset = (*lambda)(1)/2;
@@ -986,7 +1002,6 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
         if (!open->getBeginDirection().isZero()) {  u = open->getBeginDirection(); }
         else {  u = (open->points[1] - open->points[0]).unit(); }
         
-//        printf("open->begin.isZero()=%i; u=", open->begin.isZero());
         u.printNL();
         
         v = u;
@@ -1002,37 +1017,31 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
         thisLength = u.magn();
         u /= thisLength;
         
-//        currentLength + thisLength;
-        
         offset = (*lambda)((currentLength + thisLength)/open->length())/2;
     }
     
-    VECTOR dir = -(u.perpCCW() + v.perpCCW()).unit() / sqrt((1 + u * v)/2);
-    
-//    open->points[i-1].printNL();
-//    open->points[i].printNL();
-//    open->points[i+1].printNL();
-//    dir.printNL();
+    VECTOR dir = -(u.perpCCW() + v.perpCCW()).unit() / sqrt((1 + u * v) / 2);
     
     if (offset > 0) {
-        switch (sign(side)) {
-            case -1:    closed->add(open->points[i] + dir*(offset - side));     break;
-            case 0:     closed->add(open->points[i] + dir*offset);              break;
-            case 1:     closed->add(open->points[i] - dir*offset);              break;
-        }
+        closed->add(open->points[i] + dir*(side + offset));
+//        switch (sign(side)) {
+//            case -1:    closed->add(open->points[i] + dir*(offset - side));     break;
+//            case 0:     closed->add(open->points[i] + dir*offset);              break;
+//            case 1:     closed->add(open->points[i] - dir*offset);              break;
+//        }
     }
 
     if (i < open->size()-1) {
-//        printf("recursing! - %i\n", i);
         thickenRecurse(open, closed, lambda, side, minstep, i+1, currentLength + thisLength);
     }
     
     if (offset > 0) {
-        switch (sign(side)) {
-            case -1:    closed->add(open->points[i] + dir*offset);              break;
-            case 0:     closed->add(open->points[i] - dir*offset);              break;
-            case 1:     closed->add(open->points[i] - dir*(offset + side));     break;
-        }
+        closed->add(open->points[i] + dir*(side - offset));
+//        switch (sign(side)) {
+//            case -1:    closed->add(open->points[i] + dir*offset);              break;
+//            case 0:     closed->add(open->points[i] - dir*offset);              break;
+//            case 1:     closed->add(open->points[i] - dir*(offset + side));     break;
+//        }
     }
 }
 

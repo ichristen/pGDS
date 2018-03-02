@@ -10,6 +10,9 @@ VECTOR::VECTOR(GLdouble x_, GLdouble y_, bool isCylindrical) {
     }
 }
 
+//VECTOR VECTOR:setX(GLdouble x_)             const { return *this; }
+//VECTOR VECTOR:setY(GLdouble y_)             const { return *this; }
+
 bool VECTOR::isZero()                       const { return x == 0 && y == 0; }
 bool VECTOR::operator!()                    const { return isZero(); }
 
@@ -94,7 +97,7 @@ VECTOR VECTOR::rotate(GLdouble radians) const {
 
     return VECTOR(c*x - s*y, s*x + c*y);
 }
-void VECTOR::rotateEquals(GLdouble radians){
+void VECTOR::rotateEquals(GLdouble radians) {
     GLdouble c = cos(radians);
     GLdouble s = sin(radians);
 
@@ -106,17 +109,28 @@ void VECTOR::rotateEquals(GLdouble radians){
 
 void VECTOR::print()                    const {
 #ifdef MATLAB_MEX_FILE
-    mexPrintf("[ %.2f, %.2f ]",x,y);
+    mexPrintf("[ %.2f, %.2f ]",     x, y);
 #else
-    printf("[ %.2f, %.2f ]",x,y);
+    printf("[ %.2f, %.2f ]",        x, y);
 #endif
 }
 void VECTOR::printNL()                  const {
 #ifdef MATLAB_MEX_FILE
-    mexPrintf("[ %.2f, %.2f ]\n",x,y);
+    mexPrintf("[ %.2f, %.2f ]\n",   x, y);
 #else
-    printf("[ %.2f, %.2f ]\n",x,y);
+    printf("[ %.2f, %.2f ]\n",      x, y);
 #endif
+}
+std::string VECTOR::str()               const {
+    char toReturn[64];
+    
+    snprintf(toReturn, 64, "[ %.2f, %.2f ]\n", x, y);
+    
+    return std::string(toReturn);
+}
+
+long VECTOR::hash()                    const {
+    return ( ((long)x) << 1 ) ^ ( ((long)y) >> 1 );     // Change?
 }
 
 void VECTOR::render()                   const { render(0,0); }
@@ -236,7 +250,8 @@ CONNECTION AFFINE::operator*(CONNECTION c) const {
     return CONNECTION(operator*(c.v), // + translation(),
                       dv/std::abs(magn),          // Make dv a unit vector.
                       c.w*magn,         // Grow/shrink width appropriately.
-                      c.name);
+                      c.name,
+                      c.l);
 }
 CONNECTION AFFINE::linearTimes(CONNECTION c) const {
     VECTOR dv = linearTimes(c.dv.perpCCW()).perpCW() * det();
@@ -245,7 +260,8 @@ CONNECTION AFFINE::linearTimes(CONNECTION c) const {
     return CONNECTION(c.v,
                       dv/magn,          // Make dv a unit vector.
                       c.w*magn,         // Grow/shrink width appropriately.
-                      c.name);
+                      c.name,
+                      c.l);
 }
 BOUNDINGBOX AFFINE::operator*(BOUNDINGBOX bb)   const {
     BOUNDINGBOX toReturn;
@@ -403,7 +419,7 @@ void CONNECTION::print()    const {
     v.print();
     printf(" pointing toward ");
     dv.print();
-    printf(" with width %f\n", w);
+    printf(" with width %f and layer %i\n", w, l);
 }
 CONNECTION  CONNECTION::copy()  const { return CONNECTION(v, dv, w, name, l); }
 

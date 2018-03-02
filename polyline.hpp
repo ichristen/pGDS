@@ -217,6 +217,7 @@ public:
 //    POLYLINE resolve();
     
     void print()            const;
+    long hash()             const;
 };
 
 class POLYLINES {

@@ -32,6 +32,9 @@ public:
 
     VECTOR(GLdouble x_=0, GLdouble y_=0, bool isCylindrical=false);     // Initializes `[x_, y_]`; initializes `[y_*cos(x_),y_*sin(x_)]`, if 3rd coeficient equals `true`.
 
+//    VECTOR setX(GLdouble x_)            const;
+//    VECTOR setY(GLdouble y_)            const;
+    
     bool isZero()                       const;  // Checks if both coordinates are within `E` of zero.
     bool operator!()                    const;  // Calls `isZero()`.
 
@@ -86,6 +89,10 @@ public:
     void print()                        const;  // Prints the vector in `[ x, y ]` form.
     void printNL()                      const;  // Prints the vector in `[ x, y ]` form, with a newline.
 
+    std::string str()                   const;  // Returns the vector in `[ x, y ]` form as a string.
+    
+    long hash()             const;
+    
     void render()                           const;  // Draws a line from the origin to the vector using OpenGL2 syntax.
     void render(GLdouble x_, GLdouble y_)   const;  // Draws the vector, based from `[ x_, y_ ]` instead of the origin.
     void render(VECTOR v)                   const;  // Draws the vector, based from the second vector instead of the origin.

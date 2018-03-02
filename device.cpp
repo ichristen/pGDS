@@ -108,7 +108,12 @@ void DEVICE::add(DEVICEPTR device, char c) {
 
     for (std::map<std::string, CONNECTION>::iterator it = map.begin(); it != map.end(); ++it) {
         CONNECTION connection = it->second;
+//        printf("\n");
+//        it->second.print();
+//        connection.print();
         if (c) { connection.name += c; }
+//        connection.print();
+//        printf("\n");
         add(device.transformation * connection);
     }
 
