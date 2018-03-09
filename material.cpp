@@ -3,7 +3,7 @@
 MATERIAL::MATERIAL() {
     
 }
-MATERIAL::MATERIAL(std::string name_, int16_t layer_, std::array<uint8_t, 4> colorFill_, std::array<uint8_t, 4> colorOutline_, GLdouble fontThick, GLdouble fontHeight) {
+MATERIAL::MATERIAL(std::string name_, int16_t layer_, std::array<GLfloat, 4> colorFill_, std::array<GLfloat, 4> colorOutline_, GLdouble fontThick, GLdouble fontHeight) {
     name = name_;
     layer = layer_;
     
@@ -21,13 +21,13 @@ void MATERIAL::setLayer(MATERIAL m, uint16_t l) {
     layers[l] = m;
 }
 
-void MATERIAL::setFill(   std::array<uint8_t, 4> colorFill_) {
+void MATERIAL::setFill(   std::array<GLfloat, 4> colorFill_) {
     colorFill[0] = colorFill_[0];
     colorFill[1] = colorFill_[1];
     colorFill[2] = colorFill_[2];
     colorFill[3] = colorFill_[3];
 }
-void MATERIAL::setOutline(std::array<uint8_t, 4> colorOutline_) {
+void MATERIAL::setOutline(std::array<GLfloat, 4> colorOutline_) {
     colorOutline[0] = colorOutline_[0];
     colorOutline[1] = colorOutline_[1];
     colorOutline[2] = colorOutline_[2];
@@ -36,14 +36,30 @@ void MATERIAL::setOutline(std::array<uint8_t, 4> colorOutline_) {
 void MATERIAL::print() {
     printf("MATERIAL %s for layer %i", name.c_str(), layer);
 }
+void MATERIAL::glFillColor() {
+    GLuint cID = glGetUniformLocation(shaders, "c");
+//    glUniform4fv(cID, 4, colorFill);
+    glUniform4f(cID, colorFill[0], colorFill[1], colorFill[2], colorFill[3]);
+}
+void MATERIAL::glOutlineColor() {
+    GLuint cID = glGetUniformLocation(shaders, "c");
+//    glUniform4fv(cID, 4, colorOutline);
+    glUniform4f(cID, colorOutline[0], colorOutline[1], colorOutline[2], colorOutline[3]);
+//    printf("%i, [%f,%f,%f,%f]\n", shaders, colorOutline[0], colorOutline[1], colorOutline[2], colorOutline[3]);
+}
 
 uint16_t MATERIAL::currentLayer = 1;
 
-std::map<uint16_t, MATERIAL> MATERIAL::layers =   { {1, MATERIAL("LiNbO_3",             1, {0,   0,   127, 255}, {0,   0,   255, 255}, 1./2, 7./2)},
-                                                    {2, MATERIAL("Au",                  2, {255, 188, 38,  255}, {255, 210, 110, 255}, 1., 7.)},
-                                                    {3, MATERIAL("Oxide Window",        3, {127, 127, 127, 255}, {255, 255, 255, 255}, 2., 14.)},
-                                                    {4, MATERIAL("Au2",                 4, {205, 151, 29,  255}, {207, 170, 88,  255}, 2., 14.)} ,
-                                                    {5, MATERIAL("Diamond",             5, {200, 200, 200, 255}, {200, 200, 200, 255}, 1./14, .5)} };
+std::map<uint16_t, MATERIAL> MATERIAL::layers =   { {0, MATERIAL("Helper",              0, {.8, .8, .8, 1}, {1, 1, 1, 1}, 1., 7.)},
+                                                    {1, MATERIAL("LiNbO_3",             1, {.12, .6, 1, 1}, {.56, .8, 1, 1}, 1./2, 7./2)},
+                                                    {2, MATERIAL("Au",                  2, {1,  .73, .15,  1}, {1, .82, .43, 1}, 1., 7.)},
+                                                    {3, MATERIAL("Oxide Window",        3, {.5, .5, .5, 1}, {1, 1, 1, 1}, 2., 14.)},
+                                                    {4, MATERIAL("Au2",                 4, {.8, .6, .11,  1}, {.81, .66, .35,  1}, 2., 14.)},
+                                                    {5, MATERIAL("Diamond",             5, {.8, .8, .8, 1}, {.8, .8, .8, 1}, 1./14, .5)},
+                                                    {6, MATERIAL("AuSi",                6, {1, .6, .11,  1}, {1, .66, .35,  1}, 2., 14.)},
+                                                    {7, MATERIAL("SiHelper",            7, {.8, 0, 0, 1}, {1, 0, 0, 1}, 1./14, .5)} };
+
+GLuint MATERIAL::shaders = 0;
 
 //uint16_t currentMaterial = 1;
 

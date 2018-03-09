@@ -24,6 +24,11 @@ BOUNDINGBOX::BOUNDINGBOX(VECTOR c, GLdouble w, GLdouble h) {
     ll = c - VECTOR(w/2, h/2);
     initialized = true;
 }
+BOUNDINGBOX::BOUNDINGBOX(GLdouble left, GLdouble right, GLdouble top, GLdouble bottom) {
+    ur = VECTOR(right, top);
+    ll = VECTOR(left, bottom);
+    initialized = true;
+}
 
 bool BOUNDINGBOX::isInitialized() const {
     return initialized;
@@ -175,8 +180,8 @@ BOUNDINGBOX  BOUNDINGBOX::operator* (GLdouble s)  const { return copy() *= s; }
 BOUNDINGBOX  BOUNDINGBOX::operator/ (GLdouble s)  const { return copy() /= s; }
 
 BOUNDINGBOX& BOUNDINGBOX::operator*=(GLdouble s) {
-    ur /= s;
-    ll /= s;
+    ur *= s;
+    ll *= s;
     return *this;
 }
 BOUNDINGBOX& BOUNDINGBOX::operator/=(GLdouble s) {
@@ -342,7 +347,7 @@ bool POLYLINE::insert(int i, VECTOR v) {
 bool POLYLINE::erase(int i) {
     if ((i = returnValidIndex(i)) == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Out of range..."); }
         
-    if (isReversed) {   points.erase(points.begin() + points.size() - i); }
+    if (isReversed) {   points.erase(points.begin() + points.size() - i - 1); }
     else {              points.erase(points.begin() + i); }
     return true;
 }
@@ -745,6 +750,96 @@ POLYLINE POLYLINE::copy() const {
     
     return toReturn;
 }
+void POLYLINE::generateFillBuffer() {
+    generateOutlineBuffer();
+    
+    printf("fB Before: %i\n", fillBuffer);
+    if (fillBuffer == 0) {
+        glGenBuffers(1, &fillBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, fillBuffer);
+        
+        std::vector<unsigned int> i;
+        tess(*this, &i, false);
+        
+        printf("POINTS: %i\n", (int)points.size());
+        printf("i: %i\n", (int)i.size());
+        
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*i.size(), i.data(), GL_STATIC_DRAW);
+    }
+    printf("fB After: %i\n", fillBuffer);
+}
+void POLYLINE::generateOutlineBuffer() {
+    if (outlineBuffer == 0) {
+        glGenBuffers(1, &outlineBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, outlineBuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(VECTOR)*points.size(), points.data(), GL_STATIC_DRAW);
+    }
+}
+void POLYLINE::fill() {
+    generateFillBuffer();
+    
+//    MATERIAL::layers[layer].glFillColor();
+//
+//    glUseProgram(MATERIAL::shaders);
+    
+    glEnableVertexAttribArray(0);
+    
+    GLuint zID = glGetUniformLocation(MATERIAL::shaders, "z");
+    glUniform1f(zID, (GLfloat)layer);
+    MATERIAL::layers[layer].glFillColor();
+    glUseProgram(MATERIAL::shaders);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, outlineBuffer);
+    glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, fillBuffer);
+    glDrawElements(GL_TRIANGLES, ((int)points.size()-2)*3, GL_UNSIGNED_INT, (void*)0);
+    
+    glDisableVertexAttribArray(0);
+}
+void POLYLINE::outline() {
+    generateOutlineBuffer();
+    
+//    MATERIAL::layers[layer].glOutlineColor();
+//
+//    glUseProgram(MATERIAL::shaders);
+    
+    glEnableVertexAttribArray(0);
+    
+    GLuint zID = glGetUniformLocation(MATERIAL::shaders, "z");
+    glUniform1f(zID, (GLfloat)layer);
+    MATERIAL::layers[layer].glOutlineColor();
+    glUseProgram(MATERIAL::shaders);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, outlineBuffer);
+    glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, 0, (void*)0);
+    glDrawArrays(GL_LINE_LOOP, 0, (int)points.size());
+    
+    glDisableVertexAttribArray(0);
+}
+void POLYLINE::fillOutline() {
+    generateFillBuffer();
+    
+    glEnableVertexAttribArray(0);
+    
+    GLuint zID = glGetUniformLocation(MATERIAL::shaders, "z");
+    glUniform1f(zID, (GLfloat)layer);
+    MATERIAL::layers[layer].glFillColor();
+    glUseProgram(MATERIAL::shaders);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, outlineBuffer);
+    glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, 0, (void*)0);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, fillBuffer);
+    glDrawElements(GL_TRIANGLES, ((int)points.size()-2)*3, GL_UNSIGNED_INT, (void*)0);
+    
+    glUniform1f(zID, (GLfloat)layer);
+    MATERIAL::layers[layer].glOutlineColor();
+    glUseProgram(MATERIAL::shaders);
+    
+    glDrawArrays(GL_LINE_LOOP, 0, (int)points.size());
+    
+    glDisableVertexAttribArray(0);
+}
 /*
 //void POLYLINE::fill() {
 //    if (fillList == 0) {
@@ -877,6 +972,14 @@ POLYLINE    POLYLINES::operator[](int i)        const {
         return polylines[i % polylines.size()];
     }
 }
+POLYLINE&   POLYLINES::operator[](int i) {
+    if (isEmpty()) {
+        throw std::runtime_error("POLYLINES::operator[](int i): Is empty; can't return reference to nothing...");
+    } else {
+        return polylines[i % polylines.size()];
+    }
+}
+
 bool        POLYLINES::insert(int i, POLYLINE p) {
     if (i < 0 || i > polylines.size()) {
         return false;
@@ -1165,6 +1268,15 @@ void        POLYLINES::print()                  const {
     } else {
         for (int i = 0; i < polylines.size(); i++) { polylines[i].print(); }
     }
+}
+void POLYLINES::render(AFFINE m, bool fill, bool outline) {
+//    MATERIAL::glMatrix(m);
+//    printf("THERE!");
+    m.glMatrix();
+    
+    if (fill && outline) {  for (int i = 0; i < polylines.size(); i++) { polylines[i].fillOutline(); } }
+    if (fill) {             for (int i = 0; i < polylines.size(); i++) { polylines[i].fill(); } }
+    if (outline) {          for (int i = 0; i < polylines.size(); i++) { polylines[i].outline(); } }
 }
 
 

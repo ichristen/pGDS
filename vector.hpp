@@ -254,7 +254,7 @@ public:
     AFFINE inv()                            const;  // Returns the affine transformation `m2` such that `m*m2 = I`.
     
     bool islinear()                         const;  // Returns whether there is no translation component (i.e. completely linear).
-    void glTransform()                      const;  // Pushes this transformation as an OpenGL matrix. Useful for transforming already-loaded geometry.
+    void glMatrix()                         const;  // Pushes this transformation as an OpenGL matrix. Useful for transforming already-loaded geometry.
 };
 
 AFFINE mirrorX();       // Transformation that mirrors across the `x`-axis.

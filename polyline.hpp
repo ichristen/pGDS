@@ -10,7 +10,10 @@
 #include <numeric>
 #include <functional>
 
-#include <OpenGL/OpenGL.h>
+//#include <OpenGL/OpenGL.h>
+
+//#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 #include "vector.hpp"
 #include "math.hpp"
@@ -31,6 +34,7 @@ public:
     BOUNDINGBOX(VECTOR a, VECTOR b);                // Makes the smallest bounding box that contains both a and b (a != ur, b != ll, generally).
     BOUNDINGBOX(VECTOR c, GLdouble w);              // Makes a box with width `w` and height `w` centered at `c`.
     BOUNDINGBOX(VECTOR c, GLdouble w, GLdouble h);  // Makes a box with width `w` and height `h` centered at `c`.
+    BOUNDINGBOX(GLdouble left, GLdouble right, GLdouble top, GLdouble bottom);
     
     bool isInitialized() const;
     
@@ -111,7 +115,6 @@ class POLYLINES;
 
 class POLYLINE {
 private:
-    bool isReversed         = false;
     
     VECTOR begin;                       // For unclosed polylines, this defines the *direction* of the beginning and end.
     VECTOR end;
@@ -119,12 +122,14 @@ private:
     double area_            = 0;
     double length_          = 0;
     
-    GLuint fillList         = 0;
-    GLuint outlineList      = 0;
+    GLuint fillBuffer       = 0;
+    GLuint outlineBuffer    = 0;
+    
+public:
+    bool isReversed         = false;
     
     int returnValidIndex(int i) const;
     
-public:
     std::vector<VECTOR> points;         // Make private eventually?
     
     BOUNDINGBOX bb;
@@ -212,8 +217,13 @@ public:
     
     POLYLINE copy()         const;
     
-//    void fill();
-//    void outline();
+    void generateFillBuffer();
+    void generateOutlineBuffer();
+    
+    void fill();
+    void outline();
+    void fillOutline();
+    
 //    POLYLINE resolve();
     
     void print()            const;
@@ -231,6 +241,7 @@ public:
     POLYLINES(std::vector<POLYLINE> polylines_);
     
     POLYLINE    operator[](int i)       const;
+    POLYLINE&   operator[](int i);
     bool        insert(int i, POLYLINE p);
     void        clear();
     
@@ -292,9 +303,12 @@ public:
     POLYLINES copy()        const;
     
     void print()            const;
+    
+    void render(AFFINE m, bool fill=true, bool outline=true);
 };
 
 #include "boolean.hpp"
+#include "tesselation.hpp"
 
 #endif // POLYLINE_H
 

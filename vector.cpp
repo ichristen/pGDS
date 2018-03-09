@@ -223,6 +223,8 @@ AFFINE::AFFINE(BOUNDINGBOX from, BOUNDINGBOX to, int noskew) {
         GLdouble sx =  to.width()/from.width();
         GLdouble sy = to.height()/from.height();
         
+//        printf("%f, %f\n", sx, sy);
+        
         if          (noskew == 0) {
             operator=( AFFINE(to.center()) * AFFINE(sx,0,0,sy) * AFFINE(-from.center()) );
         } else if   ( (noskew == 1 && sx > sy) || (noskew ==  -1 && sx < sy) ) {
@@ -338,12 +340,18 @@ AFFINE AFFINE::inv() const {
     }
 }
 bool AFFINE::islinear()                 const { return e == 0 && f == 0; }  // Compare with E (squishy logic?)
-void AFFINE::glTransform() const {
-#ifdef USE_GL_RENDER
-    GLdouble m[16] = { a, c, 0, 0, b, d, 0, 0, 0, 0, 1, 0, e, f, 0, 1 };    // OpenGL is column-major!
+void AFFINE::glMatrix() const {
+//#ifdef USE_GL_RENDER
+    const GLfloat m[16] = { (GLfloat)a, (GLfloat)c, 0, 0, (GLfloat)b, (GLfloat)d, 0, 0, 0, 0, 1, 0, (GLfloat)e, (GLfloat)f, 0, 1 };    // OpenGL is column-major!
 //    glLoadMatrixd(m);
-    glMultMatrixd(m);   // Change cullface for transformation with negative determinant? Use both sides?
-#endif
+//    printf("HERE!");
+//    print();
+    GLuint mID = glGetUniformLocation(MATERIAL::shaders, "m");
+    glUniformMatrix4fv(mID, 1, GL_FALSE, m);
+//    gluniformMa
+    
+//    glMultMatrixd(m);   // Change cullface for transformation with negative determinant? Use both sides?
+//#endif
 }
 
 AFFINE mirrorX() {      return AFFINE( 1,  0,  0, -1); }

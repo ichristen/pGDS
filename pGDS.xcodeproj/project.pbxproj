@@ -15,6 +15,7 @@
 		080BC5D91F06A2AE003BDE67 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 080BC5D81F06A2AE003BDE67 /* Foundation.framework */; };
 		08156FAE1FA79A34009702F5 /* diamonddevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08156FAC1FA79A34009702F5 /* diamonddevices.cpp */; };
 		082DAF64204863FA00F3AF4D /* vapordevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082DAF62204863FA00F3AF4D /* vapordevices.cpp */; };
+		082DAF69204B553600F3AF4D /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 082DAF68204B553600F3AF4D /* IOKit.framework */; };
 		083CC0FF1F4CE0170054FD31 /* device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0E81F4CE0170054FD31 /* device.cpp */; };
 		083CC1011F4CE0170054FD31 /* font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EA1F4CE0170054FD31 /* font.cpp */; };
 		083CC1021F4CE0170054FD31 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EB1F4CE0170054FD31 /* main.cpp */; };
@@ -34,7 +35,6 @@
 		08A4483C201666A800C8B564 /* tesselation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A4483A201666A800C8B564 /* tesselation.cpp */; };
 		08A4483D201666B200C8B564 /* tesselation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A4483A201666A800C8B564 /* tesselation.cpp */; };
 		08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
-		08A8D1721F5B203C00DC4F70 /* pgdsNSOpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */; };
 		08C820EF202D4C4300D9E032 /* quantumdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08C820ED202D4C4300D9E032 /* quantumdevices.cpp */; };
 		08D51B461F90342200091ECB /* testing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1161F4CFCCD0054FD31 /* testing.cpp */; };
 		08D51B481F90342200091ECB /* polyline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EE1F4CE0170054FD31 /* polyline.cpp */; };
@@ -44,7 +44,6 @@
 		08D51B4C1F90342200091ECB /* vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0F21F4CE0170054FD31 /* vector.cpp */; };
 		08D51B4D1F90342200091ECB /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EC1F4CE0170054FD31 /* material.cpp */; };
 		08D51B4F1F90342200091ECB /* primitives.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EF1F4CE0170054FD31 /* primitives.cpp */; };
-		08D51B511F90342200091ECB /* pgdsNSOpenGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */; };
 		08D51B521F90342200091ECB /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 084F2B791F5B3BE800C604EB /* window.cpp */; };
 		08D51B531F90342200091ECB /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
 		08D51B541F90342200091ECB /* device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0E81F4CE0170054FD31 /* device.cpp */; };
@@ -88,6 +87,9 @@
 		08156FAD1FA79A34009702F5 /* diamonddevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = diamonddevices.hpp; path = ../pGDSdevices/diamonddevices.hpp; sourceTree = SOURCE_ROOT; };
 		082DAF62204863FA00F3AF4D /* vapordevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = vapordevices.cpp; path = ../pGDSdevices/vapordevices.cpp; sourceTree = SOURCE_ROOT; };
 		082DAF63204863FA00F3AF4D /* vapordevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = vapordevices.hpp; path = ../pGDSdevices/vapordevices.hpp; sourceTree = SOURCE_ROOT; };
+		082DAF66204B330E00F3AF4D /* test.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = test.frag; sourceTree = SOURCE_ROOT; };
+		082DAF67204B333F00F3AF4D /* test.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = test.vert; sourceTree = SOURCE_ROOT; };
+		082DAF68204B553600F3AF4D /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		083CC0D81F4CE0170054FD31 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "pGDS/macOS OpenGL/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
 		083CC0DB1F4CE0170054FD31 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "pGDS/macOS OpenGL/Info.plist"; sourceTree = SOURCE_ROOT; };
 		083CC0DD1F4CE0170054FD31 /* device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = device.hpp; sourceTree = SOURCE_ROOT; };
@@ -122,8 +124,7 @@
 		08A4483B201666A800C8B564 /* tesselation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = tesselation.hpp; sourceTree = SOURCE_ROOT; };
 		08A8D16D1F58D16200DC4F70 /* engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = engine.cpp; sourceTree = SOURCE_ROOT; };
 		08A8D16E1F58D16200DC4F70 /* engine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = engine.hpp; sourceTree = SOURCE_ROOT; };
-		08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = pgdsNSOpenGLView.mm; path = macOS/pgdsNSOpenGLView.mm; sourceTree = SOURCE_ROOT; };
-		08A8D1741F5B207500DC4F70 /* pgdsNSOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pgdsNSOpenGLView.h; path = macOS/pgdsNSOpenGLView.h; sourceTree = SOURCE_ROOT; };
+		08A8D1741F5B207500DC4F70 /* pgdsNSOpenGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = pgdsNSOpenGLView.mm; path = macOS/pgdsNSOpenGLView.mm; sourceTree = SOURCE_ROOT; };
 		08C820ED202D4C4300D9E032 /* quantumdevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quantumdevices.cpp; path = ../pGDSdevices/quantumdevices.cpp; sourceTree = SOURCE_ROOT; };
 		08C820EE202D4C4300D9E032 /* quantumdevices.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = quantumdevices.hpp; path = ../pGDSdevices/quantumdevices.hpp; sourceTree = SOURCE_ROOT; };
 		08D51B601F90342300091ECB /* pGDS OpenGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "pGDS OpenGL"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -149,6 +150,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				082DAF69204B553600F3AF4D /* IOKit.framework in Frameworks */,
 				080BC5D91F06A2AE003BDE67 /* Foundation.framework in Frameworks */,
 				080BC5D71F06A29D003BDE67 /* CoreData.framework in Frameworks */,
 				080BC5D51F06A292003BDE67 /* AppKit.framework in Frameworks */,
@@ -164,6 +166,7 @@
 		080BC5A31F059D8E003BDE67 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				082DAF68204B553600F3AF4D /* IOKit.framework */,
 				0885CA451FD0862E005FE296 /* SFML.framework */,
 				080BC5D81F06A2AE003BDE67 /* Foundation.framework */,
 				080BC5D61F06A29D003BDE67 /* CoreData.framework */,
@@ -207,8 +210,7 @@
 		08A8D1751F5B20A000DC4F70 /* macOS */ = {
 			isa = PBXGroup;
 			children = (
-				08A8D1741F5B207500DC4F70 /* pgdsNSOpenGLView.h */,
-				08A8D1711F5B203C00DC4F70 /* pgdsNSOpenGLView.mm */,
+				08A8D1741F5B207500DC4F70 /* pgdsNSOpenGLView.mm */,
 			);
 			name = macOS;
 			sourceTree = "<group>";
@@ -235,6 +237,8 @@
 		08FBFB871F00AF9300C35A59 /* pGDS */ = {
 			isa = PBXGroup;
 			children = (
+				082DAF66204B330E00F3AF4D /* test.frag */,
+				082DAF67204B333F00F3AF4D /* test.vert */,
 				083CC0EB1F4CE0170054FD31 /* main.cpp */,
 				083CC11A1F4CFCED0054FD31 /* boolean.hpp */,
 				083CC0DD1F4CE0170054FD31 /* device.hpp */,
@@ -352,7 +356,6 @@
 				08D51B4D1F90342200091ECB /* material.cpp in Sources */,
 				08D51B4F1F90342200091ECB /* primitives.cpp in Sources */,
 				08A4483D201666B200C8B564 /* tesselation.cpp in Sources */,
-				08D51B511F90342200091ECB /* pgdsNSOpenGLView.mm in Sources */,
 				08D51B521F90342200091ECB /* window.cpp in Sources */,
 				08D51B531F90342200091ECB /* engine.cpp in Sources */,
 				08D51B541F90342200091ECB /* device.cpp in Sources */,
@@ -378,7 +381,6 @@
 				083CC1061F4CE0170054FD31 /* primitives.cpp in Sources */,
 				0886D2212027E76F00C48D4C /* harvarddevices.cpp in Sources */,
 				083CC1021F4CE0170054FD31 /* main.cpp in Sources */,
-				08A8D1721F5B203C00DC4F70 /* pgdsNSOpenGLView.mm in Sources */,
 				082DAF64204863FA00F3AF4D /* vapordevices.cpp in Sources */,
 				084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */,
 				08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */,
@@ -414,7 +416,10 @@
 					/usr/local/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				OTHER_LDFLAGS = "-lGLEW";
+				OTHER_LDFLAGS = (
+					"-lGLEW",
+					"-lsfml",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -441,7 +446,10 @@
 					/usr/local/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				OTHER_LDFLAGS = "-lGLEW";
+				OTHER_LDFLAGS = (
+					"-lGLEW",
+					"-lsfml",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -541,16 +549,22 @@
 					"MATLABPATH=#/Applications/Code/MATLAB_R2017a.app",
 				);
 				HEADER_SEARCH_PATHS = (
-					/usr/local/opt/freetype/include/freetype2,
 					/Applications/Code/MATLAB_R2017a.app/,
+					/opt/local/include,
+					/usr/local/include,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/pGDS/macOS OpenGL/Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					/usr/local/opt/freetype/lib,
 					/Applications/Code/MATLAB_R2017a.app/bin/maci64,
+					/opt/local/lib,
+					/usr/local/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				OTHER_LDFLAGS = "-lfreetype";
+				OTHER_LDFLAGS = (
+					"-lglew",
+					"-lglfw",
+				);
+				OTHER_OSACOMPILEFLAGS = "-DGLFW_USE_WAYLAND=ON";
 				PRODUCT_NAME = "$(TARGET_NAME).app";
 			};
 			name = Debug;
@@ -562,16 +576,22 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = "MATLABPATH=#/Applications/Code/MATLAB_R2017a.app";
 				HEADER_SEARCH_PATHS = (
-					/usr/local/opt/freetype/include/freetype2,
 					/Applications/Code/MATLAB_R2017a.app/,
+					/opt/local/include,
+					/usr/local/include,
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/pGDS/macOS OpenGL/Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					/usr/local/opt/freetype/lib,
 					/Applications/Code/MATLAB_R2017a.app/bin/maci64,
+					/opt/local/lib,
+					/usr/local/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				OTHER_LDFLAGS = "-lfreetype";
+				OTHER_LDFLAGS = (
+					"-lglew",
+					"-lglfw",
+				);
+				OTHER_OSACOMPILEFLAGS = "-DGLFW_USE_WAYLAND=ON";
 				PRODUCT_NAME = "$(TARGET_NAME).app";
 			};
 			name = Release;

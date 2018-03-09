@@ -19,14 +19,14 @@ POLYLINE rect(VECTOR u, VECTOR v) {
             toReturn.reverse();
         }
     } else {
-        printf("primitives.hpp::rect(u,v): points defining rectangle are inline! Empty POLYLINE returned.\n");  // Make this more official.
+        printf("primitives.hpp::rect(u,v): Points defining rectangle are inline! Empty POLYLINE returned.\n");  // Make this more official.
     }
     
 //    toReturn.print();
     
     return toReturn;
 }
-POLYLINE rect(VECTOR u, VECTOR v, GLdouble p) {
+POLYLINE path(VECTOR u, VECTOR v, GLdouble p) {
     POLYLINE toReturn = POLYLINE(4);
     
     if (p != 0) {
@@ -53,6 +53,46 @@ POLYLINE rect(VECTOR c, GLdouble w, GLdouble h, int anchorx, int anchory) {
     if (h == 0) { h = w; }
     
     return rect(c - VECTOR((1+anchorx)*w/2, (1+anchory)*h/2), c + VECTOR((1-anchorx)*w/2, (1-anchory)*h/2));
+}
+
+POLYLINE roundRect(VECTOR u, VECTOR v, GLdouble r) {
+    POLYLINE toReturn = POLYLINE(4);
+    toReturn.isClosed = true;
+    
+    //    u.printNL();
+    //    v.printNL();
+    
+    if (!u.inLine(v)) {
+        VECTOR ll = VECTOR(min(u.x, v.x), min(u.y, v.y));
+        VECTOR ur = VECTOR(max(u.x, v.x), max(u.y, v.y));
+        
+        GLdouble w = ur.x - ll.x;
+        GLdouble h = ur.y - ll.y;
+        
+        r = min(r, min(w/2, h/2));
+        
+        POLYLINE round = arc(VECTOR(r,r), VECTOR(0,r), VECTOR(r,0));
+        
+        toReturn.add(round * (AFFINE(ll)));
+        toReturn.add(round * (AFFINE(VECTOR(ur.x, ll.y)) * AFFINE(TAU/4)));
+        toReturn.add(round * (AFFINE(ur)                 * AFFINE(TAU/2)));
+        toReturn.add(round * (AFFINE(VECTOR(ll.x, ur.y)) * AFFINE(-TAU/4)));
+        
+//        if (toReturn.area() < 0) {
+//            toReturn.reverse();
+//        }
+    } else {
+        printf("primitives.hpp::roundRect(u,v): Points defining rectangle are inline! Empty POLYLINE returned.\n");  // Make this more official.
+    }
+    
+    //    toReturn.print();
+    
+    return toReturn;
+}
+POLYLINE roundRect(VECTOR c, GLdouble r, GLdouble w, GLdouble h, int anchorx, int anchory) {
+    if (h == 0) { h = w; }
+    
+    return roundRect(c - VECTOR((1+anchorx)*w/2, (1+anchory)*h/2), c + VECTOR((1-anchorx)*w/2, (1-anchory)*h/2), r);
 }
 //POLYLINE rect(VECTOR c, VECTOR s, int anchorx=0, int anchory=0) {
 //    return rect(c, s.x, s.y, anchorx, anchory);
@@ -1023,12 +1063,12 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
     VECTOR dir = -(u.perpCCW() + v.perpCCW()).unit() / sqrt((1 + u * v) / 2);
     
     if (offset > 0) {
-        closed->add(open->points[i] + dir*(side + offset));
-//        switch (sign(side)) {
-//            case -1:    closed->add(open->points[i] + dir*(offset - side));     break;
-//            case 0:     closed->add(open->points[i] + dir*offset);              break;
-//            case 1:     closed->add(open->points[i] - dir*offset);              break;
-//        }
+//        closed->add(open->points[i] + dir*(side + offset));
+        switch (sign(side)) {
+            case -1:    closed->add(open->points[i] + dir*(offset - side));     break;
+            case 0:     closed->add(open->points[i] + dir*offset);              break;
+            case 1:     closed->add(open->points[i] - dir*offset);              break;
+        }
     }
 
     if (i < open->size()-1) {
@@ -1036,12 +1076,12 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
     }
     
     if (offset > 0) {
-        closed->add(open->points[i] + dir*(side - offset));
-//        switch (sign(side)) {
-//            case -1:    closed->add(open->points[i] + dir*offset);              break;
-//            case 0:     closed->add(open->points[i] - dir*offset);              break;
-//            case 1:     closed->add(open->points[i] - dir*(offset + side));     break;
-//        }
+//        closed->add(open->points[i] + dir*(side - offset));
+        switch (sign(side)) {
+            case -1:    closed->add(open->points[i] + dir*offset);              break;
+            case 0:     closed->add(open->points[i] - dir*offset);              break;
+            case 1:     closed->add(open->points[i] - dir*(offset + side));     break;
+        }
     }
 }
 

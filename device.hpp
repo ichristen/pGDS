@@ -129,6 +129,8 @@ class DEVICE {
 public:
     uint16_t version = 600;
     
+    bool exported = false;
+    
     static std::map<std::string, DEVICE*> allDevices;
     
     POLYLINES               polylines;
@@ -247,6 +249,8 @@ public:
     BOUNDINGBOX bb()                const;  // Returns the transformed bounding box of the device.
     
     void print()                    const;  // Prints the transformation and the pointed device.
+    
+    void render(AFFINE m, bool fill=true, bool outline=true);
 };
 
 #include "font.hpp"

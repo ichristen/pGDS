@@ -16,10 +16,12 @@
 // CLOSED PRIMITIVES ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 POLYLINE rect(VECTOR u, VECTOR v);
-POLYLINE rect(VECTOR u, VECTOR v, GLdouble p);
-//POLYLINE rect(GLdouble x, GLdouble y, GLdouble w, GLdouble h);
 POLYLINE rect(VECTOR c, GLdouble w, GLdouble h=0, int anchorx=0, int anchory=0);
-//POLYLINE rect(VECTOR c, VECTOR s, int anchorx=0, int anchory=0);
+
+POLYLINE roundRect(VECTOR u, VECTOR v, GLdouble r);
+POLYLINE roundRect(VECTOR c, GLdouble r, GLdouble w, GLdouble h=0, int anchorx=0, int anchory=0);
+
+POLYLINE path(VECTOR u, VECTOR v, GLdouble p);
 
 POLYLINE circle(GLdouble r, VECTOR c=VECTOR(), int steps=0);
 
