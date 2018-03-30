@@ -944,7 +944,7 @@ long POLYLINE::hash() const {
     long toReturn = 0;
     
     for (int i = 0; i < size(); i++) {
-        toReturn ^= points[i].hash();
+        toReturn ^= points[i].hash() >> i;
     }
     
     return toReturn;

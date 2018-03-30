@@ -13,6 +13,8 @@
 #define RF_GND  20
 #define RF_LAY  4
 
+//#define CONNECTTHICKEN_DEBUG 1
+
 // CLOSED PRIMITIVES ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 POLYLINE rect(VECTOR u, VECTOR v);
@@ -41,7 +43,8 @@ POLYLINE parametricCylindrical( std::function<GLdouble(GLdouble t)> lambdaR,
 
 // Conic Sections
 POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW=true, int steps=0, GLdouble stepMutliplier=1);
-GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true);
+GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest);
+GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, VECTOR db);
 POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true, int steps=0, GLdouble stepMutliplier=1);
 
 POLYLINE parabola(GLdouble x0, GLdouble x1, VECTOR focus, VECTOR vertex=VECTOR(), int steps=0);

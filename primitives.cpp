@@ -374,38 +374,110 @@ POLYLINE qBezier(std::vector<VECTOR> pts) {
 }
 
 GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
-//    printf("\tr1=%f\n", (b - c).magn2());
-//    printf("\tr2=%f\n", (e - c).magn2());
+    //    printf("\tr1=%f\n", (b - c).magn2());
+    //    printf("\tr2=%f\n", (e - c).magn2());
     
     if ((b - c).magn2() - (e - c).magn2() > 1e-9) { // 100*E) {
         printf("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...\n");
         return 1e22;  // Arbitrary!
-//        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...");
+                      //        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...");
     }
     
     if ((e - b).magn2() < 1e-9) {
         printf("getArcAngle(VECTOR^3, bool): Start and end are at the same position\n");
         return 0;
-//        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Start and end are at the same position");
+        //        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Start and end are at the same position");
     }
     
     GLdouble dir = (b - c).cross(e - c);
     GLdouble ang;
     
     if (dir == 0) {
-//        dir = 1;
+        //        dir = 1;
         ang = -PI;
         printf("Arcs are equidistant, choosing CCW as shortest...\n");      // Change this!
     } else {
         ang = dir*acos(((b - c).unit()) * ((e - c).unit()));
-//        ang = acos(((b - c).unit()) * ((e - c).unit()));
+        //        ang = acos(((b - c).unit()) * ((e - c).unit()));
     }
     
     if (!chooseShortest) {
         if (ang > 0) {  } // ang -= TAU; }
-//        if (ang > 0) { ang -= TAU; }
+                          //        if (ang > 0) { ang -= TAU; }
         else {          ang += TAU; }
     }
+    
+    return ang;
+}
+
+GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, VECTOR db) {
+    //    printf("\tr1=%f\n", (b - c).magn2());
+    //    printf("\tr2=%f\n", (e - c).magn2());
+    
+    if ((b - c).magn2() - (e - c).magn2() > 1e-9) { // 100*E) {
+        printf("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...\n");
+        return 1e22;  // Arbitrary!
+                      //        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...");
+    }
+    
+    if ((e - b).magn2() < 1e-9) {
+        printf("getArcAngle(VECTOR^3, bool): Start and end are at the same position\n");
+        return 0;
+        //        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Start and end are at the same position");
+    }
+    
+//    GLdouble dir = (b - c).cross(e - c);
+    GLdouble ang;
+    
+    int dir1 = sign((b-c).perpCCWdot(db));
+    int dir2 = sign(db*(e-c));
+    
+    if (dir2 == 0) {
+        ang = dir1*TAU/2;
+    } else {
+        ang = acos( ((b - c).unit()) * ((e - c).unit()) );
+        
+//        if (dir2 < 0) {
+//            ang = TAU - ang;
+//        }
+//
+//        ang *= -dir1;
+        
+        if (dir2 < 0) {
+            ang = TAU - ang;
+        }
+        
+        ang *= -dir1;
+    }
+//    else if (dir1*dir2 < 0) {
+//        ang = acos( ((b - c).unit()) * ((e - c).unit()) );
+//    } else {
+//        ang = acos( ((b - c).unit()) * ((e - c).unit()) ) - TAU/2;
+//    }
+    
+//    if (dir1 == 0) {
+//        //        dir = 1;
+//        ang = -PI;
+//        printf("Arcs are equidistant, choosing CCW as shortest...\n");      // Change this!
+//    } else {
+//        ang = dir*acos(((b - c).unit()) * ((e - c).unit()));
+////        ang = acos(((b - c).unit()) * ((e - c).unit()));
+//    }
+    
+//    if (db*(e-c) < 0){
+////        if (ang > 0) {
+//        ang = TAU - ang;
+////        } else {
+////            ang = -ang - TAU;
+////        }
+//    }
+    
+//    if (!chooseShortest) {
+//        if (ang > 0) {  } // ang -= TAU; }
+                          //        if (ang > 0) { ang -= TAU; }
+//        else {          ang += TAU; }
+//        if (ang < 0) { ang += TAU; }
+//    }
     
     return ang;
 }
@@ -790,39 +862,47 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     }
     
 //    bool chooseshortest = false;
-    bool chooseshortest = b.dv * e.dv < 0;
+//    bool chooseshortest = b.dv * e.dv < 0;
+    VECTOR chooseshortest1 = b.dv;
+    VECTOR chooseshortest2 = e.dv;
     
     // Straight Cases...
     VECTOR blr = bl + lr.perpCW().unit()*r;
     VECTOR elr = er + lr.perpCW().unit()*r;
-    GLdouble angblr = (getArcAngle(bl, b.v, blr, chooseshortest));
-    GLdouble angelr = (getArcAngle(er, e.v, elr, chooseshortest));
+    GLdouble angblr = (getArcAngle(bl, b.v, blr, chooseshortest1));
+    GLdouble angelr = (getArcAngle(er, e.v, elr, chooseshortest2));
 //    GLdouble angelr = std::abs(getArcAngle(er, elr, e.v));
     GLdouble Llr = ( std::abs(angblr) + std::abs(angelr) )*r + lr.magn();
     
     VECTOR brl = br + rl.perpCCW().unit()*r;
     VECTOR erl = el + rl.perpCCW().unit()*r;
-    GLdouble angbrl = (getArcAngle(br, b.v, brl, chooseshortest));
-    GLdouble angerl = (getArcAngle(el, e.v, erl, chooseshortest));
+    GLdouble angbrl = (getArcAngle(br, b.v, brl, chooseshortest1));
+    GLdouble angerl = (getArcAngle(el, e.v, erl, chooseshortest2));
 //    GLdouble angerl = std::abs(getArcAngle(el, erl, e.v));
     GLdouble Lrl = ( std::abs(angbrl) + std::abs(angerl) )*r + rl.magn();
     
     // Diagonal Cases...
     GLdouble asin2rll = asin(2*r/ll.magn());
+//    GLdouble asin2rll = -asin(2*r/ll.magn());
 //    printf("ANG1 = %f pi\n", 2*asin2rll/TAU);
+//    VECTOR bll = bl + ll.perpCW().unit().rotate(asin2rll)*r;
+//    VECTOR ell = el - ll.perpCW().unit().rotate(asin2rll)*r;
     VECTOR bll = bl + ll.perpCW().unit().rotate(asin2rll)*r;
     VECTOR ell = el - ll.perpCW().unit().rotate(asin2rll)*r;
-    GLdouble angbll = (getArcAngle(bl, b.v, bll, chooseshortest)); // + asin2rll;
-    GLdouble angell = (getArcAngle(el, e.v, ell, chooseshortest)); // + asin2rll;
+    GLdouble angbll = (getArcAngle(bl, b.v, bll, chooseshortest1)); // + asin2rll;
+    GLdouble angell = (getArcAngle(el, e.v, ell, chooseshortest2)); // + asin2rll;
 //    GLdouble angell = std::abs(getArcAngle(er, elr, e.v)) + asin2rll;
     GLdouble Lll = ( std::abs(angbll) + std::abs(angell) )*r + sqrt(ll.magn2() - 4*r*r);
     
-    GLdouble asin2rrr = -asin(2*r/rr.magn());
+//    GLdouble asin2rrr = -asin(2*r/rr.magn());
+    GLdouble asin2rrr = asin(2*r/rr.magn());
 //    printf("ANG2 = %f pi\n", 2*asin2rrr/TAU);
-    VECTOR brr = br - rr.perpCW().unit().rotate(asin2rrr)*r;
-    VECTOR err = er + rr.perpCW().unit().rotate(asin2rrr)*r;
-    GLdouble angbrr = (getArcAngle(br, b.v, brr, chooseshortest)); // + asin2rrr;
-    GLdouble angerr = (getArcAngle(er, e.v, err, chooseshortest)); // + asin2rrr;
+//    VECTOR brr = br - rr.perpCW().unit().rotate(asin2rrr)*r;
+//    VECTOR err = er + rr.perpCW().unit().rotate(asin2rrr)*r;
+    VECTOR brr = br - rr.perpCW().unit().rotate(-asin2rrr)*r;
+    VECTOR err = er + rr.perpCW().unit().rotate(-asin2rrr)*r;
+    GLdouble angbrr = (getArcAngle(br, b.v, brr, chooseshortest1)); // + asin2rrr;
+    GLdouble angerr = (getArcAngle(er, e.v, err, chooseshortest2)); // + asin2rrr;
 //    GLdouble angerr = std::abs(getArcAngle(el, erl, e.v)) + asin2rrr;
     GLdouble Lrr = ( std::abs(angbrr) + std::abs(angerr) )*r + sqrt(rr.magn2() - 4*r*r);
     
@@ -881,6 +961,21 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     else if (Lrr == Lmin) { angb = angbrr; ange = angerr; }
     else { throw std::runtime_error("connectThickenShortestDistance(CONNECTION^2, GLdouble r^2): Something went horribly wrong..."); }
     
+#ifdef CONNECTTHICKEN_DEBUG
+    std::string debug;
+    
+    if      (Lll == Lmin) { debug = "ll"; }
+    else if (Llr == Lmin) { debug = "lr"; }
+    else if (Lrl == Lmin) { debug = "rl"; }
+    else if (Lrr == Lmin) { debug = "rr"; }
+    
+    debug += "\n";
+    debug += " " + std::to_string(Lll) + " " + std::to_string(angbll/DEG2RAD) + " " + std::to_string(angell/DEG2RAD) + "\n";
+    debug += " " + std::to_string(Llr) + " " + std::to_string(angblr/DEG2RAD) + " " + std::to_string(angelr/DEG2RAD) + "\n";
+    debug += " " + std::to_string(Lrl) + " " + std::to_string(angbrl/DEG2RAD) + " " + std::to_string(angerl/DEG2RAD) + "\n";
+    debug += " " + std::to_string(Lrr) + " " + std::to_string(angbrr/DEG2RAD) + " " + std::to_string(angerr/DEG2RAD) + "\n";
+#endif
+    
 //    angb = angbrr; ange = angerr;
 //    angb = angblr; ange = angelr;
 //    angb = angbll; ange = angell;
@@ -903,6 +998,12 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     if (Lmin > 2*adiabat) {
         CONNECTION b2 = b1 + adiabat; b2.w = longWidth;
         CONNECTION e2 = e1 + adiabat; e2.w = longWidth;
+        
+#ifdef CONNECTTHICKEN_DEBUG
+        DEVICEPTR d = MATERIAL::layers[0].font.getText(debug);
+        
+        toReturn.add(d.device->getLayer(0) * AFFINE((b2.v + e2.v)/2));
+#endif
         
         if (b2.w < 0) {
             for (int i = -1; i < 2; i += 2) {

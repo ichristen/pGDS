@@ -17,8 +17,6 @@
 //#include "tesselation.hpp"
 
 int main(int argc, const char * argv[]) {
-    WINDOW w;
-    
 //    DEVICE* c = getDevice("Circle");
 //    c->add(circle(5));
     
@@ -28,7 +26,14 @@ int main(int argc, const char * argv[]) {
 //    DEVICEPTR c = DEVICEPTR(loss(2));
     //testD2(637);
     
-    w.focus = VAPORTEST();
+//    LNX_LOSS_2();
+//    VAPORTEST();
+//    LNXEOQ();
+    
+//    WINDOW w;
+//    w.focus =
+    LNXEO();
+//    LNX_HARV_6();
     
 //    w.loop();
 }

@@ -461,11 +461,11 @@ void CONNECTION::render()   const {
 //}
 
 CONNECTION bendRadius(CONNECTION start, GLdouble ang, GLdouble radius) {
-    VECTOR pivot = start.v + start.dv.perpCCW() * radius*sign(ang);
+    VECTOR pivot = start.v + start.dv.perpCCW() * (radius * sign(ang));
     
     VECTOR dv = AFFINE(ang) * start.dv;
     //    dv.printNL();
-    VECTOR v = pivot + dv.perpCW() * radius*sign(ang);
+    VECTOR v = pivot + dv.perpCW() * (radius * sign(ang));
     
     return CONNECTION(v, dv, start.w, start.name + "+", start.l);
 }

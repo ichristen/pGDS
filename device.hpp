@@ -244,6 +244,8 @@ public:
     
     DEVICEPTR copy()                const;  // Makes a copy of this transformation of the device pointer.
     
+    std::string description()       const;
+    
     GLdouble area();                        // Returns the area of the device, multiplied by a scaling factor corresponding with the affine `transformation`.
     
     BOUNDINGBOX bb()                const;  // Returns the transformed bounding box of the device.
