@@ -233,137 +233,203 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
     for (int i = 0; i < polylines.polylines.size(); i++) {
         if (!polylines.polylines[i].isCCW()) { polylines.polylines[i].reverse(); }
 //        if () {
-            // BOUNDARY
+        // BOUNDARY
+        putc(0x00, f);
+        putc(0x04, f);              // LENGTH = 4 bytes
+
+        putc(0x08, f);              // RECORD TYPE  = BOUNDARY
+        putc(0x00, f);              // DATA TYPE    = null
+
+
+        // LAYER
+        putc(0x00, f);
+        putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+
+        putc(0x0D, f);              // RECORD TYPE  = LAYER
+        putc(0x02, f);              // DATA TYPE    = 2-int
+
+        uint16_t layer = endianSwap(polylines.polylines[i].layer);
+
+        fwrite(&layer, sizeof(uint16_t), 1, f);
+
+
+        // DATATYPE                 "The DATATYPE record contains unimportant information and its argument should be zero."
+        putc(0x00, f);
+        putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+
+        putc(0x0E, f);              // RECORD TYPE  = DATATYPE
+        putc(0x02, f);              // DATA TYPE    = 2-int
+
+        putc(0x00, f);
+        putc(0x00, f);
+
+
+        // XY
+        std::vector<VECTORINT> intPoints;
+
+        if (transformation.isIdentity() || transformation.isZero()) {
+            std::transform(polylines.polylines[i].points.begin(), polylines.polylines[i].points.end(),
+                           std::back_inserter(intPoints),
+                           [](VECTOR v) -> VECTORINT { return VECTORINT(v, DBUNIT); });   // Assuming dbUnit = .001
+
+            intPoints.push_back(VECTORINT(polylines[i].points[0], DBUNIT));
+        } else {
+            std::transform(polylines.polylines[i].points.begin(), polylines.polylines[i].points.end(),
+                           std::back_inserter(intPoints),
+                           [transformation](VECTOR v) -> VECTORINT {
+                               return VECTORINT(v, DBUNIT, transformation);
+                           });   // Assuming dbUnit = .001
+
+            intPoints.push_back(VECTORINT(polylines.polylines[i].points[0], DBUNIT, transformation));
+        }
+
+        uint16_t size = endianSwap((uint16_t)(8*intPoints.size() + 4));
+
+        fwrite(&size, sizeof(uint16_t), 1, f);
+
+        putc(0x10, f);              // RECORD TYPE  = XY
+        putc(0x03, f);              // DATA TYPE    = 4-int
+
+        fwrite(&(intPoints[0]),   sizeof(VECTORINT), intPoints.size(), f);
+
+
+        // ENDEL
+        putc(0x00, f);
+        putc(0x04, f);              // LENGTH = 4 bytes
+
+        putc(0x11, f);              // RECORD TYPE  = ENDEL
+        putc(0x00, f);              // DATA TYPE    = null
+        
+#ifdef DEVICE_DEBUG
+        for (int j = 0; j < polylines.polylines[i].size(); j++) {
+            // TEXT
             putc(0x00, f);
             putc(0x04, f);              // LENGTH = 4 bytes
-
-            putc(0x08, f);              // RECORD TYPE  = BOUNDARY
+        
+            putc(0x0C, f);              // RECORD TYPE  = TEXT
             putc(0x00, f);              // DATA TYPE    = null
-
-
+            
             // LAYER
             putc(0x00, f);
             putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
-
+            
             putc(0x0D, f);              // RECORD TYPE  = LAYER
             putc(0x02, f);              // DATA TYPE    = 2-int
-
-            uint16_t layer = endianSwap(polylines.polylines[i].layer);
-
+            
+            uint16_t layer = endianSwap(-1);
+            
             fwrite(&layer, sizeof(uint16_t), 1, f);
-
-
-            // DATATYPE                 "The DATATYPE record contains unimportant information and its argument should be zero."
+            
+            // TEXTTYPE
             putc(0x00, f);
             putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
-
-            putc(0x0E, f);              // RECORD TYPE  = DATATYPE
+            
+            putc(0x16, f);              // RECORD TYPE  = TEXTTYPE
             putc(0x02, f);              // DATA TYPE    = 2-int
-
-            putc(0x00, f);
-            putc(0x00, f);
-
-
+            
+            uint16_t texttype = endianSwap(0);
+            
+            fwrite(&texttype, sizeof(uint16_t), 1, f);
+            
             // XY
-            std::vector<VECTORINT> intPoints;
-
-            if (transformation.isIdentity() || transformation.isZero()) {
-                std::transform(polylines.polylines[i].points.begin(), polylines.polylines[i].points.end(),
-                               std::back_inserter(intPoints),
-                               [](VECTOR v) -> VECTORINT { return VECTORINT(v, DBUNIT); });   // Assuming dbUnit = .001
-
-                intPoints.push_back(VECTORINT(polylines[i].points[0], DBUNIT));
-            } else {
-                std::transform(polylines.polylines[i].points.begin(), polylines.polylines[i].points.end(),
-                               std::back_inserter(intPoints),
-                               [transformation](VECTOR v) -> VECTORINT {
-                                   return VECTORINT(v, DBUNIT, transformation);
-                               });   // Assuming dbUnit = .001
-
-                intPoints.push_back(VECTORINT(polylines.polylines[i].points[0], DBUNIT, transformation));
-            }
-
-            uint16_t size = endianSwap((uint16_t)(8*intPoints.size() + 4));
-
+            uint16_t size = endianSwap((uint16_t)(8 + 4));
+            
             fwrite(&size, sizeof(uint16_t), 1, f);
-
+            
             putc(0x10, f);              // RECORD TYPE  = XY
             putc(0x03, f);              // DATA TYPE    = 4-int
-
-            fwrite(&(intPoints[0]),   sizeof(VECTORINT), intPoints.size(), f);
-
-
+            
+            VECTORINT v = VECTORINT(polylines.polylines[i].points[j], DBUNIT, transformation);
+            
+            fwrite(&v,   sizeof(VECTORINT), 1, f);
+        
+            // STRING
+            char str[8];    // This will break at > "[99999]"
+            sprintf(str, "[%i]", j);
+            
+            putc(0x00, f);
+            putc((uint8_t)(8+4), f);
+        
+            putc(0x19, f);              // RECORD TYPE  = STRING
+            putc(0x06, f);              // DATA TYPE    = ASCII string
+        
+            fwrite(str,   sizeof(char), 8, f);
+        
             // ENDEL
             putc(0x00, f);
             putc(0x04, f);              // LENGTH = 4 bytes
-
+        
             putc(0x11, f);              // RECORD TYPE  = ENDEL
             putc(0x00, f);              // DATA TYPE    = null
-            
-#ifdef DEVICE_DEBUG
-            for (int j = 0; j < polylines.polylines[i].size(); j++){
-                // TEXT
-                putc(0x00, f);
-                putc(0x04, f);              // LENGTH = 4 bytes
-            
-                putc(0x0C, f);              // RECORD TYPE  = TEXT
-                putc(0x00, f);              // DATA TYPE    = null
-                
-                // LAYER
-                putc(0x00, f);
-                putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
-                
-                putc(0x0D, f);              // RECORD TYPE  = LAYER
-                putc(0x02, f);              // DATA TYPE    = 2-int
-                
-                uint16_t layer = endianSwap(-1);
-                
-                fwrite(&layer, sizeof(uint16_t), 1, f);
-                
-                // TEXTTYPE
-                putc(0x00, f);
-                putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
-                
-                putc(0x16, f);              // RECORD TYPE  = TEXTTYPE
-                putc(0x02, f);              // DATA TYPE    = 2-int
-                
-                uint16_t texttype = endianSwap(0);
-                
-                fwrite(&texttype, sizeof(uint16_t), 1, f);
-                
-                // XY
-                uint16_t size = endianSwap((uint16_t)(8 + 4));
-                
-                fwrite(&size, sizeof(uint16_t), 1, f);
-                
-                putc(0x10, f);              // RECORD TYPE  = XY
-                putc(0x03, f);              // DATA TYPE    = 4-int
-                
-                VECTORINT v = VECTORINT(polylines.polylines[i].points[j], DBUNIT, transformation);
-                
-                fwrite(&v,   sizeof(VECTORINT), 1, f);
-            
-                // STRING
-                char str[8];    // This will break at > "[99999]"
-                sprintf(str, "[%i]", j);
-                
-                putc(0x00, f);
-                putc((uint8_t)(8+4), f);
-            
-                putc(0x19, f);              // RECORD TYPE  = STRING
-                putc(0x06, f);              // DATA TYPE    = ASCII string
-            
-                fwrite(str,   sizeof(char), 8, f);
-            
-                // ENDEL
-                putc(0x00, f);
-                putc(0x04, f);              // LENGTH = 4 bytes
-            
-                putc(0x11, f);              // RECORD TYPE  = ENDEL
-                putc(0x00, f);              // DATA TYPE    = null
-            }
-#endif
         }
+#endif
+        
+#ifdef DEVICE_CONNECTIONS
+        for (auto const& x : connections) {
+            // TEXT
+            putc(0x00, f);
+            putc(0x04, f);              // LENGTH = 4 bytes
+            
+            putc(0x0C, f);              // RECORD TYPE  = TEXT
+            putc(0x00, f);              // DATA TYPE    = null
+            
+            // LAYER
+            putc(0x00, f);
+            putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+            
+            putc(0x0D, f);              // RECORD TYPE  = LAYER
+            putc(0x02, f);              // DATA TYPE    = 2-int
+            
+//            uint16_t layer = endianSwap(x.second.l);
+            uint16_t layer = endianSwap(-1);
+            
+            fwrite(&layer, sizeof(uint16_t), 1, f);
+            
+            // TEXTTYPE
+            putc(0x00, f);
+            putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+            
+            putc(0x16, f);              // RECORD TYPE  = TEXTTYPE
+            putc(0x02, f);              // DATA TYPE    = 2-int
+            
+            uint16_t texttype = endianSwap(0);
+            
+            fwrite(&texttype, sizeof(uint16_t), 1, f);
+            
+            // XY
+            uint16_t size = endianSwap((uint16_t)(8 + 4));
+            
+            fwrite(&size, sizeof(uint16_t), 1, f);
+            
+            putc(0x10, f);              // RECORD TYPE  = XY
+            putc(0x03, f);              // DATA TYPE    = 4-int
+            
+            VECTORINT v = VECTORINT(x.second.v, DBUNIT, transformation);
+            
+            fwrite(&v,   sizeof(VECTORINT), 1, f);
+            
+            // STRING
+            char str[16];
+            snprintf(str, 16, "%s", x.first.c_str());
+//            snprintf(str, 8, "%s", x.second.name.c_str());
+            
+            putc(0x00, f);
+            putc((uint8_t)(16+4), f);
+            
+            putc(0x19, f);              // RECORD TYPE  = STRING
+            putc(0x06, f);              // DATA TYPE    = ASCII string
+            
+            fwrite(str,   sizeof(char), 16, f);
+            
+            // ENDEL
+            putc(0x00, f);
+            putc(0x04, f);              // LENGTH = 4 bytes
+            
+            putc(0x11, f);              // RECORD TYPE  = ENDEL
+            putc(0x00, f);              // DATA TYPE    = null
+        }
+#endif
+    }
 //    }
 
     if (!transformation.isZero()) {
@@ -382,14 +448,18 @@ bool DEVICE::exportLibraryGDS(std::string fname, bool flatten) {
 //    FILE* f2 = fopen("/Users/i/Desktop/hyper2.gds", "wb"); mexPrintf("2 - 0x%X\n", f2);
 //    FILE* f3 = fopen("/Users/i/Desktop/hyper3.gds", "w+"); mexPrintf("3 - 0x%X\n", f3);
 //    
-//    mexPrintf("HERE!\n");
-//    
-//    mexPrintf("%s\n", fname.c_str());
-//    
-//#endif
+    printf("HERE!\n");
     
+    printf("%s\n", fname.c_str());
+//
+//#endif
+//    printf(fname.c_str())
     // return exportLibraryGDS(fopen("/Users/i/Desktop/hyper.gds", "wb"), flatten);
+#ifdef MATLAB_MEX_FILE
+    return exportLibraryGDS(fopen("/Users/i/Desktop/MPB/ldc/ldc.gds", "w+"), flatten);
+#else
     return exportLibraryGDS(fopen(fname.c_str(), "w+"), flatten);
+#endif
 }
 bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
     // References:  http://www.cnf.cornell.edu/cnf_spie9.html

@@ -25,6 +25,7 @@
 #define DBUNIT 1000
 
 //#define DEVICE_DEBUG 1
+//#define DEVICE_CONNECTIONS 1
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -153,7 +154,7 @@ public:
     GDSDATE modification;   // Date of last modification (not really supported)
     GDSDATE access;         // Date of last access (not really supported)
     
-    DEVICE(std::string description_);   // Makes an empty device with the appropriate `description`. Note that there should only be *one* device object for each `description`
+    DEVICE(std::string description_="");   // Makes an empty device with the appropriate `description`. Note that there should only be *one* device object for each `description`
     
     void add(POLYLINE p);                                   // Add a single polyline to our device.
     void add(POLYLINES p);                                  // Add a set of polylines to our device.

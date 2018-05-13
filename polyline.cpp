@@ -234,6 +234,44 @@ POLYLINE::POLYLINE(size_t size_) {
     
     layer = MATERIAL::currentLayer;
 }
+POLYLINE::POLYLINE(size_t size_, GLdouble* x, GLdouble* y, bool isCylindrical) {
+    points.reserve(size_);
+    
+    if (isCylindrical) {
+        for (size_t i = 0; i < size_; i++) {
+            points[i] = VECTOR(x[i], y[i]);     // Best way to do this? Ideally, there would be a std::algorithm way...
+        }
+    } else {    // Duplicated for speed.
+        for (size_t i = 0; i < size_; i++) {
+            points[i] = VECTOR(x[i], y[i], true);
+        }
+    }
+    
+    layer = MATERIAL::currentLayer;
+}
+POLYLINE::POLYLINE(std::vector<GLdouble> x, std::vector<GLdouble> y, bool isCylindrical) {
+    if (x.size() != y.size()) {
+        throw std::runtime_error("POLYLINE::POLYLINE(std::vector<GLdouble> x, std::vector<GLdouble> y, bool): x and y have different lengths!");
+    }
+    
+//    points.reserve(x.size());
+    
+    if (isCylindrical) {
+        for (size_t i = 0; i < x.size(); i++) {
+//            points[i] = VECTOR(x[i], y[i]);     // Best way to do this? Ideally, there would be a std::algorithm way...
+            add(VECTOR(x[i], y[i]));
+            points[i].printNL();
+        }
+    } else {    // Duplicated for speed.
+        for (size_t i = 0; i < x.size(); i++) {
+//            points[i] = VECTOR(x[i], y[i], true);
+            add(VECTOR(x[i], y[i], true));
+            points[i].printNL();
+        }
+    }
+    
+    layer = MATERIAL::currentLayer;
+}
 POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
 //    printf("WARNING: POLYLINE(POLYLINE p, int b, int e) is currently slightly bugged (with begin/end calculation).\n");
     
@@ -752,6 +790,7 @@ POLYLINE POLYLINE::copy() const {
 }
 void POLYLINE::generateFillBuffer() {
     generateOutlineBuffer();
+#ifdef pGDSGLFW
     
     printf("fB Before: %i\n", fillBuffer);
     if (fillBuffer == 0) {
@@ -767,13 +806,16 @@ void POLYLINE::generateFillBuffer() {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*i.size(), i.data(), GL_STATIC_DRAW);
     }
     printf("fB After: %i\n", fillBuffer);
+#endif
 }
 void POLYLINE::generateOutlineBuffer() {
+#ifdef pGDSGLFW
     if (outlineBuffer == 0) {
         glGenBuffers(1, &outlineBuffer);
         glBindBuffer(GL_ARRAY_BUFFER, outlineBuffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(VECTOR)*points.size(), points.data(), GL_STATIC_DRAW);
     }
+#endif
 }
 void POLYLINE::fill() {
     generateFillBuffer();
@@ -782,6 +824,7 @@ void POLYLINE::fill() {
 //
 //    glUseProgram(MATERIAL::shaders);
     
+#ifdef pGDSGLFW
     glEnableVertexAttribArray(0);
     
     GLuint zID = glGetUniformLocation(MATERIAL::shaders, "z");
@@ -795,6 +838,7 @@ void POLYLINE::fill() {
     glDrawElements(GL_TRIANGLES, ((int)points.size()-2)*3, GL_UNSIGNED_INT, (void*)0);
     
     glDisableVertexAttribArray(0);
+#endif
 }
 void POLYLINE::outline() {
     generateOutlineBuffer();
@@ -803,6 +847,7 @@ void POLYLINE::outline() {
 //
 //    glUseProgram(MATERIAL::shaders);
     
+#ifdef pGDSGLFW
     glEnableVertexAttribArray(0);
     
     GLuint zID = glGetUniformLocation(MATERIAL::shaders, "z");
@@ -815,10 +860,12 @@ void POLYLINE::outline() {
     glDrawArrays(GL_LINE_LOOP, 0, (int)points.size());
     
     glDisableVertexAttribArray(0);
+#endif
 }
 void POLYLINE::fillOutline() {
     generateFillBuffer();
     
+#ifdef pGDSGLFW
     glEnableVertexAttribArray(0);
     
     GLuint zID = glGetUniformLocation(MATERIAL::shaders, "z");
@@ -839,6 +886,7 @@ void POLYLINE::fillOutline() {
     glDrawArrays(GL_LINE_LOOP, 0, (int)points.size());
     
     glDisableVertexAttribArray(0);
+#endif
 }
 /*
 //void POLYLINE::fill() {

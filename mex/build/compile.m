@@ -165,7 +165,8 @@ function compile(fname)
     failed = false;
 
     try
-        mex('-v', mexFile, 'vector.cpp', 'math.cpp', 'polyline.cpp', 'primitives.cpp',  'device.cpp', 'font.cpp', 'material.cpp', 'testdevices.cpp', 'boolean.cpp'); %, '-L/usr/local/opt/freetype/lib', '-I/usr/local/opt/freetype/include/freetype2/');
+        mex('-v', mexFile, 'boolean.cpp', 'device.cpp', 'font.cpp', 'material.cpp',  'math.cpp', 'polyline.cpp', 'primitives.cpp', 'tesselation.cpp', 'vector.cpp');
+%         mex('-v', mexFile, 'vector.cpp', 'math.cpp', 'polyline.cpp', 'primitives.cpp',  'device.cpp', 'font.cpp', 'material.cpp', 'testdevices.cpp', 'boolean.cpp'); %, '-L/usr/local/opt/freetype/lib', '-I/usr/local/opt/freetype/include/freetype2/');
     catch err
         disp(err.message);
         failed = true;
@@ -301,9 +302,9 @@ function writeMatlabCall(fmat, method, ii, tab, isClass)
 
     if strcmp(type, 'void')
         if isempty(method.arguments)
-            fprintf(fmat, [tab '            mex_bridge(' num2str(ii) ', this.objectHandle);' newline ]);
+            fprintf(fmat, [tab '            mex_bridge(' num2str(ii) objHandle ');' newline ]);
         else
-            fprintf(fmat, [tab '            mex_bridge(' num2str(ii) ', this.objectHandle, varargin{:});' newline ]);
+            fprintf(fmat, [tab '            mex_bridge(' num2str(ii) objHandle ', varargin{:});' newline ]);
         end
     elseif strcmp(type, 'delete')
         fprintf(fmat, [tab '            mex_bridge(' num2str(ii) ', this.objectHandle);' newline ]);
@@ -687,14 +688,17 @@ function writeArgument(fmex, argument, ii, tab)
         case 'enum'
             % will support...
         case 'string'
-            % fprintf(fmex, [ '        ' tab 'char str' num2str(ii) '[64];' newline ]);  % Make longer?
-            % fprintf(fmex, [ '        ' tab 'mxGetString(prhs[' num2str(ii) '], str' num2str(ii) ', 64);' newline ]);
-            fprintf(fmex, [ '        ' tab 'char* str = mxArrayToString(prhs[' num2str(ii) '];' newline ]); % mxArrayToString
+            fprintf(fmex, [ '        ' tab 'char str' num2str(ii) '[64];' newline ]);  % Make longer?
+            fprintf(fmex, [ '        ' tab 'mxGetString(prhs[' num2str(ii) '], str' num2str(ii) ', 64);' newline ]);
+%             warning('Not sure if this is finished!')
+%             fprintf(fmex, [ '        ' tab 'char* str' num2str(ii) ' = mxArrayToString(prhs[' num2str(ii) ']);' newline ]); % mxArrayToString
+%             fprintf(fmex, [ '        ' tab 'std::string ' argument.var ' = std::string(str' num2str(ii) ');' newline ]);
             fprintf(fmex, [ '        ' tab 'std::string ' argument.var ' = std::string(str' num2str(ii) ');' newline ]);
         case 'vector'
 %             fprintf(fmex, [ '        ' tab argument.type ' ' argument.var ';' newline ]);
 %             fprintf(fmex, [ '        ' tab 'for (int i = 0; i < mxGetN(prhs[' num2str(ii) ']); i++) { ' argument.var '.push_back( (mxGetPr(prhs[' num2str(ii) ']))[i] ); }' newline ]);
             fprintf(fmex, [ '        ' tab argument.type ' ' argument.var '(mxGetPr(prhs[' num2str(ii) ']), mxGetPr(prhs[' num2str(ii) ']) + mxGetN(prhs[' num2str(ii) ']));' newline ]);
+%             fprintf(fmex, [ '        ' tab argument.type ' ' argument.var '(mxGetDoubles(prhs[' num2str(ii) ']), mxGetDoubles(prhs[' num2str(ii) ']) + mxGetN(prhs[' num2str(ii) ']));' newline ]);
         case 'classvector'
             fprintf(fmex, [ '        ' tab argument.type argument.typespecial ' ' argument.var ';' newline ]);
 

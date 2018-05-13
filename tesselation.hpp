@@ -25,6 +25,11 @@ void tessCTL(POLYLINES& p,  FILE* f);
 void tessCTL(POLYLINE& p,   std::string output);
 void tessCTL(POLYLINES& p,  std::string output);
 
+#ifdef MATLAB_MEX_FILE
+void tessCTL(POLYLINE& p);
+void tessCTL(POLYLINES& p);
+#endif
+
 void tessGL(POLYLINE& p);
 //void tessGL(POLYLINES& p);
 

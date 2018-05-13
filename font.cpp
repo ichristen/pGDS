@@ -624,10 +624,10 @@ DEVICE* FONT::getChar(unsigned char c) {
             toReturn->add(thicken(p, thick));
         } else if (c == ']') {
             POLYLINE p = POLYLINE();
-            p += VECTOR(right-5*chamfer, bot-thick/2);
+            p += VECTOR(right-4*chamfer, bot-thick/2);
             p += VECTOR(right-1*chamfer, bot-thick/2);
             p += VECTOR(right-1*chamfer, top+thick/2);
-            p += VECTOR(right-5*chamfer, top+thick/2);
+            p += VECTOR(right-4*chamfer, top+thick/2);
             
             toReturn->add(thicken(p, thick));
         } else if (c == '(') {

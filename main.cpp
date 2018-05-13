@@ -5,10 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define pGDSGLFW 1
+
 #include "window.hpp"
 
 #include "testdevices.hpp"
-//#include "diamonddevices.hpp"
+#include "diamonddevices.hpp"
 //#include "eodevices.hpp"
 //#include "testing.hpp"
 //#include "harvarddevices.hpp"
@@ -17,6 +19,7 @@
 //#include "tesselation.hpp"
 
 int main(int argc, const char * argv[]) {
+    mainDiamondDevice(0);
 //    DEVICE* c = getDevice("Circle");
 //    c->add(circle(5));
     
@@ -32,7 +35,7 @@ int main(int argc, const char * argv[]) {
     
 //    WINDOW w;
 //    w.focus =
-    LNXEO();
+//    LNXEO();
 //    LNX_HARV_6();
     
 //    w.loop();

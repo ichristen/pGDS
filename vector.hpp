@@ -164,7 +164,7 @@ public:
     VECTOR left()                       const;  // Returns the position of the left side of the connection (forward is the direction of the connection).
     VECTOR right()                      const;  // Returns the position of the right side of the connection.
 
-    GLdouble getAng()                   const;  // Get the angle of the connection with standard notation.
+//    GLdouble getAng()                   const;  // Get the angle of the connection with standard notation.
     
     void render()                       const;  // Draws an arrow with appropriate location, width and direction using OpenGL2.
 };

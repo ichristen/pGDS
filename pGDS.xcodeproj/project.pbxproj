@@ -77,6 +77,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		08023DC2209FCEF000EEA647 /* include.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = include.hpp; sourceTree = SOURCE_ROOT; };
 		080BC5A41F059D8E003BDE67 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		080BC5CC1F069F2E003BDE67 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		080BC5D21F06A198003BDE67 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
@@ -240,6 +241,7 @@
 				082DAF66204B330E00F3AF4D /* test.frag */,
 				082DAF67204B333F00F3AF4D /* test.vert */,
 				083CC0EB1F4CE0170054FD31 /* main.cpp */,
+				08023DC2209FCEF000EEA647 /* include.hpp */,
 				083CC11A1F4CFCED0054FD31 /* boolean.hpp */,
 				083CC0DD1F4CE0170054FD31 /* device.hpp */,
 				08A8D16E1F58D16200DC4F70 /* engine.hpp */,

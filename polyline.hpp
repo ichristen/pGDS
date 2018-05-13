@@ -13,7 +13,9 @@
 //#include <OpenGL/OpenGL.h>
 
 //#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#ifdef pGDSGLFW
+    #include <GLFW/glfw3.h>
+#endif
 
 #include "vector.hpp"
 #include "math.hpp"
@@ -141,6 +143,10 @@ public:
                        // When a polyline is reversed, begin still corresponds to the internal first index.
     
     POLYLINE(size_t size_=200);
+//    POLYLINE(size_t size_, GLdouble* x, GLdouble* y);
+    POLYLINE(size_t size_, GLdouble* x, GLdouble* y, bool isCylindrical=false);
+    POLYLINE(std::vector<GLdouble> x, std::vector<GLdouble> y, bool isCylindrical=false);
+    
     POLYLINE(POLYLINE p, int b, int e);
     
     VECTOR  operator[](int i)       const;

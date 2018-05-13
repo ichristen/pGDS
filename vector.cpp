@@ -346,8 +346,12 @@ void AFFINE::glMatrix() const {
 //    glLoadMatrixd(m);
 //    printf("HERE!");
 //    print();
+    
+#ifdef pGDSGLFW
     GLuint mID = glGetUniformLocation(MATERIAL::shaders, "m");
     glUniformMatrix4fv(mID, 1, GL_FALSE, m);
+#endif
+    
 //    gluniformMa
     
 //    glMultMatrixd(m);   // Change cullface for transformation with negative determinant? Use both sides?
