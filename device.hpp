@@ -163,6 +163,8 @@ public:
     void add(DEVICE* device, AFFINE m=AFFINE(), char c=0);  // Same as above.
     void add(CONNECTION connection);                        // Add a `CONNECTION`. If a `CONNECTION` of this name already exists, replace the existing `CONNECTION`.
     
+    void clear();
+    
     POLYLINES getLayer(uint16_t l1) const;
     POLYLINES getLayer(uint16_t l1, uint16_t l2) const;
 //    POLYLINES removeLayer(uint16_t l);

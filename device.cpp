@@ -119,6 +119,12 @@ void DEVICE::add(DEVICEPTR device, char c) {
 
     area_ += device.area();
 }
+
+void DEVICE::clear() {
+    polylines.clear();
+    devices.clear();
+}
+
 void DEVICE::printConnectionNames() {
     for (std::map<std::string, CONNECTION>::iterator it = connections.begin(); it != connections.end(); ++it) {
         printf("%s\n", it->first.c_str());
@@ -456,9 +462,13 @@ bool DEVICE::exportLibraryGDS(std::string fname, bool flatten) {
 //    printf(fname.c_str())
     // return exportLibraryGDS(fopen("/Users/i/Desktop/hyper.gds", "wb"), flatten);
 #ifdef MATLAB_MEX_FILE
-    return exportLibraryGDS(fopen("/Users/i/Desktop/MPB/ldc/ldc.gds", "w+"), flatten);
+    if (fname.length() < 10) {
+        return exportLibraryGDS(fopen("/Users/i/Desktop/MPB/wmc/wmc.gds", "w"), flatten);
+    } else {
+        return exportLibraryGDS(fopen(fname.c_str(), "w"), flatten);
+    }
 #else
-    return exportLibraryGDS(fopen(fname.c_str(), "w+"), flatten);
+    return exportLibraryGDS(fopen(fname.c_str(), "w"), flatten);
 #endif
 }
 bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {

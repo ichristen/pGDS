@@ -179,6 +179,9 @@ public:
     bool setBeginDirection(VECTOR dir);
     bool setEndDirection(VECTOR dir);
     
+    bool setBeginDirection();
+    bool setEndDirection();
+    
     POLYLINE  operator+ (VECTOR v)      const;
     POLYLINE  operator- (VECTOR v)      const;
     POLYLINE& operator+=(VECTOR v);

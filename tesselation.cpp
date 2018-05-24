@@ -7,8 +7,8 @@ void tessCTL(POLYLINE& p, std::string output) {     FILE* f = fopen(output.c_str
 void tessCTL(POLYLINES& p, std::string output) {    FILE* f = fopen(output.c_str(), "w+"); tess(p, f); }
 
 #ifdef MATLAB_MEX_FILE
-void tessCTL(POLYLINE& p) {                         FILE* f = fopen("/Users/i/Desktop/MPB/ldc/ldcgeo.ctl", "w+"); tess(POLYLINES(p), f); }
-void tessCTL(POLYLINES& p) {                        FILE* f = fopen("/Users/i/Desktop/MPB/ldc/ldcgeo.ctl", "w+"); tess(p, f); }
+void tessCTL(POLYLINE& p) {                         FILE* f = fopen("/Users/i/Desktop/MPB/wmc/wmcgeo.ctl", "w+"); tess(POLYLINES(p), f); }
+void tessCTL(POLYLINES& p) {                        FILE* f = fopen("/Users/i/Desktop/MPB/wmc/wmcgeo.ctl", "w+"); tess(p, f); }
 #endif
 
 void tessGL(POLYLINE& p) {                          tess(p, nullptr, false); }
@@ -32,6 +32,8 @@ void tess(POLYLINES plines, FILE* f) {
     
 #ifdef TESSDEBUG
     tessTest->exportLibraryGDS("/Users/i/Desktop/Sandia/GDS/2018_05_08_tessTest.gds");
+    tessTest->clear();
+//    delete tessTest;
 #endif
     
     
@@ -67,12 +69,9 @@ void tess(POLYLINE p, void* ptr, bool isCTL
 //        bool angleGood = p.area() * ( (p[i] - p[i-1]).perpCW() * (p[i+1] - p[i]) ) >= 0;   // Check whether the current angle is convex...
         bool angleGood = ((p.isReversed)?(-1):(1)) * ( (p[i] - p[i-1]).perpCW() * (p[i+1] - p[i]) ) <= 0;   // Check whether the current angle is convex...
         
-//        (p[i] - p[i-1]).printNL();
-//        (p[i+1] - p[i]).printNL();
+        bool angle2Good = (p[i+1] - p[i]) * ( (p[i+2] - p[i+1]).unit() - (p[i-1] - p[i+1]).unit() ) >= 0; // This might break in certain situations...
         
-//        angleGood = true;
-        
-        bool intersectionGood = angleGood;
+        bool intersectionGood = angleGood && angle2Good;
         
         if (angleGood) {
 
@@ -139,11 +138,11 @@ void outputTriangle(VECTOR v1, VECTOR v2, VECTOR v3, FILE* f) {
         outputQuadrilateral(v1 * mirrorX(), v2 * mirrorX(), v3 * mirrorX(), f);
         outputQuadrilateral(v2 * mirrorX(), v3 * mirrorX(), v1 * mirrorX(), f);
         outputQuadrilateral(v3 * mirrorX(), v1 * mirrorX(), v2 * mirrorX(), f);
-        
+
         outputQuadrilateral(v1 * mirrorY(), v2 * mirrorY(), v3 * mirrorY(), f);
         outputQuadrilateral(v2 * mirrorY(), v3 * mirrorY(), v1 * mirrorY(), f);
         outputQuadrilateral(v3 * mirrorY(), v1 * mirrorY(), v2 * mirrorY(), f);
-        
+
         outputQuadrilateral(-v1, -v2, -v3, f);
         outputQuadrilateral(-v2, -v3, -v1, f);
         outputQuadrilateral(-v3, -v1, -v2, f);
@@ -160,12 +159,12 @@ void outputQuadrilateral(VECTOR v1, VECTOR v2, VECTOR v3, FILE* f) {
     
         fprintf(f, "\t(make block ");
     
-        fprintf(f, "(center %.12f %.12f 0) ", c.x, c.y);
+        fprintf(f, "(center %.15f %.15f 0) ", c.x, c.y);
     
-        fprintf(f, "(e1 %.12f %.12f 0) ", e1.x, e1.y);
-        fprintf(f, "(e2 %.12f %.12f 0) ", e2.x, e2.y);
+        fprintf(f, "(e1 %.15f %.15f 0) ", e1.x, e1.y);
+        fprintf(f, "(e2 %.15f %.15f 0) ", e2.x, e2.y);
     
-        fprintf(f, "(size %.12f %.12f h) ", e1.magn()/2, e2.magn()/2);
+        fprintf(f, "(size %.15f %.15f h) ", e1.magn()/2, e2.magn()/2);
     
         fprintf(f, "(material GDS))\n");
     }

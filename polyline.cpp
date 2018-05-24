@@ -350,6 +350,20 @@ void POLYLINE::add(POLYLINE p){
     operator+=(p);
 }
 
+void POLYLINE::clear() {
+    points.clear();
+    bb.clear();
+    
+    fillBuffer = 0;
+    outlineBuffer = 0;
+    area_ = 0;
+    length_ = 0;
+    isClosed = false;
+    
+    begin.zero();
+    end.zero();
+}
+
 void POLYLINE::recomputeBoundingBox() {
     bb.clear();
     
@@ -389,10 +403,10 @@ bool POLYLINE::erase(int i) {
     else {              points.erase(points.begin() + i); }
     return true;
 }
-void POLYLINE::clear() {
-    points.clear();
-    bb.clear();
-}
+//void POLYLINE::clear() {
+//    points.clear();
+//    bb.clear();
+//}
 
 //void POLYLINE::operator=(POLYLINE other) {
 //    
@@ -471,6 +485,21 @@ bool POLYLINE::setEndDirection(VECTOR dir) {
         if (isReversed) {   begin = dir.unit(); }
         else {              end =   dir.unit(); }
         return true;
+    }
+}
+
+bool POLYLINE::setBeginDirection() {
+    if (isClosed || size() < 2) {
+        return false;
+    } else {
+        return setBeginDirection(this->operator[](0) - this->operator[](1));
+    }
+}
+bool POLYLINE::setEndDirection() {
+    if (isClosed) {
+        return false;
+    } else {
+        return setEndDirection(this->operator[](points.size()-1) - this->operator[](points.size()-2));
     }
 }
 
