@@ -8,12 +8,22 @@
 #include "math.hpp"
 #include "device.hpp"
 
+#define RF_WID  10
+#define RF_GAP  5
+#define RF_GND  20
+#define RF_LAY  4
+
+//#define CONNECTTHICKEN_DEBUG 1
+
 // CLOSED PRIMITIVES ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 POLYLINE rect(VECTOR u, VECTOR v);
-//POLYLINE rect(GLdouble x, GLdouble y, GLdouble w, GLdouble h);
-POLYLINE rect(VECTOR c, GLdouble w, GLdouble h, int anchorx=0, int anchory=0);
-//POLYLINE rect(VECTOR c, VECTOR s, int anchorx=0, int anchory=0);
+POLYLINE rect(VECTOR c, GLdouble w, GLdouble h=0, int anchorx=0, int anchory=0);
+
+POLYLINE roundRect(VECTOR u, VECTOR v, GLdouble r);
+POLYLINE roundRect(VECTOR c, GLdouble r, GLdouble w, GLdouble h=0, int anchorx=0, int anchory=0);
+
+POLYLINE path(VECTOR u, VECTOR v, GLdouble p);
 
 POLYLINE circle(GLdouble r, VECTOR c=VECTOR(), int steps=0);
 
@@ -32,9 +42,10 @@ POLYLINE parametricCylindrical( std::function<GLdouble(GLdouble t)> lambdaR,
                                 size_t steps=0);
 
 // Conic Sections
-POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW=true, int steps=0);
-GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true);
-POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true, int steps=0);
+POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW=true, int steps=0, GLdouble stepMutliplier=1);
+GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest);
+GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, VECTOR db);
+POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest=true, int steps=0, GLdouble stepMutliplier=1);
 
 POLYLINE parabola(GLdouble x0, GLdouble x1, VECTOR focus, VECTOR vertex=VECTOR(), int steps=0);
 POLYLINE parabola(GLdouble x0, GLdouble x1, GLdouble a, VECTOR center=VECTOR(), VECTOR direction=VECTOR(0,1), int steps=0);
@@ -54,17 +65,31 @@ POLYLINE qBezier(std::vector<VECTOR> pts);
 
 enum CONNECTIONTYPE { LINEAR=0, QBEZIER=1, CBEZIER=2, CIRCULAR=3, MONOCIRCULAR=4 };
 
-bool intersect(CONNECTION a, CONNECTION b, VECTOR** i, bool onlyForward=false);     // Get the intersection point of the lines originating from `CONNECTION`s `a` and `b`. If `onlyForward`, do not consider intersections strictly 'behind' the `CONNECTIONS`. `*i` is set to `NULL` if no intersection exists.
-
-POLYLINE connect(CONNECTION b, CONNECTION e, CONNECTIONTYPE type=CIRCULAR, int numPointsDuringLinear=2);
+POLYLINE connect(CONNECTION b, CONNECTION e, CONNECTIONTYPE type=CIRCULAR, int numPointsDuringLinear=2, GLdouble stepMutliplier=1);
 
 // THICKENED CONNECTIONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1);
+void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1);
 
-POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, int side=0, GLdouble minstep=1);
-POLYLINE thicken(POLYLINE open, GLdouble width, int side=0, GLdouble minstep=1);
+POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat=10, GLdouble mult=3);
 
-void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLdouble t)>* lambda, int side, GLdouble minstep, int i, GLdouble currentLength); // Change? Recursion might be inefficient...
+POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, GLdouble side=0, GLdouble minstep=1);
+POLYLINE thicken(POLYLINE open, GLdouble width, GLdouble side=0, GLdouble minstep=1);
+
+POLYLINES thicken(POLYLINES open, std::function<GLdouble(GLdouble t)> lambda, GLdouble side=0, GLdouble minstep=1);
+POLYLINES thicken(POLYLINES open, GLdouble width, GLdouble side=0, GLdouble minstep=1);
+
+void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLdouble t)>* lambda, GLdouble side, GLdouble minstep, int i, GLdouble currentLength); // Change? Recursion might be inefficient...
+
+enum RFTYPE { UPPER=0, UPPERwithGROUND=1 };
+
+POLYLINES rfThicken(POLYLINE open, GLdouble width, GLdouble gap, GLdouble groundWidth, uint16_t layer, uint16_t groundlayer=0);
+POLYLINES rfThicken(POLYLINE open, RFTYPE type);
+POLYLINES rfConnectThicken(CONNECTION b, CONNECTION e, RFTYPE type);
 
 #endif
+
+
+
+

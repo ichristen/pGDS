@@ -8,17 +8,18 @@
 #include <map>
 
 #ifdef __APPLE__
-    #include <OpenGL/OpenGL.h>
+//    #include <OpenGL/OpenGL.h>
 //    #include <Cocoa/Cocoa.h>
 #endif
 #ifdef __MINGW32__
 
 #endif
 #ifdef __linux__
+
 #endif
 
-#include "vector.hpp"
 #include "window.hpp"
+#include "vector.hpp"
 #include "device.hpp"
 
 #include <extern/include/engine.h>  // MATLAB engine; it is slightly confusing that this has the same name...

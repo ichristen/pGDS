@@ -58,7 +58,7 @@ void FONT::recalculate() {
     throw std::runtime_error("FONT::recalculate(): Not written yet...");
 }
 
-DEVICE* FONT::getChar(char c) {
+DEVICE* FONT::getChar(unsigned char c) {
     if (chars.find(c) == chars.end()) {
         if (c == 10) {          // Handle newline.
             return nullptr;
@@ -74,7 +74,12 @@ DEVICE* FONT::getChar(char c) {
         GLdouble left = thick/2;
         GLdouble right = width - thick/2;
         
-        GLdouble chamfer = width/8;
+//        GLdouble chamfer = width/8;
+        GLdouble chamfer = width/6;
+        
+        uint16_t cl = MATERIAL::currentLayer;
+        
+        MATERIAL::currentLayer = layer;
         
         if (c == 'a' || c == 'A') {
             POLYLINE p = POLYLINE();
@@ -549,18 +554,143 @@ DEVICE* FONT::getChar(char c) {
             toReturn->add(thicken(p, thick));
         } else if (c == '.') {
             toReturn->add(rect(VECTOR(width/2 - thick/2, 0), VECTOR(width/2 + thick/2, thick)));
-        } else if (c == ',') {
+        } else if (c == ':') {
+            toReturn->add(rect(VECTOR(width/2 - thick/2,   thick), VECTOR(width/2 + thick/2, 2*thick)));
+            toReturn->add(rect(VECTOR(width/2 - thick/2, 4*thick), VECTOR(width/2 + thick/2, 5*thick)));
+        } else if (c == ';') {
             POLYLINE p = POLYLINE();
             
-            p += VECTOR(width/2-thick/2, thick);
+            p += VECTOR(width/2-thick/2, 2*thick);
+            p += VECTOR(width/2+thick/2, 2*thick);
             p += VECTOR(width/2+thick/2, thick);
-            p += VECTOR(width/2+thick/2, 0);
-            p += VECTOR(width/2-thick/2, -thick);
+            p += VECTOR(width/2-thick/2, 0);
             p.reverse();
             p.close();
             
             toReturn->add(p);
+            
+            toReturn->add(rect(VECTOR(width/2 - thick/2, 4*thick), VECTOR(width/2 + thick/2, 5*thick)));
+        }   else if (c == ',') {
+            POLYLINE p = POLYLINE();
+            
+            p += VECTOR(width/2-thick/2, 2*thick);
+            p += VECTOR(width/2+thick/2, 2*thick);
+            p += VECTOR(width/2+thick/2, thick);
+            p += VECTOR(width/2-thick/2, 0);
+            p.reverse();
+            p.close();
+            
+            toReturn->add(p);
+        }  else if (c == '"') {
+            POLYLINE p = POLYLINE();
+            
+            p += VECTOR(width/2-thick/2 - thick, height);
+            p += VECTOR(width/2+thick/2 - thick, height);
+            p += VECTOR(width/2+thick/2 - thick, height-2*thick);
+            p += VECTOR(width/2-thick/2 - thick, height-2*thick);
+            p.reverse();
+            p.close();
+            
+            toReturn->add(p);
+            
+            POLYLINE p2 = POLYLINE();
+            
+            p2 += VECTOR(width/2-thick/2 + thick, height);
+            p2 += VECTOR(width/2+thick/2 + thick, height);
+            p2 += VECTOR(width/2+thick/2 + thick, height-2*thick);
+            p2 += VECTOR(width/2-thick/2 + thick, height-2*thick);
+            p2.reverse();
+            p2.close();
+            
+            toReturn->add(p2);
+        }  else if (c == '&' + 1) { // '
+            POLYLINE p = POLYLINE();
+            
+            p += VECTOR(width/2-thick/2, height);
+            p += VECTOR(width/2+thick/2, height);
+            p += VECTOR(width/2+thick/2, height-2*thick);
+            p += VECTOR(width/2-thick/2, height-2*thick);
+            p.reverse();
+            p.close();
+            
+            toReturn->add(p);
+        } else if (c == '[') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(left+4*chamfer, bot-thick/2);
+            p += VECTOR(left+1*chamfer, bot-thick/2);
+            p += VECTOR(left+1*chamfer, top+thick/2);
+            p += VECTOR(left+4*chamfer, top+thick/2);
+            
+            toReturn->add(thicken(p, thick));
+        } else if (c == ']') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(right-4*chamfer, bot-thick/2);
+            p += VECTOR(right-1*chamfer, bot-thick/2);
+            p += VECTOR(right-1*chamfer, top+thick/2);
+            p += VECTOR(right-4*chamfer, top+thick/2);
+            
+            toReturn->add(thicken(p, thick));
+        } else if (c == '(') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(left+4*chamfer, bot-thick/2);
+            p += VECTOR(left+2*chamfer, bot-thick/2);
+            p += VECTOR(left+1*chamfer, bot+chamfer-thick/2);
+            p += VECTOR(left+1*chamfer, top-chamfer+thick/2);
+            p += VECTOR(left+2*chamfer, top+thick/2);
+            p += VECTOR(left+4*chamfer, top+thick/2);
+            
+            toReturn->add(thicken(p, thick));
+        } else if (c == ')') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(right-5*chamfer, bot-thick/2);
+            p += VECTOR(right-2*chamfer, bot-thick/2);
+            p += VECTOR(right-1*chamfer, bot+chamfer-thick/2);
+            p += VECTOR(right-1*chamfer, top-chamfer+thick/2);
+            p += VECTOR(right-2*chamfer, top+thick/2);
+            p += VECTOR(right-5*chamfer, top+thick/2);
+            
+            toReturn->add(thicken(p, thick));
+        } else if (c == '@') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(0,      mid-width/2);
+            p += VECTOR(width,  mid);
+            p += VECTOR(0,      mid+width/2);
+            
+            printf("HERE!");
+            
+            p.reverse();
+            p.close();
+            toReturn->add(p);
+        } else if (c == '#') {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(width,  mid+width/2);
+            p += VECTOR(0,      mid);
+            p += VECTOR(width,  mid-width/2);
+            
+            
+            printf("THERE!");
+            
+            p.close();
+            toReturn->add(p);
+        } else if (c == 0x1E) {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(width/2,    mid+width/2);
+            p += VECTOR(0,          mid-width/2);
+            p += VECTOR(width,      mid-width/2);
+            
+            p.close();
+            toReturn->add(p);
+        } else if (c == 0x1F) {
+            POLYLINE p = POLYLINE();
+            p += VECTOR(width/2,    mid-width/2);
+            p += VECTOR(width,      mid+width/2);
+            p += VECTOR(0,          mid+width/2);
+            
+            p.close();
+            toReturn->add(p);
         }
+        
+        MATERIAL::currentLayer = cl;
         
         return toReturn;
     }
@@ -568,32 +698,75 @@ DEVICE* FONT::getChar(char c) {
     return nullptr;
 }
 
-DEVICE* FONT::getTextPrivate(std::string text) {
-    DEVICE* toReturn = new DEVICE(text);
+std::vector<std::string> split_string(const std::string& str, const std::string& delimiter) {   // Code stolen from StackOverflow, I think... Find the link...
+    std::vector<std::string> strings;
     
-    VECTOR pen;
-    
-    for (int i = 0; i < text.size(); i++) {
-        DEVICE* character = getChar(text[i]);
-        toReturn->add( DEVICEPTR(character, AFFINE(pen)) );
-        pen += VECTOR(width + thick, 0);    // Change this...
-        
-//        pen += VECTOR(character->bb.width() + thick, 0);    // Change this...
+    std::string::size_type pos = 0;
+    std::string::size_type prev = 0;
+    while ((pos = str.find(delimiter, prev)) != std::string::npos) {
+        strings.push_back(str.substr(prev, pos - prev));
+        prev = pos + 1;
     }
     
-    return toReturn;
-//    DEVICEPTR(toReturn, AFFINE(-toReturn->bb.width()/2, -toReturn->bb.height()/2));
+    // To get the last substring (or only, if delimiter is not found)
+    strings.push_back(str.substr(prev));
     
-//    return nullptr;
+    return strings;
+}
+
+void FONT::getTextPrivate(std::string text, DEVICE* toReturn) {
+//    DEVICE* toReturn = new DEVICE(text);
+    
+    VECTOR pen;
+        
+    for (int i = 0; i < text.size(); i++) {
+        if (text[i] == '_' && i < text.size()-1) {
+            i++;
+            DEVICE* character = getChar(text[i]);
+            
+            if (character) {
+                character->setLayer(layer);
+                toReturn->add( DEVICEPTR(character, AFFINE(pen)*.5) );
+                pen += VECTOR(width/2 + thick, 0);    // Change this...
+            }
+        } else {
+            DEVICE* character = getChar(text[i]);
+            if (character) {
+                character->setLayer(layer);
+                toReturn->add( DEVICEPTR(character, AFFINE(pen)) );
+                pen += VECTOR(width + thick, 0);    // Change this...
+            }
+        }
+    }
+    
+//    return toReturn;
 }
 DEVICEPTR FONT::getText(std::string text, int anchorx, int anchory) {
-    DEVICE* toReturn = getTextPrivate(text);
+    DEVICE* toReturn = getDevice(text + " layer " + std::to_string(layer));
     
+    bool multiline = false;
+    
+    if (!toReturn->initialized()) {
+        std::vector<std::string> strings = split_string(text, "\n");
+
+        if (strings.size() > 1) {
+            multiline = true;
+            
+            for (int i = 0; i < strings.size(); i++) {
+                toReturn->add(getText(strings[i], -1, -1) * AFFINE(0, -(i - (strings.size())/2.)*(height+2*thick)));
+            }
+        } else {
+            getTextPrivate(text, toReturn);
+        }
+    }
+        
     VECTOR shift;
     
-    if      (anchorx >  0) { shift.x = -toReturn->bb.width(); }      // Right,
-    else if (anchorx == 0) { shift.x = -toReturn->bb.width()/2; }    // Center,
-                                                                    // Otherwise left.
+//    if (!multiline) {
+        if      (anchorx >  0) { shift.x = -toReturn->bb.width(); }      // Right,
+        else if (anchorx == 0) { shift.x = -toReturn->bb.width()/2; }    // Center,
+                                                                        // Otherwise left.
+//    }
     
     if      (anchory >  0) { shift.y = -toReturn->bb.height(); }     // Top,
     else if (anchory == 0) { shift.y = -toReturn->bb.height()/2; }   // Mid,

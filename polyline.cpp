@@ -14,14 +14,51 @@ BOUNDINGBOX::BOUNDINGBOX(VECTOR a, VECTOR b) {
     ll = VECTOR(min(a.x, b.x), min(a.y, b.y));
     initialized = true;
 }
-GLdouble BOUNDINGBOX::width() {
+BOUNDINGBOX::BOUNDINGBOX(VECTOR c, GLdouble w) {
+    ur = c + VECTOR(w/2, w/2);
+    ll = c - VECTOR(w/2, w/2);
+    initialized = true;
+}
+BOUNDINGBOX::BOUNDINGBOX(VECTOR c, GLdouble w, GLdouble h) {
+    ur = c + VECTOR(w/2, h/2);
+    ll = c - VECTOR(w/2, h/2);
+    initialized = true;
+}
+BOUNDINGBOX::BOUNDINGBOX(GLdouble left, GLdouble right, GLdouble top, GLdouble bottom) {
+    ur = VECTOR(right, top);
+    ll = VECTOR(left, bottom);
+    initialized = true;
+}
+
+bool BOUNDINGBOX::isInitialized() const {
+    return initialized;
+}
+GLdouble BOUNDINGBOX::width() const {
     if (initialized) {  return ur.x - ll.x; }
     else {              return 0; }
 }
-GLdouble BOUNDINGBOX::height() {
+GLdouble BOUNDINGBOX::height() const {
     if (initialized) {  return ur.y - ll.y; }
     else {              return 0; }
 }
+
+VECTOR BOUNDINGBOX::center() const {    return (ur + ll)/2; }
+
+VECTOR BOUNDINGBOX::n() const { return VECTOR((ur.x + ll.x)/2, ur.y); }
+VECTOR BOUNDINGBOX::s() const { return VECTOR((ur.x + ll.x)/2, ll.y); }
+VECTOR BOUNDINGBOX::e() const { return VECTOR(ur.x, (ur.y + ll.y)/2); }
+VECTOR BOUNDINGBOX::w() const { return VECTOR(ll.x, (ur.y + ll.y)/2); }
+
+VECTOR BOUNDINGBOX::north() const { return n(); }
+VECTOR BOUNDINGBOX::south() const { return s(); }
+VECTOR BOUNDINGBOX::east()  const { return e(); }
+VECTOR BOUNDINGBOX::west()  const { return w(); }
+
+VECTOR BOUNDINGBOX::nw() const { return VECTOR(ll.x, ur.y); }
+VECTOR BOUNDINGBOX::ne() const { return ur; }
+VECTOR BOUNDINGBOX::sw() const { return ll; }
+VECTOR BOUNDINGBOX::se() const { return VECTOR(ur.x, ll.y); }
+
 BOUNDINGBOX BOUNDINGBOX::copy() const {
     return BOUNDINGBOX(ur, ll);
 }
@@ -30,19 +67,19 @@ void BOUNDINGBOX::clear() {
     ll.zero();
     initialized = false;
 }
-bool BOUNDINGBOX::isEmpty() {
+bool BOUNDINGBOX::isEmpty() const {
     return !initialized;
 }
-bool BOUNDINGBOX::doesContain(VECTOR v) {
-    return initialized && (v.x <= ur.x && v.x >= ll.x) && (v.y <= ur.y && v.y >= ll.y);
+bool BOUNDINGBOX::doesContain(VECTOR v) const {
+    return initialized && (v.x <= ur.x + ERROR && v.x >= ll.x - ERROR) && (v.y <= ur.y + ERROR && v.y >= ll.y - ERROR);
 }
-bool BOUNDINGBOX::doesContainX(GLdouble x) {
-    return initialized && (x <= ur.x && x >= ll.x);
+bool BOUNDINGBOX::doesContainX(GLdouble x) const {
+    return initialized && (x <= ur.x + ERROR  && x >= ll.x - ERROR);
 }
-bool BOUNDINGBOX::doesContainY(GLdouble y) {
-    return initialized && (y <= ur.y && y >= ll.y);
+bool BOUNDINGBOX::doesContainY(GLdouble y) const {
+    return initialized && (y <= ur.y + ERROR  && y >= ll.y - ERROR);
 }
-bool BOUNDINGBOX::doesContain(BOUNDINGBOX bb) {
+bool BOUNDINGBOX::doesContain(BOUNDINGBOX bb) const {
     return initialized && doesContain(bb.ur) && doesContain(bb.ll);
 }
 
@@ -71,7 +108,7 @@ bool BOUNDINGBOX::enlarge(VECTOR v) {
 }
 bool BOUNDINGBOX::enlarge(BOUNDINGBOX bb) {
     if (initialized) {
-        return enlarge(bb.ur) || enlarge(bb.ll);
+        return enlarge(bb.ur) + enlarge(bb.ll) > 0;
     } else {
         *this = bb;
         
@@ -143,8 +180,8 @@ BOUNDINGBOX  BOUNDINGBOX::operator* (GLdouble s)  const { return copy() *= s; }
 BOUNDINGBOX  BOUNDINGBOX::operator/ (GLdouble s)  const { return copy() /= s; }
 
 BOUNDINGBOX& BOUNDINGBOX::operator*=(GLdouble s) {
-    ur /= s;
-    ll /= s;
+    ur *= s;
+    ll *= s;
     return *this;
 }
 BOUNDINGBOX& BOUNDINGBOX::operator/=(GLdouble s) {
@@ -175,35 +212,93 @@ void BOUNDINGBOX::print()                    const {
 #endif
 }
 
+POLYLINE BOUNDINGBOX::draw() const {
+    return rect(ur, ll).setLayer(0);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+int POLYLINE::returnValidIndex(int i) const {
+//    printf("%i\n", isClosed);
+//    printf("%i\n", (i < 0 || i >= points.size()));
+//    printf("%i\n", !isClosed && (i < 0 || i >= points.size()));
+    
+    if (!isClosed && (i < 0 || i >= points.size())) {
+        return -1;
+    }
+    
+    return (i + (int)points.size()) % (points.size());
+}
 POLYLINE::POLYLINE(size_t size_) {
     points.reserve(size_);
     
     layer = MATERIAL::currentLayer;
 }
+POLYLINE::POLYLINE(size_t size_, GLdouble* x, GLdouble* y, bool isCylindrical) {
+    points.reserve(size_);
+    
+    if (isCylindrical) {
+        for (size_t i = 0; i < size_; i++) {
+            points[i] = VECTOR(x[i], y[i]);     // Best way to do this? Ideally, there would be a std::algorithm way...
+        }
+    } else {    // Duplicated for speed.
+        for (size_t i = 0; i < size_; i++) {
+            points[i] = VECTOR(x[i], y[i], true);
+        }
+    }
+    
+    layer = MATERIAL::currentLayer;
+}
+POLYLINE::POLYLINE(std::vector<GLdouble> x, std::vector<GLdouble> y, bool isCylindrical) {
+    if (x.size() != y.size()) {
+        throw std::runtime_error("POLYLINE::POLYLINE(std::vector<GLdouble> x, std::vector<GLdouble> y, bool): x and y have different lengths!");
+    }
+    
+//    points.reserve(x.size());
+    
+    if (isCylindrical) {
+        for (size_t i = 0; i < x.size(); i++) {
+//            points[i] = VECTOR(x[i], y[i]);     // Best way to do this? Ideally, there would be a std::algorithm way...
+            add(VECTOR(x[i], y[i]));
+            points[i].printNL();
+        }
+    } else {    // Duplicated for speed.
+        for (size_t i = 0; i < x.size(); i++) {
+//            points[i] = VECTOR(x[i], y[i], true);
+            add(VECTOR(x[i], y[i], true));
+            points[i].printNL();
+        }
+    }
+    
+    layer = MATERIAL::currentLayer;
+}
 POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
-    printf("WARNING: POLYLINE(POLYLINE p, int b, int e) is currently slightly bugged (with begin/end calculation).\n");
+//    printf("WARNING: POLYLINE(POLYLINE p, int b, int e) is currently slightly bugged (with begin/end calculation).\n");
     
-    printf("b=%i\n", b);
-    printf("e=%i\n", e);
+//    printf("s=%i\n", p.size());
+//
+//    printf("b=%i\n", b);
+//    printf("e=%i\n", e);
     
-    b %= p.size();
-    e %= p.size();
+    b = p.returnValidIndex(b);
+    e = p.returnValidIndex(e);
+    
+//    printf("b=%i\n", b);
+//    printf("e=%i\n", e);
+    
+    if (b == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Beginning point invalid."); }
+    if (e == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Ending point invalid."); }
     
     isClosed = false;   // p.isClosed;
     isReversed = false;
     
     if (b == e) {
         points.push_back(p[b]);
-        
-        print();
     } else if (b < e) {
         points.reserve(e-b+1);
         
         if (p.isReversed) { std::copy(p.points.rbegin() + b, p.points.rbegin() + e + 1, std::back_inserter(points)); }  // Check the + 1...
         else {              std::copy(p.points.begin()  + b, p.points.begin()  + e + 1, std::back_inserter(points)); }
-        
 //        printf("SIZE: %i", points.size());
         
         if (b == 0 && !p.isClosed) {
@@ -219,8 +314,6 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
         } else {
             end = ( (p[e] - p[e-1]).unit() + (p[e+1] - p[e]).unit() ).unit() * ( (p.isReversed)?(-1):(1) ); // Check if e±1 is the same point?
         }
-        
-        print();
     } else if (b > e) {
         if (p.isClosed) {
             points.reserve(p.size()-e+b+1);
@@ -228,21 +321,21 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
             if (p.isReversed) {
                 std::copy(p.points.rbegin() + b,    p.points.rend(),            std::back_inserter(points));
                 std::copy(p.points.rbegin(),        p.points.rbegin() + e + 1,  std::back_inserter(points));
-            }
-            else {
+            } else {
                 std::copy(p.points.begin() + b,     p.points.end(),             std::back_inserter(points));
                 std::copy(p.points.begin(),         p.points.begin() + e + 1,   std::back_inserter(points));
             }
             
             begin = ( (p[b] - p[b-1]).unit() + (p[b+1] - p[b]).unit() ).unit() * ( (p.isReversed)?(-1):(1) ); // Check if b±1 is the same point?
             end =   ( (p[e] - p[e-1]).unit() + (p[e+1] - p[e]).unit() ).unit() * ( (p.isReversed)?(-1):(1) ); // Check if e±1 is the same point?
-            
-            print();
         } else {
             // Don't know what to do...
             throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Unable to clip an open polyline with e < b.");
         }
     }
+    
+    while (points.size() > 1 && points[0]               == points[1]) {                 points.erase(points.begin()); }
+    while (points.size() > 1 && points[points.size()-1] == points[points.size()-2]) {   points.erase(points.end()-1); }
     
     layer = p.layer;
 }
@@ -250,8 +343,25 @@ POLYLINE::POLYLINE(POLYLINE p, int b, int e) {
 void POLYLINE::add(VECTOR v){
     operator+=(v);
 }
+void POLYLINE::addToPrev(VECTOR v){
+    operator+=(getEndPoint() + v);
+}
 void POLYLINE::add(POLYLINE p){
     operator+=(p);
+}
+
+void POLYLINE::clear() {
+    points.clear();
+    bb.clear();
+    
+    fillBuffer = 0;
+    outlineBuffer = 0;
+    area_ = 0;
+    length_ = 0;
+    isClosed = false;
+    
+    begin.zero();
+    end.zero();
 }
 
 void POLYLINE::recomputeBoundingBox() {
@@ -268,26 +378,35 @@ POLYLINE POLYLINE::clip(int b, int e) {
 
 
 VECTOR POLYLINE::operator[](int i) const {
-//    if (i < 0 || i >= points.size()){   return VECTOR(); }  // Or throw error?
-//    if (i < 0 || i >= points.size()){   printf("POLYLINE[int i]: i out of range. Setting i = i %% size().\n"); }
-    if (points.size()) {
-        i = i % points.size();
-        
-        if (isReversed) {                   return points[points.size() - i - 1]; }
-        else {                              return points[i]; }
-    } else {
-        throw std::runtime_error("POLYLINE::operator[](int): This POLYLINE has no points to reference[]...");
-    }
+    if (!points.size()) { throw std::runtime_error("POLYLINE::operator[](int): This POLYLINE has no points to reference[]..."); }
+    
+    if ((i = returnValidIndex(i)) == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Out of range..."); }
+    
+    if (isReversed) {                   return points[points.size() - i - 1]; }
+    else {                              return points[i]; }
 }
 bool POLYLINE::insert(int i, VECTOR v) {
-    if (i < 0 || i > points.size()) {
-        return false;
-    } else {
-        if (isReversed) {   points.insert(points.begin() + points.size() - i, v); }
-        else {              points.insert(points.begin() + i, v); }
-        return true;
-    }
+    if (i == points.size()) {   add(v); return true; }
+    
+    if ((i = returnValidIndex(i)) == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Out of range..."); }
+        
+    if (operator[](i) == v) { return false; }
+    
+    if (isReversed) {   points.insert(points.begin() + points.size() - i, v); }
+    else {              points.insert(points.begin() + i, v); }
+    return true;
 }
+bool POLYLINE::erase(int i) {
+    if ((i = returnValidIndex(i)) == -1) { throw std::runtime_error("POLYLINE(POLYLINE p, int b, int e): Out of range..."); }
+        
+    if (isReversed) {   points.erase(points.begin() + points.size() - i - 1); }
+    else {              points.erase(points.begin() + i); }
+    return true;
+}
+//void POLYLINE::clear() {
+//    points.clear();
+//    bb.clear();
+//}
 
 //void POLYLINE::operator=(POLYLINE other) {
 //    
@@ -303,11 +422,6 @@ POLYLINE POLYLINE::operator-() {        // Revist whether area should be calcula
 POLYLINE& POLYLINE::reverse() {
     area_ = -area();
     isReversed = !isReversed;
-    
-//    VECTOR temp = begin;
-//    
-//    begin = end;
-//    end = temp;
     
     return *this;
 }
@@ -374,6 +488,21 @@ bool POLYLINE::setEndDirection(VECTOR dir) {
     }
 }
 
+bool POLYLINE::setBeginDirection() {
+    if (isClosed || size() < 2) {
+        return false;
+    } else {
+        return setBeginDirection(this->operator[](0) - this->operator[](1));
+    }
+}
+bool POLYLINE::setEndDirection() {
+    if (isClosed) {
+        return false;
+    } else {
+        return setEndDirection(this->operator[](points.size()-1) - this->operator[](points.size()-2));
+    }
+}
+
 POLYLINE  POLYLINE::operator/(double s) const { return copy() /= s; }
 POLYLINE  POLYLINE::operator*(double s) const { return copy() *= s; }
 POLYLINE  POLYLINE::operator*(AFFINE m) const { return copy() *= m; }
@@ -382,17 +511,24 @@ POLYLINE& POLYLINE::operator/=(double s) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [s](VECTOR v) -> VECTOR { return v/s; });
     bb /= s;
+    area_ /= s;
     return *this;
 }
 POLYLINE& POLYLINE::operator*=(double s) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [s](VECTOR v) -> VECTOR { return v*s; });
     bb *= s;
+    area_ *= s;
     return *this;
 }
 POLYLINE& POLYLINE::operator*=(AFFINE m) {
     std::transform(points.begin(), points.end(), points.begin(),
                    [m](VECTOR v) -> VECTOR { return v*m; });
+    
+    begin = m.linearTimes(begin);
+    end =   m.linearTimes(end);
+    
+    area_ = 0;
     recomputeBoundingBox();
     return *this;
 }
@@ -423,7 +559,11 @@ POLYLINE& POLYLINE::operator+=(VECTOR v) {
     bb.enlarge(v);
     
 //    if (v != *(points.end())) {
+    if (isReversed){
+        points.insert(points.begin(), v);
+    } else {
         points.push_back(v);
+    }
 //    }
 
     return *this;
@@ -460,8 +600,18 @@ POLYLINE& POLYLINE::operator+=(POLYLINE p) {
             
             int add = 0;
             
+//            printf("\n\np.print()\n");
+//            p.print();
+//            printf("\n\nprint()\n");
+//            print();
+            
             if (size()) {
-                add = (p[0] == operator[](0));
+                add = (p[0] == operator[]((int)size()-1));
+//                printf("p[0] = ");  p[0].printNL();
+//                printf("p[-1] = "); p[-1].printNL();
+//                printf("operator[](0) = ");  operator[](0).printNL();
+//                printf("operator[](-1) = "); operator[](-1).printNL();
+//                printf("ADD: %i\n", add);
             }
             
             if (p.isReversed) {
@@ -596,6 +746,7 @@ std::vector<int> POLYLINE::getIntersectionsIndex(GLdouble x) const {
     return sortedReturn;
 }
 bool POLYLINE::contains(VECTOR v) const {
+    if (!bb.doesContain(v)) { return false; }
     if (isClosed) {
         std::vector<GLdouble> y = getIntersections(v.x);
         
@@ -609,6 +760,22 @@ bool POLYLINE::contains(VECTOR v) const {
         
         return i % 2;
     }
+    return false;
+}
+bool POLYLINE::boundaryContains(VECTOR v) const {
+    if (!bb.doesContain(v)) { return false; }
+    
+    int s = size() - ((isClosed)?(1):(2));
+    
+    for (int i = 0; i < s; i++) {
+        if (BOUNDINGBOX(operator[](i), operator[](i+1)).doesContain(v)) {
+            if (operator[](i+1) == v) { return true; }
+            
+            GLdouble y = (v.x - operator[](i).x)*(operator[](i+1).y - operator[](i).y)/(operator[](i+1).x - operator[](i).x) + operator[](i).y;
+            if (v.y > y - ERROR && v.y < y + ERROR) { return true; }
+        }
+    }
+    
     return false;
 }
 
@@ -649,6 +816,106 @@ POLYLINE POLYLINE::copy() const {
     toReturn.end =          end;
     
     return toReturn;
+}
+void POLYLINE::generateFillBuffer() {
+    generateOutlineBuffer();
+#ifdef pGDSGLFW
+    
+    printf("fB Before: %i\n", fillBuffer);
+    if (fillBuffer == 0) {
+        glGenBuffers(1, &fillBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, fillBuffer);
+        
+        std::vector<unsigned int> i;
+        tess(*this, &i, false);
+        
+        printf("POINTS: %i\n", (int)points.size());
+        printf("i: %i\n", (int)i.size());
+        
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*i.size(), i.data(), GL_STATIC_DRAW);
+    }
+    printf("fB After: %i\n", fillBuffer);
+#endif
+}
+void POLYLINE::generateOutlineBuffer() {
+#ifdef pGDSGLFW
+    if (outlineBuffer == 0) {
+        glGenBuffers(1, &outlineBuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, outlineBuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(VECTOR)*points.size(), points.data(), GL_STATIC_DRAW);
+    }
+#endif
+}
+void POLYLINE::fill() {
+    generateFillBuffer();
+    
+//    MATERIAL::layers[layer].glFillColor();
+//
+//    glUseProgram(MATERIAL::shaders);
+    
+#ifdef pGDSGLFW
+    glEnableVertexAttribArray(0);
+    
+    GLuint zID = glGetUniformLocation(MATERIAL::shaders, "z");
+    glUniform1f(zID, (GLfloat)layer);
+    MATERIAL::layers[layer].glFillColor();
+    glUseProgram(MATERIAL::shaders);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, outlineBuffer);
+    glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, 0, (void*)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, fillBuffer);
+    glDrawElements(GL_TRIANGLES, ((int)points.size()-2)*3, GL_UNSIGNED_INT, (void*)0);
+    
+    glDisableVertexAttribArray(0);
+#endif
+}
+void POLYLINE::outline() {
+    generateOutlineBuffer();
+    
+//    MATERIAL::layers[layer].glOutlineColor();
+//
+//    glUseProgram(MATERIAL::shaders);
+    
+#ifdef pGDSGLFW
+    glEnableVertexAttribArray(0);
+    
+    GLuint zID = glGetUniformLocation(MATERIAL::shaders, "z");
+    glUniform1f(zID, (GLfloat)layer);
+    MATERIAL::layers[layer].glOutlineColor();
+    glUseProgram(MATERIAL::shaders);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, outlineBuffer);
+    glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, 0, (void*)0);
+    glDrawArrays(GL_LINE_LOOP, 0, (int)points.size());
+    
+    glDisableVertexAttribArray(0);
+#endif
+}
+void POLYLINE::fillOutline() {
+    generateFillBuffer();
+    
+#ifdef pGDSGLFW
+    glEnableVertexAttribArray(0);
+    
+    GLuint zID = glGetUniformLocation(MATERIAL::shaders, "z");
+    glUniform1f(zID, (GLfloat)layer);
+    MATERIAL::layers[layer].glFillColor();
+    glUseProgram(MATERIAL::shaders);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, outlineBuffer);
+    glVertexAttribPointer(0, 2, GL_DOUBLE, GL_FALSE, 0, (void*)0);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, fillBuffer);
+    glDrawElements(GL_TRIANGLES, ((int)points.size()-2)*3, GL_UNSIGNED_INT, (void*)0);
+    
+    glUniform1f(zID, (GLfloat)layer);
+    MATERIAL::layers[layer].glOutlineColor();
+    glUseProgram(MATERIAL::shaders);
+    
+    glDrawArrays(GL_LINE_LOOP, 0, (int)points.size());
+    
+    glDisableVertexAttribArray(0);
+#endif
 }
 /*
 //void POLYLINE::fill() {
@@ -727,20 +994,20 @@ void POLYLINE::print() const {
     
     if (isEmpty()) {
 #ifdef MATLAB_MEX_FILE
-        mexPrintf("Empty POLYLINE\n");
+        mexPrintf("Empty POLYLINE on layer [%i]\n", layer);
 #else
-        printf("Empty POLYLINE\n");
+        printf("Empty POLYLINE on layer [%i]\n", layer);
 #endif
     } else {
         
 #ifdef MATLAB_MEX_FILE
         if (isClosed) { mexPrintf("Closed"); } else { mexPrintf("Open"); }
         
-        mexPrintf(" POLYLINE with points: \n");
+        mexPrintf(" POLYLINE on layer [%i] with points: \n", layer);
 #else
         if (isClosed) { printf("Closed"); } else { printf("Open"); }
         
-        printf(" POLYLINE with points: \n");
+        printf(" POLYLINE on layer [%i] with points: \n", layer);
 #endif
         
         if (isReversed) {
@@ -749,6 +1016,15 @@ void POLYLINE::print() const {
             for (int i = 0; i < points.size(); i++) {           printf("[%i] - ", i);                       points[i].printNL(); }
         }
     }
+}
+long POLYLINE::hash() const {
+    long toReturn = 0;
+    
+    for (int i = 0; i < size(); i++) {
+        toReturn ^= points[i].hash() >> i;
+    }
+    
+    return toReturn;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -773,6 +1049,14 @@ POLYLINE    POLYLINES::operator[](int i)        const {
         return polylines[i % polylines.size()];
     }
 }
+POLYLINE&   POLYLINES::operator[](int i) {
+    if (isEmpty()) {
+        throw std::runtime_error("POLYLINES::operator[](int i): Is empty; can't return reference to nothing...");
+    } else {
+        return polylines[i % polylines.size()];
+    }
+}
+
 bool        POLYLINES::insert(int i, POLYLINE p) {
     if (i < 0 || i > polylines.size()) {
         return false;
@@ -805,6 +1089,11 @@ void POLYLINES::recomputeBoundingBox() {
     for (int i = 0; i < polylines.size(); i++){
         polylines[i].recomputeBoundingBox();
         bb.enlarge(polylines[i].bb);
+        
+//        printf("\n");
+        
+//        polylines[i].bb.print();
+//        bb.print();
     }
 }
 
@@ -813,6 +1102,37 @@ size_t      POLYLINES::size()                   const {
 }
 bool        POLYLINES::isEmpty()                const {
     return polylines.size() == 0;
+}
+
+POLYLINES   POLYLINES::getLayer(uint16_t l) const {
+    POLYLINES pnew;
+    
+    std::copy_if(polylines.begin(), polylines.end(), std::back_inserter(pnew.polylines),
+                 [l] (const POLYLINE& p) -> bool { return p.layer == l; });
+    
+    return pnew;
+}
+bool        POLYLINES::removeLayer(uint16_t l) {
+    polylines.erase(std::remove_if(polylines.begin(), polylines.end(),
+                                   [l] (POLYLINE& p) { return p.layer == l; }), polylines.end());
+    return true;
+}
+bool        POLYLINES::setLayer(uint16_t from, uint16_t to) {
+    std::for_each(polylines.begin(), polylines.end(),
+                  [from, to] (POLYLINE& p) { if (p.layer == from) { p.layer = to; } });
+    return true;
+}
+bool        POLYLINES::setLayer(uint16_t to) {
+    std::for_each(polylines.begin(), polylines.end(), [to] (POLYLINE& p) { p.layer = to; });
+    return true;
+}
+bool        POLYLINES::exchangeLayers(uint16_t l1, uint16_t l2) {
+    std::for_each(polylines.begin(), polylines.end(),
+                  [l1, l2] (POLYLINE& p) {
+                      if       (p.layer == l1) { p.layer = l2; }
+                      else if  (p.layer == l2) { p.layer = l1; };
+                  });
+    return true;
 }
 
 POLYLINES   POLYLINES::operator/ (double s)     const { return copy() /= s; }
@@ -846,11 +1166,21 @@ POLYLINES   POLYLINES::boolean(POLYLINE p, BOOLOPERATION op) const { return copy
 POLYLINES&  POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
 //    for (int i = 0; i < polylines.size(); i++) { polylines[i].boolean(p, op); }
     
+    switch (op) {
+        case AND: printf("OP = AND\n"); break;
+        case OR:  printf("OP = OR\n"); break;
+        case XOR: printf("OP = XOR\n"); break;
+    }
+    
     if (op == OR) {
         POLYLINES pUnique(p);
         
+        printf("Attempting to OR polyline with AREA = %f\n", p.area());
+        
         for (int i = 0; i < polylines.size(); i++) {
             pUnique.booleanEquals(-polylines[i], AND);  // Cut away any intersections.
+            
+            printf("Polyline has AREA = %f after subtracting polyline with AREA = %f\n", pUnique.area(), (-polylines[i]).area());
         }
         
         add(pUnique);   // And add this new polyline(s).
@@ -859,13 +1189,28 @@ POLYLINES&  POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
         
         clear();
         
+//        POLYLINES temptemp(p);
+//        POLYLINES temptemptemp(p);
+        
         switch (op) {
             default:
                 throw std::runtime_error("Expected OR to have been caught previously...");
             case AND:
                 for (int i = 0; i < temp.size(); i++) {
+                    printf("ATTEMPT: temp[%i].area() = %f, and p.area() = %f\n", i, temp[i].area(), p.area());
                     add(temp[i].boolean(p, AND));
+//                    temptemp.booleanEquals(temp[i], AND);
+                    
+//                    temptemptemp = temptemp.copy();
+//
+//                    temptemp.clear();
+//
+//                    for (int j = 0; j < temptemptemp.size(); j++) {
+//                        temptemp.add(temptemptemp[j].boolean(temp[i], AND));
+//                    }
                 }
+                
+//                add(temptemp);
                 
                 break;
             case XOR:
@@ -890,13 +1235,22 @@ POLYLINES&  POLYLINES::booleanEquals(POLYLINE p, BOOLOPERATION op) {
 POLYLINES   POLYLINES::boolean(POLYLINES p, BOOLOPERATION op) const { return copy().booleanEquals(p, op); }
 POLYLINES&  POLYLINES::booleanEquals(POLYLINES p, BOOLOPERATION op) {
     if (size()*p.size() > 100) {
-        printf("POLYLINES::booleanEquals(POLYLINES, BOOLOPERATION): There are this.size() * other.size() = %lu * %lu = %lu comparisons to make.\nMaybe it's time to implement Bentley–Ottmann\n", size(), p.size(), size()*p.size());
+        printf("POLYLINES::booleanEquals(POLYLINES, BOOLOPERATION): There are this.size() * other.size() = %lu * %lu = %lu comparisons to make.\nMaybe it's time to implement Bentley–Ottmann?\n", size(), p.size(), size()*p.size());
+    }
+    
+    switch (op) {
+        case AND: printf("OP = AND\n"); break;
+        case OR:  printf("OP = OR\n"); break;
+        case XOR: printf("OP = XOR\n"); break;
     }
     
     if (op == OR) {
         POLYLINES pUnique(p);
         
+        printf("Attempting to OR polyline with AREA = %f\n", p.area());
+        
         for (int i = 0; i < polylines.size(); i++) {
+            printf("Subtracting polyline with AREA = %f\n", (-polylines[i]).area());
             pUnique.booleanEquals(-polylines[i], AND);  // Cut away any intersections.
         }
         
@@ -910,10 +1264,16 @@ POLYLINES&  POLYLINES::booleanEquals(POLYLINES p, BOOLOPERATION op) {
             default:
                 throw std::runtime_error("Expected OR to have been caught previously...");
             case AND:
-                for (int i = 0; i < temp.size(); i++) {
+                for (int i = 0; i < temp.size(); i++) {     // Not algorithmically correct?
+                    POLYLINES temptemp(temp[i]);
+                    
                     for (int j = 0; j < p.polylines.size(); j++) {
-                        add(temp[i].boolean(p.polylines[j], AND));
+//                    for (int j = p.polylines.size()-1; j >= 0; j--) {
+                        temptemp.booleanEquals(p.polylines[j], AND);
+                        printf("AREA = %f", temptemp.area());
                     }
+                    
+                    add(temptemp);
                 }
                 
                 break;
@@ -985,6 +1345,15 @@ void        POLYLINES::print()                  const {
     } else {
         for (int i = 0; i < polylines.size(); i++) { polylines[i].print(); }
     }
+}
+void POLYLINES::render(AFFINE m, bool fill, bool outline) {
+//    MATERIAL::glMatrix(m);
+//    printf("THERE!");
+    m.glMatrix();
+    
+    if (fill && outline) {  for (int i = 0; i < polylines.size(); i++) { polylines[i].fillOutline(); } }
+    if (fill) {             for (int i = 0; i < polylines.size(); i++) { polylines[i].fill(); } }
+    if (outline) {          for (int i = 0; i < polylines.size(); i++) { polylines[i].outline(); } }
 }
 
 

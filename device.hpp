@@ -22,7 +22,10 @@
 #include <mex.h>
 #endif
 
-#define DBUNIT 10000
+#define DBUNIT 1000
+
+//#define DEVICE_DEBUG 1
+//#define DEVICE_CONNECTIONS 1
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -32,9 +35,12 @@ struct VECTORINT {  // Vectors are stored as integers in GDSII. This helper stru
     int32_t x;
     int32_t y;
     
+    VECTORINT();
     VECTORINT(VECTOR v, GLdouble scalar);
     VECTORINT(VECTOR v, GLdouble scalar, AFFINE m);
 };
+
+VECTOR int2vec(VECTORINT vi, GLdouble scalar);
 
 struct GDSDATE {    // Helper struture encapsulating the GDSII date structure.
     int16_t year;
@@ -124,6 +130,8 @@ class DEVICE {
 public:
     uint16_t version = 600;
     
+    bool exported = false;
+    
     static std::map<std::string, DEVICE*> allDevices;
     
     POLYLINES               polylines;
@@ -146,7 +154,7 @@ public:
     GDSDATE modification;   // Date of last modification (not really supported)
     GDSDATE access;         // Date of last access (not really supported)
     
-    DEVICE(std::string description_);   // Makes an empty device with the appropriate `description`. Note that there should only be *one* device object for each `description`
+    DEVICE(std::string description_="");   // Makes an empty device with the appropriate `description`. Note that there should only be *one* device object for each `description`
     
     void add(POLYLINE p);                                   // Add a single polyline to our device.
     void add(POLYLINES p);                                  // Add a set of polylines to our device.
@@ -154,6 +162,18 @@ public:
     void add(DEVICEPTR device, char c=0);                   // Add a pointer to a transformed device. Suffix all `CONNECTION` in this device with `c` (does not suffix if `c == 0`). Note that all `CONNECTION`s are appropriately transformed.
     void add(DEVICE* device, AFFINE m=AFFINE(), char c=0);  // Same as above.
     void add(CONNECTION connection);                        // Add a `CONNECTION`. If a `CONNECTION` of this name already exists, replace the existing `CONNECTION`.
+    
+    void clear();
+    
+    POLYLINES getLayer(uint16_t l1) const;
+    POLYLINES getLayer(uint16_t l1, uint16_t l2) const;
+//    POLYLINES removeLayer(uint16_t l);
+//    POLYLINES setLayer(uint16_t from, uint16_t to);
+//    POLYLINES exchangeLayers(uint16_t l1, uint16_t l2);
+    
+    void setLayer(uint16_t layer);
+    void setConnectionName(std::string prev, std::string next);
+    void eraseConnection(std::string name);
     
 //    void render();
 //    void flush();
@@ -171,7 +191,8 @@ public:
     DEVICEPTR operator/(GLdouble s) const;  // Returns a pointer to this device, scaled by `1/s`.
     DEVICEPTR operator*(AFFINE m)   const;  // Returns a pointer to this device, transformed by `m`.
     
-    CONNECTION operator[](std::string connectionName)   const;      // Returns the `CONNECTION` corresponding to `connectionName`. If no correspondence, returns empty `CONNECTION`.
+    CONNECTION operator[](std::string connectionName)       const;  // Returns the `CONNECTION` corresponding to `connectionName`. If no correspondence, returns empty `CONNECTION`.
+    CONNECTION getConnection(std::string connectionName)    const;  // Same as above.
     
     void print();                                                   // Prints the device description, along with the contained `POLYLINE`s and `DEVICEPTR`s.
     void printConnectionNames();                                    // Prints the names of the contained `CONNECTION`s.
@@ -180,6 +201,8 @@ public:
     
     bool exportLibraryGDS(std::string fname, bool flatten=true);    // Export as .gds...
     bool exportLibraryGDS(FILE* f, bool flatten=true);              // Generally for internal use only...
+    
+//    POLYLINES getLayer(uint8_t l);
     
 private:
     bool exportStructureGDS(FILE* f);                               // For internal use only...
@@ -214,11 +237,25 @@ public:
     DEVICEPTR operator*=(GLdouble s);       // Same as above.
     DEVICEPTR operator/=(GLdouble s);       // Same as above.
     
+    CONNECTION operator[](std::string connectionName)       const;  // Returns the `CONNECTION` corresponding to `connectionName`. If no correspondence, returns empty `CONNECTION`.
+    CONNECTION getConnection(std::string connectionName)    const;  // Same as above.
+    
+    AFFINE getTransformation()      const;  // Getter for transformation.
+    void setTransformation(AFFINE m);       // Setter for transformation.
+    
+    bool isEmpty()                  const;  // Returns whether device == nullptr.
+    
     DEVICEPTR copy()                const;  // Makes a copy of this transformation of the device pointer.
+    
+    std::string description()       const;
     
     GLdouble area();                        // Returns the area of the device, multiplied by a scaling factor corresponding with the affine `transformation`.
     
+    BOUNDINGBOX bb()                const;  // Returns the transformed bounding box of the device.
+    
     void print()                    const;  // Prints the transformation and the pointed device.
+    
+    void render(AFFINE m, bool fill=true, bool outline=true);
 };
 
 #include "font.hpp"

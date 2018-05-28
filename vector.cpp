@@ -10,6 +10,9 @@ VECTOR::VECTOR(GLdouble x_, GLdouble y_, bool isCylindrical) {
     }
 }
 
+//VECTOR VECTOR:setX(GLdouble x_)             const { return *this; }
+//VECTOR VECTOR:setY(GLdouble y_)             const { return *this; }
+
 bool VECTOR::isZero()                       const { return x == 0 && y == 0; }
 bool VECTOR::operator!()                    const { return isZero(); }
 
@@ -18,14 +21,14 @@ bool VECTOR::operator!=(VECTOR v)           const { return !operator==(v); }
 #define SQUISHYLOGIC 1
 
 #ifdef SQUISHYLOGIC
-bool VECTOR::operator==(VECTOR v)           const { return (x == v.x && y == v.y) || (std::abs(x - v.x) < E && std::abs(y - v.y) < E); }
+bool VECTOR::operator==(VECTOR v)           const { return (x == v.x && y == v.y) || (std::abs(x - v.x) < ERROR && std::abs(y - v.y) < ERROR); }
 
-bool VECTOR::operator< (VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < E)?(y <   v.y - E):(x <   v.x - E); }
-bool VECTOR::operator<=(VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < E)?(y <=  v.y - E):(x <=  v.x - E); }
-bool VECTOR::operator> (VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < E)?(y >   v.y - E):(x >   v.x - E); }
-bool VECTOR::operator>=(VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < E)?(y >=  v.y - E):(x >=  v.x - E); }
+bool VECTOR::operator< (VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < ERROR)?(y <   v.y - ERROR):(x <   v.x - ERROR); }
+bool VECTOR::operator<=(VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < ERROR)?(y <=  v.y - ERROR):(x <=  v.x - ERROR); }
+bool VECTOR::operator> (VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < ERROR)?(y >   v.y - ERROR):(x >   v.x - ERROR); }
+bool VECTOR::operator>=(VECTOR v)           const { return (x == v.x || std::abs(x - v.x) < ERROR)?(y >=  v.y - ERROR):(x >=  v.x - ERROR); }
 
-bool VECTOR::inLine(VECTOR v)               const { return x == v.x || y == v.y || std::abs(x - v.x) < E || std::abs(y - v.y) < E; }
+bool VECTOR::inLine(VECTOR v)               const { return x == v.x || y == v.y || std::abs(x - v.x) < ERROR || std::abs(y - v.y) < ERROR; }
 #else
 bool VECTOR::operator==(VECTOR v)           const { return (x == v.x && y == v.y); }
     
@@ -94,7 +97,7 @@ VECTOR VECTOR::rotate(GLdouble radians) const {
 
     return VECTOR(c*x - s*y, s*x + c*y);
 }
-void VECTOR::rotateEquals(GLdouble radians){
+void VECTOR::rotateEquals(GLdouble radians) {
     GLdouble c = cos(radians);
     GLdouble s = sin(radians);
 
@@ -106,17 +109,28 @@ void VECTOR::rotateEquals(GLdouble radians){
 
 void VECTOR::print()                    const {
 #ifdef MATLAB_MEX_FILE
-    mexPrintf("[ %.2f, %.2f ]",x,y);
+    mexPrintf("[ %.2f, %.2f ]",     x, y);
 #else
-    printf("[ %.2f, %.2f ]",x,y);
+    printf("[ %.2f, %.2f ]",        x, y);
 #endif
 }
 void VECTOR::printNL()                  const {
 #ifdef MATLAB_MEX_FILE
-    mexPrintf("[ %.2f, %.2f ]\n",x,y);
+    mexPrintf("[ %.2f, %.2f ]\n",   x, y);
 #else
-    printf("[ %.2f, %.2f ]\n",x,y);
+    printf("[ %.2f, %.2f ]\n",      x, y);
 #endif
+}
+std::string VECTOR::str()               const {
+    char toReturn[64];
+    
+    snprintf(toReturn, 64, "[ %.2f, %.2f ]\n", x, y);
+    
+    return std::string(toReturn);
+}
+
+long VECTOR::hash()                    const {
+    return ( ((long)x) << 1 ) ^ ( ((long)y) >> 1 );     // Change?
 }
 
 void VECTOR::render()                   const { render(0,0); }
@@ -204,12 +218,20 @@ AFFINE::AFFINE(CONNECTION from, CONNECTION to) {
     
     operator=(AFFINE(radians, to.v)*AFFINE(-from.v));
 }
-AFFINE::AFFINE(BOUNDINGBOX from, BOUNDINGBOX to) {
+AFFINE::AFFINE(BOUNDINGBOX from, BOUNDINGBOX to, int noskew) {
     if (from.area() && to.area()) {
         GLdouble sx =  to.width()/from.width();
         GLdouble sy = to.height()/from.height();
         
-        operator=( AFFINE(to.ll) * AFFINE(sx,0,0,sy) * AFFINE(-from.ll) );
+//        printf("%f, %f\n", sx, sy);
+        
+        if          (noskew == 0) {
+            operator=( AFFINE(to.center()) * AFFINE(sx,0,0,sy) * AFFINE(-from.center()) );
+        } else if   ( (noskew == 1 && sx > sy) || (noskew ==  -1 && sx < sy) ) {
+            operator=( AFFINE(to.center()) * AFFINE(sx,0,0,sx) * AFFINE(-from.center()) );
+        } else {
+            operator=( AFFINE(to.center()) * AFFINE(sy,0,0,sy) * AFFINE(-from.center()) );
+        }
     } else {
         a = 1; b = 0; c = 0; d = 1; e = 0; f = 0;   // Identity...
     }
@@ -224,22 +246,24 @@ VECTOR AFFINE::operator*(VECTOR v)      const { return VECTOR(a*v.x + b*v.y + e,
 VECTOR AFFINE::linearTimes(VECTOR v)    const { return VECTOR(a*v.x + b*v.y, c*v.x + d*v.y); }
 
 CONNECTION AFFINE::operator*(CONNECTION c) const {
-    VECTOR dv = linearTimes(c.dv.perpCCW()).perpCW();
+    VECTOR dv = linearTimes(c.dv.perpCCW()).perpCW() * det();
     GLdouble magn = dv.magn();
 
     return CONNECTION(operator*(c.v), // + translation(),
-                      dv/magn,          // Make dv a unit vector.
+                      dv/std::abs(magn),          // Make dv a unit vector.
                       c.w*magn,         // Grow/shrink width appropriately.
-                      c.name);
+                      c.name,
+                      c.l);
 }
 CONNECTION AFFINE::linearTimes(CONNECTION c) const {
-    VECTOR dv = linearTimes(c.dv.perpCCW()).perpCW();
+    VECTOR dv = linearTimes(c.dv.perpCCW()).perpCW() * det();
     GLdouble magn = dv.magn();
 
     return CONNECTION(c.v,
                       dv/magn,          // Make dv a unit vector.
                       c.w*magn,         // Grow/shrink width appropriately.
-                      c.name);
+                      c.name,
+                      c.l);
 }
 BOUNDINGBOX AFFINE::operator*(BOUNDINGBOX bb)   const {
     BOUNDINGBOX toReturn;
@@ -285,6 +309,9 @@ AFFINE AFFINE::operator-(VECTOR v)      const { return AFFINE(a, b, c, d, e-v.x,
 AFFINE AFFINE::operator*(GLdouble s)    const { return copy() *= s; }
 AFFINE AFFINE::operator/(GLdouble s)    const { return copy() /= s; }
 
+//DEVICEPTR AFFINE::operator*(DEVICE* ptr)    const { return DEVICEPTR(ptr, *this); }
+//DEVICEPTR AFFINE::operator*(DEVICEPTR ptr)  const { return ptr * (*this); }
+
 AFFINE AFFINE::operator+=(VECTOR v) {   e += v.x; f += v.y; return *this; }
 AFFINE AFFINE::operator-=(VECTOR v) {   e -= v.x; f -= v.y; return *this; }
 //AFFINE AFFINE::operator*=(GLdouble s) { a *= s; b *= s; c *= s; d *= s; return *this; }
@@ -313,12 +340,22 @@ AFFINE AFFINE::inv() const {
     }
 }
 bool AFFINE::islinear()                 const { return e == 0 && f == 0; }  // Compare with E (squishy logic?)
-void AFFINE::glTransform() const {
-#ifdef USE_GL_RENDER
-    GLdouble m[16] = { a, c, 0, 0, b, d, 0, 0, 0, 0, 1, 0, e, f, 0, 1 };    // OpenGL is column-major!
+void AFFINE::glMatrix() const {
+//#ifdef USE_GL_RENDER
+    const GLfloat m[16] = { (GLfloat)a, (GLfloat)c, 0, 0, (GLfloat)b, (GLfloat)d, 0, 0, 0, 0, 1, 0, (GLfloat)e, (GLfloat)f, 0, 1 };    // OpenGL is column-major!
 //    glLoadMatrixd(m);
-    glMultMatrixd(m);   // Change cullface for transformation with negative determinant? Use both sides?
+//    printf("HERE!");
+//    print();
+    
+#ifdef pGDSGLFW
+    GLuint mID = glGetUniformLocation(MATERIAL::shaders, "m");
+    glUniformMatrix4fv(mID, 1, GL_FALSE, m);
 #endif
+    
+//    gluniformMa
+    
+//    glMultMatrixd(m);   // Change cullface for transformation with negative determinant? Use both sides?
+//#endif
 }
 
 AFFINE mirrorX() {      return AFFINE( 1,  0,  0, -1); }
@@ -330,52 +367,61 @@ AFFINE zeroAFFINE() {   return AFFINE( 0,  0,  0,  0); }
 // CONNECTION ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CONNECTION::CONNECTION() {
-    v = VECTOR(0,0); dv = VECTOR(1,0); w = 1; name = "Default";
+    v = VECTOR(0,0); dv = VECTOR(1,0); w = 1; name = "default";
 }
-CONNECTION::CONNECTION(VECTOR v_, VECTOR dv_, GLdouble w_, std::string name_) {
+CONNECTION::CONNECTION(VECTOR v_, VECTOR dv_, GLdouble w_, std::string name_, int16_t l_) {
 //    v = v_; dv = dv_; w = std::abs(w_); name = name_;
     v = v_; dv = dv_; w = w_; name = name_;
+    
+    if (l_ == -1)   { l = 1; } //l = MATERIAL::currentLayer; }
+    else            { l = l_; }
 }
-CONNECTION CONNECTION::operator=(CONNECTION c) {    v = c.v; dv = c.dv; w = c.w; name = c.name; l = c.l; return *this; }
-CONNECTION CONNECTION::operator-()          const { return CONNECTION(v, -dv, w, name); }
+bool CONNECTION::isEmpty() const { return v.isZero() && dv ==  VECTOR(1,0) && w == 1 && name == "default"; }
+CONNECTION CONNECTION::operator=(CONNECTION c) {        v = c.v; dv = c.dv; w = c.w; name = c.name; l = c.l; return *this; }
+CONNECTION CONNECTION::operator-()          const {     return CONNECTION(v, -dv, w, name, l); }
 
 //CONNECTION CONNECTION::operator+(VECTOR v_) const { return CONNECTION(v + v_, dv, w, name); }
 //CONNECTION CONNECTION::operator-(VECTOR v_) const { return CONNECTION(v - v_, dv, w, name); }
-CONNECTION CONNECTION::operator+(VECTOR v_) const { return copy() += v_; }
-CONNECTION CONNECTION::operator-(VECTOR v_) const { return copy() -= v_; }
-CONNECTION CONNECTION::operator+=(VECTOR v_) {      v += v_; return *this; }
-CONNECTION CONNECTION::operator-=(VECTOR v_) {      v -= v_; return *this; }
+CONNECTION CONNECTION::operator+(VECTOR v_) const {     return copy() += v_; }
+CONNECTION CONNECTION::operator-(VECTOR v_) const {     return copy() -= v_; }
+CONNECTION CONNECTION::operator+(GLdouble x) const {    return copy() += x; }
+CONNECTION CONNECTION::operator-(GLdouble x) const {    return copy() -= x; }
+
+CONNECTION CONNECTION::operator+=(VECTOR v_) {          v += v_;    return *this; }
+CONNECTION CONNECTION::operator-=(VECTOR v_) {          v -= v_;    return *this; }
+CONNECTION CONNECTION::operator+=(GLdouble x) {         v += dv*x;  return *this; }
+CONNECTION CONNECTION::operator-=(GLdouble x) {         v -= dv*x;  return *this; }
 
 //CONNECTION CONNECTION::operator*(GLdouble s) const {    return CONNECTION(v*s, dv*sign(s), w*std::abs(s), name); }
 //CONNECTION CONNECTION::operator*=(GLdouble s) {         v *= s; dv *= sign(s); w *= std::abs(s); return *this; }
 
-CONNECTION CONNECTION::operator* (GLdouble s) const {    return copy() *= s; }
-CONNECTION CONNECTION::operator*=(GLdouble s) {
-//    if (s) {
-        v *= s; dv *= sign(s); w *= std::abs(s); return *this;
-//    }
-//    else {    }
-}
+CONNECTION CONNECTION::operator* (GLdouble s) const {   return copy() *= s; }
+CONNECTION CONNECTION::operator*=(GLdouble s) {         v *= s; dv *= sign(s); w *= std::abs(s); return *this; }
 
 CONNECTION CONNECTION::operator/ (GLdouble s) const {   return copy() /= s; }
 CONNECTION CONNECTION::operator/=(GLdouble s) {         v /= s; dv *= sign(s); w /= std::abs(s); return *this; }
 
 CONNECTION CONNECTION::operator* (AFFINE m) const { return copy() *= m; }
 CONNECTION CONNECTION::operator*=(AFFINE m) {
-    VECTOR dv_ = m.linearTimes(dv.perpCCW()).perpCW();
+//    VECTOR dv_ = m.linearTimes(dv.perpCCW()).perpCW();
+    VECTOR dv_ = m.linearTimes(dv.perpCCW()).perpCW() ;
     GLdouble magn = dv_.magn();
     
 //    return CONNECTION(c.v,
 //                      dv/magn,          // Make dv a unit vector.
 //                      c.w*magn,         // Grow/shrink width appropriately.
 //                      c.name);
-    dv /= magn;
+//    printf("FISHFISH");
+    
+    dv /= magn * m.det();       // FIX ME!!!
     w *= magn;
     
     return *this;
 }
 
 bool CONNECTION::operator==(CONNECTION c)    const { return v == c.v && dv == c.dv && w == c.w; }
+
+CONNECTION CONNECTION::setWidth(GLdouble w_) {      w = w_;         return *this; }
 
 CONNECTION CONNECTION::setName(std::string name_){  name = name_;   return *this; }
 CONNECTION CONNECTION::setLayer(int16_t l_){        l = l_;         return *this; }
@@ -385,9 +431,13 @@ void CONNECTION::print()    const {
     v.print();
     printf(" pointing toward ");
     dv.print();
-    printf(" with width %f\n", w);
+    printf(" with width %f and layer %i\n", w, l);
 }
-CONNECTION CONNECTION::copy() const { return CONNECTION(v, dv, w, name); }
+CONNECTION  CONNECTION::copy()  const { return CONNECTION(v, dv, w, name, l); }
+
+VECTOR      CONNECTION::left()  const { return v + dv.perpCW()*(w/2); }
+VECTOR      CONNECTION::right() const { return v + dv.perpCCW()*(w/2); }
+
 void CONNECTION::render()   const {
 #ifdef USE_GL_RENDER
     VECTOR offset = dv.perpCW()*(w/2);
@@ -409,3 +459,119 @@ void CONNECTION::render()   const {
     glEnd();
 #endif
 }
+
+//GLdouble getAng(VECTOR u, VECTOR v) {
+//    return acos(u*v);
+//}
+
+CONNECTION bendRadius(CONNECTION start, GLdouble ang, GLdouble radius) {
+    VECTOR pivot = start.v + start.dv.perpCCW() * (radius * sign(ang));
+    
+    VECTOR dv = AFFINE(ang) * start.dv;
+    //    dv.printNL();
+    VECTOR v = pivot + dv.perpCW() * (radius * sign(ang));
+    
+    return CONNECTION(v, dv, start.w, start.name + "+", start.l);
+}
+
+CONNECTION bendTowards(CONNECTION start, GLdouble ang, GLdouble radius) {
+    return bendTowards(start, VECTOR(ang), radius);
+}
+CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius) {
+    bool dir = start.dv.perpCCWdot(towards) > 0;
+    
+//    printf("%f\n", acos(start.dv * towards.unit()));
+//    printf("%f\n", ((dir)?(-1):(1)) * acos(start.dv * towards.unit()));
+    
+    return bendRadius(start, ((dir)?(-1):(1)) * acos(start.dv * towards.unit()), radius);
+}
+
+CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang) {
+    if (ang == 0) { return start; }
+    
+    GLdouble radius = length/ang;
+    
+    if (radius < 0) {   return bendRadius(start, ang, -radius); }
+    else {              return bendRadius(start, ang,  radius); }
+}
+CONNECTION bendLeft(CONNECTION start, GLdouble radius) {    return bendRadius(start,  TAU/4, radius); }
+CONNECTION bendRight(CONNECTION start, GLdouble radius) {   return bendRadius(start, -TAU/4, radius); }
+
+//bool intersect(CONNECTION c1, CONNECTION c2, VECTOR** i) {
+//
+//}
+
+CONNECTION bendHorizontal(CONNECTION start, GLdouble horizontal) {
+    VECTOR* i = new VECTOR();
+    
+//    printf("FISH!: %f\n\n", horizontal);
+//
+//    start.print();
+    
+    
+    if (intersect(start, CONNECTION(VECTOR(start.v.x, horizontal), VECTOR(1, 0)), &i)) {
+//        i->printNL();
+        VECTOR path = *i - start.v;
+        
+//        path.printNL();
+        
+        if (path * start.dv > 0) {
+            GLdouble d = path.norm();
+            int dir = sign(start.dv.x);
+            
+            return CONNECTION(*i + VECTOR(dir*d, 0), VECTOR(-dir, 0), start.w, start.name + "+");
+        }
+    }
+    
+    delete i;
+    return CONNECTION();
+}
+CONNECTION bendVertical(CONNECTION start,   GLdouble vertical) {
+    VECTOR* i = new VECTOR();
+    
+//    printf("FISH!\n\n");
+    
+    if (intersect(start, CONNECTION(VECTOR(vertical, start.v.y), VECTOR(0, 1)), &i)) {
+//        i->printNL();
+        VECTOR path = *i - start.v;
+        
+//        path.printNL();
+        
+        if (path * start.dv > 0) {
+            GLdouble d = path.norm();
+            int dir = sign(start.dv.y);
+            
+            return CONNECTION(*i + VECTOR(0, dir*d), VECTOR(0, -dir), start.w, start.name + "+");
+        }
+    }
+    
+    delete i;
+    return CONNECTION();
+}
+
+bool intersect(CONNECTION a, CONNECTION b, VECTOR** i, bool onlyForward) {
+    if (a.dv == b.dv || a.dv == -b.dv) { *i = nullptr; return false; }  // Lines are parallel, no valid intersection...
+    
+    if (a.dv.x == 0 && b.dv.x == 0) {   // If both are vertical...
+        throw std::runtime_error("intersect(CONNECTION^2, VECTOR**, bool): Both-vertical case should have been caught by parallel check...");
+    } else if (a.dv.x == 0) {           // If `a` is vertical...
+        *i = new VECTOR( a.v.x, (b.dv.y / b.dv.x) * (a.v.x - b.v.x) + b.v.y );
+    } else if (b.dv.x == 0) {           // If `b` is vertical...
+        *i = new VECTOR( b.v.x, (a.dv.y / a.dv.x) * (b.v.x - a.v.x) + a.v.y );
+    } else {                            // If neither `a` nor `b` are vertical...
+        GLdouble x = ( (a.dv.y / a.dv.x) * a.v.x - (b.dv.y / b.dv.x) * b.v.x - a.v.y + b.v.y ) / ( (a.dv.y / a.dv.x) - (b.dv.y / b.dv.x) );
+        
+        *i = new VECTOR( x, (a.dv.y / a.dv.x) * (x - a.v.x) + a.v.y );
+    }
+    
+    if (onlyForward) {
+        if ( (**i - a.v) * a.dv <= 0 || (**i - b.v) * b.dv <= 0 ) {
+            delete *i;  *i = nullptr; return false;
+        }
+    }
+    
+    return true;
+}
+
+
+

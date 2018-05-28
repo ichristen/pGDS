@@ -1,3 +1,4 @@
 clear all;  %#ok
 
-compile('main.cpp');
+% compile('main.cpp');
+compile('include.hpp');
