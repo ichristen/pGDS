@@ -919,7 +919,7 @@ function gather(fname)
     end
     
     if ~exist(fname)
-        disp('Cannot interpret unknown filename...');
+        disp(['Cannot interpret unknown filename: ' fname]);
         return;
     end
     
