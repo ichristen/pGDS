@@ -182,8 +182,8 @@ CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius);
 
 //bool intersect(CONNECTION c1, CONNECTION c2, VECTOR** i);
 
-CONNECTION bendHorizontal(CONNECTION start, GLdouble horizontal);
-CONNECTION bendVertical(CONNECTION start,   GLdouble vertical);
+CONNECTION bendHorizontal(CONNECTION start, GLdouble horizontal,    GLdouble radius=0);
+CONNECTION bendVertical(CONNECTION start,   GLdouble vertical,      GLdouble radius=0);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

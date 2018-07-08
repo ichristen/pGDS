@@ -19,7 +19,7 @@
 //#include "tesselation.hpp"
 
 int main(int argc, const char * argv[]) {
-    mainDiamondDevice(0);
+//    mainDiamondDevice(0);
 //    DEVICE* c = getDevice("Circle");
 //    c->add(circle(5));
     
@@ -31,7 +31,7 @@ int main(int argc, const char * argv[]) {
     
 //    LNX_LOSS_2();
 //    VAPORTEST();
-//    LNXEOQ();
+    LNXEOQ();
     
 //    WINDOW w;
 //    w.focus =

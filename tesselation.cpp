@@ -154,17 +154,17 @@ void outputQuadrilateral(VECTOR v1, VECTOR v2, VECTOR v3, FILE* f) {
     VECTOR e1 = v1 - v2;
     VECTOR e2 = v1 - v3;
     
-    if (!e1.isZero() && !e2.isZero() && e1 != e2) {
+    if (!e1.isZero() && !e2.isZero() && e1 != e2 && e1 != -e2) {
         VECTOR c = (v1*2 + v2 + v3)/4;
     
         fprintf(f, "\t(make block ");
     
-        fprintf(f, "(center %.15f %.15f 0) ", c.x, c.y);
+        fprintf(f, "(center %.5f %.5f 0) ", c.x, c.y);
     
-        fprintf(f, "(e1 %.15f %.15f 0) ", e1.x, e1.y);
-        fprintf(f, "(e2 %.15f %.15f 0) ", e2.x, e2.y);
+        fprintf(f, "(e1 %.5f %.5f 0) ", e1.x, e1.y);
+        fprintf(f, "(e2 %.5f %.5f 0) ", e2.x, e2.y);
     
-        fprintf(f, "(size %.15f %.15f h) ", e1.magn()/2, e2.magn()/2);
+        fprintf(f, "(size %.5f %.5f h) ", e1.magn()/2, e2.magn()/2);
     
         fprintf(f, "(material GDS))\n");
     }

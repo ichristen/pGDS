@@ -501,23 +501,24 @@ CONNECTION bendRight(CONNECTION start, GLdouble radius) {   return bendRadius(st
 //
 //}
 
-CONNECTION bendHorizontal(CONNECTION start, GLdouble horizontal) {
+CONNECTION bendHorizontal(CONNECTION start, GLdouble horizontal, GLdouble radius) {
     VECTOR* i = new VECTOR();
     
-//    printf("FISH!: %f\n\n", horizontal);
-//
-//    start.print();
+    if (radius < 0) { radius = -radius; }
     
+    if (start.dv.y == 0) { throw std::runtime_error("bendHorizontal: Cannot bend already horizontal connection"); }
     
     if (intersect(start, CONNECTION(VECTOR(start.v.x, horizontal), VECTOR(1, 0)), &i)) {
-//        i->printNL();
         VECTOR path = *i - start.v;
-        
-//        path.printNL();
         
         if (path * start.dv > 0) {
             GLdouble d = path.norm();
             int dir = sign(start.dv.x);
+            
+            
+//            GLdouble tantheta = 0;
+//
+//            if abs(start.dv.y/start.dv.x);
             
             return CONNECTION(*i + VECTOR(dir*d, 0), VECTOR(-dir, 0), start.w, start.name + "+");
         }
@@ -526,7 +527,7 @@ CONNECTION bendHorizontal(CONNECTION start, GLdouble horizontal) {
     delete i;
     return CONNECTION();
 }
-CONNECTION bendVertical(CONNECTION start,   GLdouble vertical) {
+CONNECTION bendVertical(CONNECTION start,   GLdouble vertical, GLdouble radius) {
     VECTOR* i = new VECTOR();
     
 //    printf("FISH!\n\n");
