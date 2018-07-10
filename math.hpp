@@ -23,6 +23,7 @@
 #define PI          3.141592653589793238462643383279502884197169399375105820974
 #define DEG2RAD     0.017453292519943295769236907684886127134428718885417254560
 
+
 enum BOOLOPERATION { AND=0, OR=1, XOR=2 };                                      // The three possible boolean operations. Boolean Difference can be acomplished with AND and negative area.
 
 inline int sign(GLdouble x) { return (x > 0)?( 1 ):( (x < 0)?( -1 ):( 0 ) ); }  // Returns the sign of a number (e.g. -1 for -2, +1 for 3). Zero returns zero.

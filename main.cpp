@@ -9,7 +9,7 @@
 
 #include "window.hpp"
 
-#include "testdevices.hpp"
+//#include "testdevices.hpp"
 #include "diamonddevices.hpp"
 //#include "eodevices.hpp"
 //#include "testing.hpp"

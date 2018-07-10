@@ -92,8 +92,8 @@
 		082DAF66204B330E00F3AF4D /* test.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = test.frag; sourceTree = SOURCE_ROOT; };
 		082DAF67204B333F00F3AF4D /* test.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = test.vert; sourceTree = SOURCE_ROOT; };
 		082DAF68204B553600F3AF4D /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
-		0836BF9E20F29E1A00C43474 /* wavelengths.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = wavelengths.cpp; path = ../pGDSdevices/wavelengths.cpp; sourceTree = "<group>"; };
-		0836BF9F20F29E1A00C43474 /* wavelengths.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = wavelengths.hpp; path = ../pGDSdevices/wavelengths.hpp; sourceTree = "<group>"; };
+		0836BF9E20F29E1A00C43474 /* wavelengths.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = wavelengths.cpp; path = ../pGDSdevices/wavelengths.cpp; sourceTree = SOURCE_ROOT; };
+		0836BF9F20F29E1A00C43474 /* wavelengths.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = wavelengths.hpp; path = ../pGDSdevices/wavelengths.hpp; sourceTree = SOURCE_ROOT; };
 		083CC0D81F4CE0170054FD31 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "pGDS/macOS OpenGL/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
 		083CC0DB1F4CE0170054FD31 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "pGDS/macOS OpenGL/Info.plist"; sourceTree = SOURCE_ROOT; };
 		083CC0DD1F4CE0170054FD31 /* device.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = device.hpp; sourceTree = SOURCE_ROOT; };
@@ -200,15 +200,15 @@
 				0886D2202027E76F00C48D4C /* harvarddevices.hpp */,
 				083CC1111F4CE0C00054FD31 /* testdevices.hpp */,
 				08C820EE202D4C4300D9E032 /* quantumdevices.hpp */,
-				0836BF9F20F29E1A00C43474 /* wavelengths.hpp */,
 				082DAF63204863FA00F3AF4D /* vapordevices.hpp */,
+				0836BF9F20F29E1A00C43474 /* wavelengths.hpp */,
 				08156FAC1FA79A34009702F5 /* diamonddevices.cpp */,
 				083CC1121F4CE0C00054FD31 /* eodevices.cpp */,
 				0886D21F2027E76F00C48D4C /* harvarddevices.cpp */,
 				083CC1131F4CE0C00054FD31 /* testdevices.cpp */,
 				08C820ED202D4C4300D9E032 /* quantumdevices.cpp */,
-				0836BF9E20F29E1A00C43474 /* wavelengths.cpp */,
 				082DAF62204863FA00F3AF4D /* vapordevices.cpp */,
+				0836BF9E20F29E1A00C43474 /* wavelengths.cpp */,
 			);
 			name = Devices;
 			sourceTree = "<group>";
