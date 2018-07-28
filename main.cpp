@@ -31,11 +31,11 @@ int main(int argc, const char * argv[]) {
     
 //    LNX_LOSS_2();
 //    VAPORTEST();
-    LNXEOQ();
     
 //    WINDOW w;
 //    w.focus =
-//    LNXEO();
+    LNXEOQ();
+    LNXEO();
 //    LNX_HARV_6();
     
 //    w.loop();

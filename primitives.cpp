@@ -486,13 +486,17 @@ POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps, GLdou
     GLdouble ang = getArcAngle(c, b, e, chooseShortest);
     GLdouble r = (b - c).magn();
     
-    if (ang > TAU) { return POLYLINE(); }
+    if (ang > TAU || r > 2000) { return POLYLINE(); }
     
 //    printf("ang: %f\n", ang);
     
     if (!steps) {
-        steps = ceil(std::abs(ang)/acos(1 - EPSILON/r))*stepMutliplier;
+        steps = ceil(std::abs(ang)/acos(1 - EPSILON/r))*stepMutliplier + 2;
     }
+    
+    if (ang > TAU || r > 2000) { return POLYLINE(); }
+    
+    if (steps > 1e6) { return POLYLINE(); }
     
 //    printf("steps: %i\n", steps);
     
@@ -527,6 +531,8 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
 //        
 //    }
     POLYLINE toReturn;
+    
+    if (i.v == f.v) { return toReturn; }
     
     toReturn.setBeginDirection(i.dv);
     toReturn.setEndDirection(-f.dv);
@@ -712,6 +718,30 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
 
 // THICKENED CONNECTIONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble tb, GLdouble te, GLdouble lb, GLdouble le) {
+    CONNECTION b1 = bendRadius(b, tb);  b1.w = -a0;
+    CONNECTION e1 = bendRadius(e, te);  e1.w = -a0;
+    
+    CONNECTION b2 = b1 + lb;
+    CONNECTION e2 = e1 + le;
+    
+    connectThickenAndAdd(addto, b, -b1, CIRCULAR);
+//    connectThickenAndAdd(addto, b1, -b2, CIRCULAR);
+    addto->add(connectThickenShortestDistance(b1, -b2, MINRADIUS));
+//    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
+    if ((e.v - b.v).magn() > 30) {
+        addto->add(connectThickenShortestDistance(b2, e2, MINRADIUS));
+    } else {
+        connectThickenAndAdd(addto, b2, e2,  CIRCULAR);
+    }
+//    connectThickenAndAdd(addto, e1, b1,  CIRCULAR);
+//    addto->add(connectThickenShortestDistance(b1, e1, MINRADIUS));
+//    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
+//    connectThickenAndAdd(addto, e1, -e2, CIRCULAR);
+    addto->add(connectThickenShortestDistance(e1, -e2, MINRADIUS));
+    connectThickenAndAdd(addto, e, -e1, CIRCULAR);
+}
+    
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep) {
     std::function<GLdouble(GLdouble t)> lambda;
     
@@ -832,7 +862,7 @@ void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTI
     }
 }
 
-POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat, GLdouble mult) {
+POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat, GLdouble mult, GLdouble padding) {
     POLYLINES toReturn;
     
     VECTOR bl = b.v + b.dv.perpCCW()*r;
@@ -949,7 +979,8 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     
 //    printf("min( %f, ")
     
-    GLdouble longWidth = mult*(b.w + e.w)/2.;
+//    GLdouble longWidth = mult*(b.w + e.w)/2.;
+    GLdouble longWidth = sign(b.w)*mult*max(abs(b.w), abs(e.w));
     
     GLdouble angb, ange;
     
@@ -992,10 +1023,14 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
         return toReturn;
     }
     
-    connectThickenAndAdd(&toReturn, b, -b1, CIRCULAR);  // Change this to thicken the arc?
-    connectThickenAndAdd(&toReturn, e, -e1, CIRCULAR);
+    GLdouble Lminfin = (b1.v - e1.v).norm();
+    
+    if (abs(Lmin - Lminfin) > .1) { printf("Lmin=%f, Lminfin=%f\n", Lmin, Lminfin); Lmin = Lminfin; }
     
     if (Lmin > 2*adiabat) {
+        connectThickenAndAdd(&toReturn, b, -b1, CIRCULAR);  // Change this to thicken the arc?
+        connectThickenAndAdd(&toReturn, e, -e1, CIRCULAR);
+        
         CONNECTION b2 = b1 + adiabat; b2.w = longWidth;
         CONNECTION e2 = e1 + adiabat; e2.w = longWidth;
         
@@ -1010,8 +1045,8 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
                 POLYLINE p;
                 
                 p.add(b2.v + b2.dv.perpCCW()*i*(-b2.w/2));
-                p.add(b2.v + b2.dv.perpCCW()*i*(-b2.w/2 + PADDING));
-                p.add(e2.v - e2.dv.perpCCW()*i*(-e2.w/2 + PADDING));
+                p.add(b2.v + b2.dv.perpCCW()*i*(-b2.w/2 + padding));
+                p.add(e2.v - e2.dv.perpCCW()*i*(-e2.w/2 + padding));
                 p.add(e2.v - e2.dv.perpCCW()*i*(-e2.w/2));
                 
                 p.close().setLayer(b.l);
@@ -1045,7 +1080,7 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
         connectThickenAndAdd(&toReturn, b1, -b2, CIRCULAR);
         connectThickenAndAdd(&toReturn, e1, -e2, CIRCULAR);
     } else {
-        connectThickenAndAdd(&toReturn, b1, e1, CIRCULAR);
+        connectThickenAndAdd(&toReturn, b, e, CIRCULAR);
     }
     
     return toReturn;
