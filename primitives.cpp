@@ -486,7 +486,7 @@ POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps, GLdou
     GLdouble ang = getArcAngle(c, b, e, chooseShortest);
     GLdouble r = (b - c).magn();
     
-    if (ang > TAU || r > 2000) { return POLYLINE(); }
+//    if (ang > TAU || r > 2000000) { return POLYLINE(); }
     
 //    printf("ang: %f\n", ang);
     
@@ -494,9 +494,9 @@ POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps, GLdou
         steps = ceil(std::abs(ang)/acos(1 - EPSILON/r))*stepMutliplier + 2;
     }
     
-    if (ang > TAU || r > 2000) { return POLYLINE(); }
+    if (ang > TAU) { return POLYLINE(); }
     
-    if (steps > 1e6) { return POLYLINE(); }
+    if (steps > 1e6 || steps < 0) { return POLYLINE(); }
     
 //    printf("steps: %i\n", steps);
     
@@ -719,26 +719,50 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
 // THICKENED CONNECTIONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble tb, GLdouble te, GLdouble lb, GLdouble le) {
-    CONNECTION b1 = bendRadius(b, tb);  b1.w = -a0;
-    CONNECTION e1 = bendRadius(e, te);  e1.w = -a0;
+    CONNECTION b1 = bendRadius(b, tb);  if (tb != 0) { b1.w = -a0; }
+    CONNECTION e1 = bendRadius(e, te);  if (te != 0) { e1.w = -a0; }
     
     CONNECTION b2 = b1 + lb;
     CONNECTION e2 = e1 + le;
     
     connectThickenAndAdd(addto, b, -b1, CIRCULAR);
-//    connectThickenAndAdd(addto, b1, -b2, CIRCULAR);
+    //    connectThickenAndAdd(addto, b1, -b2, CIRCULAR);
     addto->add(connectThickenShortestDistance(b1, -b2, MINRADIUS));
-//    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
+    //    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
     if ((e.v - b.v).magn() > 30) {
         addto->add(connectThickenShortestDistance(b2, e2, MINRADIUS));
     } else {
         connectThickenAndAdd(addto, b2, e2,  CIRCULAR);
     }
-//    connectThickenAndAdd(addto, e1, b1,  CIRCULAR);
-//    addto->add(connectThickenShortestDistance(b1, e1, MINRADIUS));
-//    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
-//    connectThickenAndAdd(addto, e1, -e2, CIRCULAR);
+    //    connectThickenAndAdd(addto, e1, b1,  CIRCULAR);
+    //    addto->add(connectThickenShortestDistance(b1, e1, MINRADIUS));
+    //    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
+    //    connectThickenAndAdd(addto, e1, -e2, CIRCULAR);
     addto->add(connectThickenShortestDistance(e1, -e2, MINRADIUS));
+    connectThickenAndAdd(addto, e, -e1, CIRCULAR);
+}
+
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, WAVELENGTH wl, GLdouble tb, GLdouble te, GLdouble lb, GLdouble le) {
+    CONNECTION b1 = bendRadius(b, tb);  if (tb != 0) { b1.w = -wl.sm; }
+    CONNECTION e1 = bendRadius(e, te);  if (te != 0) { e1.w = -wl.sm; }
+    
+    CONNECTION b2 = b1 + lb;
+    CONNECTION e2 = e1 + le;
+    
+    connectThickenAndAdd(addto, b, -b1, CIRCULAR);
+    //    connectThickenAndAdd(addto, b1, -b2, CIRCULAR);
+    addto->add(connectThickenShortestDistance(b1, -b2, wl.rad));
+    //    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
+    if ((e.v - b.v).magn() > 30) {
+        addto->add(connectThickenShortestDistance(b2, e2, wl.rad));
+    } else {
+        connectThickenAndAdd(addto, b2, e2,  CIRCULAR);
+    }
+    //    connectThickenAndAdd(addto, e1, b1,  CIRCULAR);
+    //    addto->add(connectThickenShortestDistance(b1, e1, MINRADIUS));
+    //    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
+    //    connectThickenAndAdd(addto, e1, -e2, CIRCULAR);
+    addto->add(connectThickenShortestDistance(e1, -e2, wl.rad));
     connectThickenAndAdd(addto, e, -e1, CIRCULAR);
 }
     

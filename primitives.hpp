@@ -6,11 +6,16 @@
 #include "polyline.hpp"
 #include "vector.hpp"
 #include "math.hpp"
+#include "wavelengths.hpp"
 #include "device.hpp"
 
-#define RF_WID  10
-#define RF_GAP  5
-#define RF_GND  20
+//#define RF_WID  16
+//#define RF_GAP  4
+//#define RF_GND  24
+//#define RF_LAY  4
+#define RF_WID  12
+#define RF_GAP  4
+#define RF_GND  24
 #define RF_LAY  4
 
 //#define CONNECTTHICKEN_DEBUG 1
@@ -69,7 +74,10 @@ POLYLINE connect(CONNECTION b, CONNECTION e, CONNECTIONTYPE type=CIRCULAR, int n
 
 // THICKENED CONNECTIONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class WAVELENGTH;
+
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble tb, GLdouble te, GLdouble lb=0, GLdouble le=0);
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, WAVELENGTH wl, GLdouble tb, GLdouble te, GLdouble lb=0, GLdouble le=0);
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1);
 void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1);
 
