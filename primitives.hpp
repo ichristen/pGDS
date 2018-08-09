@@ -9,14 +9,15 @@
 #include "wavelengths.hpp"
 #include "device.hpp"
 
-//#define RF_WID  16
+#define RF_WID  16
+#define RF_GAP  4
+#define RF_GND  16
+#define RF_LAY  4
+
+//#define RF_WID  12
 //#define RF_GAP  4
 //#define RF_GND  24
 //#define RF_LAY  4
-#define RF_WID  12
-#define RF_GAP  4
-#define RF_GND  24
-#define RF_LAY  4
 
 //#define CONNECTTHICKEN_DEBUG 1
 
@@ -78,8 +79,8 @@ class WAVELENGTH;
 
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble tb, GLdouble te, GLdouble lb=0, GLdouble le=0);
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, WAVELENGTH wl, GLdouble tb, GLdouble te, GLdouble lb=0, GLdouble le=0);
-void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1);
-void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1);
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1, GLdouble padding=PADDING);
+void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1, GLdouble padding=PADDING);
 
 POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat=15, GLdouble mult=2, GLdouble padding=PADDING);
 

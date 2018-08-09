@@ -766,7 +766,7 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
     connectThickenAndAdd(addto, e, -e1, CIRCULAR);
 }
     
-void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep) {
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep, GLdouble padding) {
     std::function<GLdouble(GLdouble t)> lambda;
     
     if ( (b.w > 0 && e.w < 0) || (b.w < 0 && e.w > 0) ) {
@@ -825,11 +825,11 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
     
     for (int j = 0; j < polylines.size(); j++) {
         for (int i = (outer)?(-1):(0); i < 2; i += 2) {
-            addto->add(thicken(polylines[j], lambda, PADDING*i, minstep).setLayer(b.l));
+            addto->add(thicken(polylines[j], lambda, padding*i, minstep).setLayer(b.l));
         }
     }
 }
-void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep) {
+void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep, GLdouble padding) {
     std::function<GLdouble(GLdouble t)> lambda;
     
     if ( (b.w > 0 && e.w < 0) || (b.w < 0 && e.w > 0) ) {
@@ -881,7 +881,7 @@ void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTI
     
     for (int j = 0; j < polylines.size(); j++) {
         for (int i = (outer)?(-1):(0); i < 2; i += 2) {
-            addto->add(thicken(polylines[j], lambda, i*PADDING, minstep).setLayer(b.l));
+            addto->add(thicken(polylines[j], lambda, i*padding, minstep).setLayer(b.l));
         }
     }
 }

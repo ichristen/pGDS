@@ -34,7 +34,10 @@ int main(int argc, const char * argv[]) {
     
 //    WINDOW w;
 //    w.focus =
-    LNXEOQ();
+    ALNHARV();
+//    SiN();
+    
+//    LNXEOQ();
 //    LNXEO();
 //    LNX_HARV_6();
     
