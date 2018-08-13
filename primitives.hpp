@@ -87,10 +87,14 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, GLdouble side=0, GLdouble minstep=1);
 POLYLINE thicken(POLYLINE open, GLdouble width, GLdouble side=0, GLdouble minstep=1);
 
+//POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, GLdouble side=0, GLdouble minstep=1);
+POLYLINES thicken(POLYLINE open, std::vector<GLdouble> widths, GLdouble minstep=1);
+
 POLYLINES thicken(POLYLINES open, std::function<GLdouble(GLdouble t)> lambda, GLdouble side=0, GLdouble minstep=1);
 POLYLINES thicken(POLYLINES open, GLdouble width, GLdouble side=0, GLdouble minstep=1);
 
 void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLdouble t)>* lambda, GLdouble side, GLdouble minstep, int i, GLdouble currentLength); // Change? Recursion might be inefficient...
+void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLdouble t)>* lambdal, std::function<GLdouble(GLdouble t)>* lambdar, GLdouble minstep, int i, GLdouble currentLength);
 
 enum RFTYPE { UPPER=0, UPPERwithGROUND=1 };
 

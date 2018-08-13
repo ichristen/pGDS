@@ -1129,6 +1129,30 @@ POLYLINES thicken(POLYLINES open, std::function<GLdouble(GLdouble t)> lambda, GL
     return toReturn;
 }
 
+POLYLINES thicken(POLYLINE open, std::vector<GLdouble> widths, GLdouble minstep) {
+    if (widths.size() % 2) {    throw std::runtime_error("thicken"); }
+    if (open.size() < 2) {      throw std::runtime_error("thicken"); }
+    
+    POLYLINES toReturn;
+    
+    for (int i = 0; i < widths.size(); i += 2) {
+        POLYLINE step = POLYLINE(open.size()*2).setLayer(open.layer);
+        
+        GLdouble l = widths[i];
+        GLdouble r = widths[i+1];
+        
+        std::function<GLdouble(GLdouble t)> lambdal = [l] (GLdouble t) -> GLdouble { return l; };
+        std::function<GLdouble(GLdouble t)> lambdar = [r] (GLdouble t) -> GLdouble { return r; };
+        
+        thickenRecurse(&open, &step, &lambdal, &lambdar, minstep, 0, 0);
+        
+        toReturn.add(step);
+    }
+    
+    return toReturn;
+//    return thicken(open, [width] (GLdouble t) -> GLdouble { return width; }, side, minstep);
+}
+
 POLYLINE thicken(POLYLINE open, GLdouble width, GLdouble side, GLdouble minstep) {
     return thicken(open, [width] (GLdouble t) -> GLdouble { return width; }, side, minstep);
 }
@@ -1223,26 +1247,76 @@ void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLd
     VECTOR dir = -(u.perpCCW() + v.perpCCW()).unit() / sqrt((1 + u * v) / 2);
     
     if (offset > 0) {
-//        closed->add(open->points[i] + dir*(side + offset));
+        //        closed->add(open->points[i] + dir*(side + offset));
         switch (sign(side)) {
             case -1:    closed->add(open->points[i] + dir*(offset - side));     break;
             case 0:     closed->add(open->points[i] + dir*offset);              break;
             case 1:     closed->add(open->points[i] - dir*offset);              break;
         }
     }
-
+    
     if (i < open->size()-1) {
         thickenRecurse(open, closed, lambda, side, minstep, i+1, currentLength + thisLength);
     }
     
     if (offset > 0) {
-//        closed->add(open->points[i] + dir*(side - offset));
+        //        closed->add(open->points[i] + dir*(side - offset));
         switch (sign(side)) {
             case -1:    closed->add(open->points[i] + dir*offset);              break;
             case 0:     closed->add(open->points[i] - dir*offset);              break;
             case 1:     closed->add(open->points[i] - dir*(offset + side));     break;
         }
     }
+}
+void thickenRecurse(POLYLINE* open, POLYLINE* closed, std::function<GLdouble(GLdouble t)>* lambdal, std::function<GLdouble(GLdouble t)>* lambdar, GLdouble minstep, int i, GLdouble currentLength) {
+    VECTOR u;
+    VECTOR v;
+    
+    GLdouble l;
+    GLdouble r;
+    GLdouble thisLength = 0;// = minstep;
+    
+    if (i == open->size()-1) {
+        if (!open->getEndDirection().isZero()) {    u = open->getEndDirection(); }
+        else {  u = (open->points[open->size()-1] - open->points[open->size()-2]).unit(); }
+        
+        v = u;
+        
+        l = (*lambdal)(1);
+        r = (*lambdar)(1);
+    } else if (i == 0) {
+        if (!open->getBeginDirection().isZero()) {  u = open->getBeginDirection(); }
+        else {  u = (open->points[1] - open->points[0]).unit(); }
+        
+        u.printNL();
+        
+        v = u;
+        
+        l = (*lambdal)(0);
+        r = (*lambdar)(0);
+    } else {
+        if (open->points[i] == open->points[i-1]) { u = open->points[i-1] - open->points[i-2]; }
+        else {                                      u = open->points[i] - open->points[i-1]; }
+        
+        if (open->points[i+1] == open->points[i]) { v = (open->points[i+2] - open->points[i+1]).unit(); }
+        else {                                      v = (open->points[i+1] - open->points[i]).unit(); }
+        
+        thisLength = u.magn();
+        u /= thisLength;
+        
+        l = (*lambdal)((currentLength + thisLength)/open->length());
+        r = (*lambdar)((currentLength + thisLength)/open->length());
+    }
+    
+    VECTOR dir = -(u.perpCCW() + v.perpCCW()).unit() / sqrt((1 + u * v) / 2);
+    
+    closed->add(open->points[i] + dir*r);
+    
+    if (i < open->size()-1) {
+        thickenRecurse(open, closed, lambdal, lambdar, minstep, i+1, currentLength + thisLength);
+    }
+    
+    closed->add(open->points[i] + dir*l);
 }
 
 POLYLINES rfThicken(POLYLINE open, GLdouble width, GLdouble gap, GLdouble groundWidth, uint16_t layer, uint16_t groundlayer) {
