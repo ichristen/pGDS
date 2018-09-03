@@ -1004,7 +1004,7 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    printf("min( %f, ")
     
 //    GLdouble longWidth = mult*(b.w + e.w)/2.;
-    GLdouble longWidth = sign(b.w)*mult*max(abs(b.w), abs(e.w));
+    GLdouble longWidth = sign(b.w)*mult*max(std::abs(b.w), std::abs(e.w));
     
     GLdouble angb, ange;
     
@@ -1049,7 +1049,7 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     
     GLdouble Lminfin = (b1.v - e1.v).norm();
     
-    if (abs(Lmin - Lminfin) > .1) { printf("Lmin=%f, Lminfin=%f\n", Lmin, Lminfin); Lmin = Lminfin; }
+    if (std::abs(Lmin - Lminfin) > .1) { printf("Lmin=%f, Lminfin=%f\n", Lmin, Lminfin); Lmin = Lminfin; }
     
     if (Lmin > 2*adiabat) {
         connectThickenAndAdd(&toReturn, b, -b1, CIRCULAR);  // Change this to thicken the arc?
