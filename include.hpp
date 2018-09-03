@@ -7,6 +7,7 @@
 #include "primitives.hpp"
 #include "tesselation.hpp"
 #include "vector.hpp"
+#include "wavelengths.hpp"
 
 
 

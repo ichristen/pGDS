@@ -77,6 +77,7 @@ POLYLINE connect(CONNECTION b, CONNECTION e, CONNECTIONTYPE type=CIRCULAR, int n
 
 class WAVELENGTH;
 
+POLYLINES connectThicken(CONNECTION b, CONNECTION e, CONNECTIONTYPE type=CIRCULAR);
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble tb, GLdouble te, GLdouble lb=0, GLdouble le=0);
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, WAVELENGTH wl, GLdouble tb, GLdouble te, GLdouble lb=0, GLdouble le=0);
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1, GLdouble padding=PADDING);

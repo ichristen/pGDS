@@ -5,9 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define pGDSGLFW 1
+//#define pGDSGLFW 1
 
-#include "window.hpp"
+//#include "window.hpp"
 
 //#include "testdevices.hpp"
 #include "diamonddevices.hpp"
@@ -42,6 +42,9 @@ int main(int argc, const char * argv[]) {
     LNX_HARV_6();
     
 //    w.loop();
+    
+    dcTest(.2, .4, 4, .3, 30, 20, 4);
+    
 }
 
 

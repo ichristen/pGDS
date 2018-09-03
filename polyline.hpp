@@ -150,6 +150,7 @@ public:
     POLYLINE(POLYLINE p, int b, int e);
     
     VECTOR  operator[](int i)       const;
+    VECTOR  at(int i)       const;
     bool    insert(int i, VECTOR v);
     bool    erase(int i);
     void    clear();
@@ -251,6 +252,8 @@ public:
     
     POLYLINE    operator[](int i)       const;
     POLYLINE&   operator[](int i);
+    POLYLINE    at(int i)       const;
+//    POLYLINE&   at(int i);
     bool        insert(int i, POLYLINE p);
     void        clear();
     
@@ -279,6 +282,7 @@ public:
     POLYLINES   operator-();
     POLYLINES&  reverse();
     
+//    POLYLINES&  makePositiveArea();
     
     POLYLINES   boolean(POLYLINE p, BOOLOPERATION op) const;
     

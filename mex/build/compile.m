@@ -98,7 +98,7 @@ function compile(fname)
     onlyMethods.parent = '';
     onlyMethods.variables = [];
 
-%     gatheredClasses
+    gatheredClasses.name
 
     gatheredClasses = [gatheredClasses onlyMethods];
 
@@ -165,7 +165,7 @@ function compile(fname)
     failed = false;
 
     try
-        mex('-v', mexFile, 'boolean.cpp', 'device.cpp', 'font.cpp', 'material.cpp',  'math.cpp', 'polyline.cpp', 'primitives.cpp', 'tesselation.cpp', 'vector.cpp');
+        mex('-v', mexFile, 'boolean.cpp', 'device.cpp', 'font.cpp', 'material.cpp',  'math.cpp', 'polyline.cpp', 'primitives.cpp', 'tesselation.cpp', 'vector.cpp', 'wavelengths.cpp');
 %         mex('-v', mexFile, 'vector.cpp', 'math.cpp', 'polyline.cpp', 'primitives.cpp',  'device.cpp', 'font.cpp', 'material.cpp', 'testdevices.cpp', 'boolean.cpp'); %, '-L/usr/local/opt/freetype/lib', '-I/usr/local/opt/freetype/include/freetype2/');
     catch err
         disp(err.message);
