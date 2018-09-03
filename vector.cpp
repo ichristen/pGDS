@@ -13,6 +13,9 @@ VECTOR::VECTOR(GLdouble x_, GLdouble y_, bool isCylindrical) {
 //VECTOR VECTOR:setX(GLdouble x_)             const { return *this; }
 //VECTOR VECTOR:setY(GLdouble y_)             const { return *this; }
 
+GLdouble VECTOR::getX()                     const { return x; }
+GLdouble VECTOR::getY()                     const { return y; }
+
 bool VECTOR::isZero()                       const { return x == 0 && y == 0; }
 bool VECTOR::operator!()                    const { return isZero(); }
 

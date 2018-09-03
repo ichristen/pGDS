@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "53A17F41843A48415F258B4DC0F4BACA077C1BC4",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "E6ACE89B6E3CF056C66353FB21ABF601786E6313" : 0,
+    "53A17F41843A48415F258B4DC0F4BACA077C1BC4" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "874C6133-F2CA-46FC-A0F6-EF43F8758E30",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "E6ACE89B6E3CF056C66353FB21ABF601786E6313" : "pGDSdevices\/",
+    "53A17F41843A48415F258B4DC0F4BACA077C1BC4" : "pGDS\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "pGDS",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "pGDS.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/ichristen\/pGDS.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "53A17F41843A48415F258B4DC0F4BACA077C1BC4"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/ichristen\/pGDSdevices.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "E6ACE89B6E3CF056C66353FB21ABF601786E6313"
+    }
+  ]
+}

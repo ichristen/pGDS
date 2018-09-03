@@ -385,6 +385,9 @@ VECTOR POLYLINE::operator[](int i) const {
     if (isReversed) {                   return points[points.size() - i - 1]; }
     else {                              return points[i]; }
 }
+VECTOR POLYLINE::at(int i) const {
+    return operator[](i);
+}
 bool POLYLINE::insert(int i, VECTOR v) {
     if (i == points.size()) {   add(v); return true; }
     
@@ -765,7 +768,7 @@ bool POLYLINE::contains(VECTOR v) const {
 bool POLYLINE::boundaryContains(VECTOR v) const {
     if (!bb.doesContain(v)) { return false; }
     
-    int s = size() - ((isClosed)?(1):(2));
+    int s = (int)size() - ((isClosed)?(0):(1));
     
     for (int i = 0; i < s; i++) {
         if (BOUNDINGBOX(operator[](i), operator[](i+1)).doesContain(v)) {
@@ -1056,6 +1059,12 @@ POLYLINE&   POLYLINES::operator[](int i) {
         return polylines[i % polylines.size()];
     }
 }
+POLYLINE    POLYLINES::at(int i) const {
+    return operator[](i);
+}
+//POLYLINE&   POLYLINES::at(int i) const {
+//    return operator[](i);
+//}
 
 bool        POLYLINES::insert(int i, POLYLINE p) {
     if (i < 0 || i > polylines.size()) {
@@ -1328,7 +1337,10 @@ GLdouble    POLYLINES::area() {
 bool        POLYLINES::contains(VECTOR v)       const {
     bool toReturn = false;
     
-    for (int i = 0; i < polylines.size() && !toReturn; i++) { toReturn &= polylines[i].contains(v); }
+    for (int i = 0; i < polylines.size() && !toReturn; i++) {
+        toReturn |= polylines[i].contains(v);
+//        if (toReturn) { polylines[i].print(); }
+    }
     
     return toReturn;
 }

@@ -829,6 +829,14 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
         }
     }
 }
+POLYLINES connectThicken(CONNECTION b, CONNECTION e, CONNECTIONTYPE type) {
+    POLYLINES toReturn;
+    
+    connectThickenAndAdd(&toReturn, b, e, type);
+    
+    return toReturn;
+}
+
 void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep, GLdouble padding) {
     std::function<GLdouble(GLdouble t)> lambda;
     

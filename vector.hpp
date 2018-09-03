@@ -35,6 +35,9 @@ public:
 //    VECTOR setX(GLdouble x_)            const;
 //    VECTOR setY(GLdouble y_)            const;
     
+    GLdouble getX()                     const;
+    GLdouble getY()                     const;
+    
     bool isZero()                       const;  // Checks if both coordinates are within `E` of zero.
     bool operator!()                    const;  // Calls `isZero()`.
 
