@@ -302,14 +302,14 @@ WAVELENGTHS::WAVELENGTHS() : wavelengths {
     WAVELENGTH( 1550.0, 1.5457, 1.300,  0.2,    30) }
 {
     // LOSS                 step    len     N       d
-    wavelengths[0].setLoss( 300,    800,    2,      .075);
-    wavelengths[1].setLoss( 500,    800,    2,      .125);
-    wavelengths[2].setLoss( 1250,   1000,   3,      .200);
-    wavelengths[3].setLoss( 1250,   1000,   3,      .225);
-    wavelengths[4].setLoss( 1250,   1000,   3,      .250);
-    wavelengths[5].setLoss( 1250,   1000,   3,      .325);
-    wavelengths[6].setLoss( 1250,   1000,   3,      .450);
-    wavelengths[7].setLoss( 1250,   1000,   3,      .800);
+    wavelengths[0].setLoss( 300,    800,    2,      .075+.5);
+    wavelengths[1].setLoss( 500,    800,    2,      .125+.5);
+    wavelengths[2].setLoss( 1250,   1000,   3,      .200+.5);
+    wavelengths[3].setLoss( 1250,   1000,   3,      .225+.5);
+    wavelengths[4].setLoss( 1250,   1000,   3,      .250+.5);
+    wavelengths[5].setLoss( 1250,   1000,   3,      .325+.5);
+    wavelengths[6].setLoss( 1250,   1000,   3,      .450+.5);
+    wavelengths[7].setLoss( 1250,   1000,   3,      .800+.5);
 
     // EO                   w       s       l (umV)
     wavelengths[0].setEO(   0.600,  1.200,  2900);
@@ -351,6 +351,7 @@ WAVELENGTHS::WAVELENGTHS() : wavelengths {
     wavelengths[3].makeDC(  .5,     0.200,  0.620,  0,  80, 12.5);     // 9/04
     wavelengths[4].makeDC(  .5,     0.200,  0.630,  0,  80, 12.5);     // 9/04
     wavelengths[5].makeDC(  .5,     0.200,  0.630,  0,  80, 12.5);     // 9/04
+    wavelengths[6].makeDC(  .5,     0.200,  0.640,  0,  80, 12.5);     // 9/04 (guess!)
     
     wavelengths[2].makeDC(  .8,     0.200,  0.630,  0,  80, 12.5);     // 9/04
     wavelengths[3].makeDC(  .8,     0.200,  0.640,  0,  80, 12.5);     // 9/04
@@ -358,10 +359,16 @@ WAVELENGTHS::WAVELENGTHS() : wavelengths {
     wavelengths[4].makeDC(  .8,     0.200,  0.645,  0,  80, 12.5);     // 9/04
     wavelengths[5].makeDC(  .8,     0.250,  0.600,  0,  80, 12.5);     // 9/04
     
+//    wavelengths[1].makeDC(  1.5,    0.260,  0.600,  0,   80, 12.5);     // 9/04
+//    wavelengths[2].makeDC(  1.5,    0.200,  0.620,  30,  80, 12.5);     // 9/04
+//    wavelengths[3].makeDC(  1.5,    0.200,  0.620,  25,  80, 12.5);     // 9/04
+//    wavelengths[4].makeDC(  1.5,    0.200,  0.630,  20,  80, 12.5);     // 9/04
+//    wavelengths[5].makeDC(  1.5,    0.250,  0.600,  17,  80, 12.5);     // 9/04
+    
     wavelengths[1].makeDC(  1.5,    0.260,  0.600,  0,   80, 12.5);     // 9/04
     wavelengths[2].makeDC(  1.5,    0.200,  0.620,  30,  80, 12.5);     // 9/04
     wavelengths[3].makeDC(  1.5,    0.200,  0.620,  25,  80, 12.5);     // 9/04
-    wavelengths[4].makeDC(  1.5,    0.200,  0.630,  20,  80, 12.5);     // 9/04
+    wavelengths[4].makeDC(  1.5,    0.200,  0.630,  16,  80, 12.5);     // 9/04
     wavelengths[5].makeDC(  1.5,    0.250,  0.600,  17,  80, 12.5);     // 9/04
     
     wavelengths[3].makeDC(  .1,     0.200,  1,  0,  80, 12.5);     // 9/04
