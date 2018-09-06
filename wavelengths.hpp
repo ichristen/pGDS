@@ -22,9 +22,10 @@ public:
     GLdouble d;
     GLdouble l;
     GLdouble r;
+    GLdouble t;
     
     DCINFO();
-    DCINFO(GLdouble a, GLdouble d, GLdouble l, GLdouble r);
+    DCINFO(GLdouble a, GLdouble d, GLdouble l, GLdouble r, GLdouble t);
 };
 
 class WAVELENGTH {
@@ -53,7 +54,7 @@ public:
     WAVELENGTH();
     WAVELENGTH(GLdouble nm_, GLdouble neff_, GLdouble sm_, GLdouble fc_, GLdouble rad_);
     void setLoss(GLdouble s, GLdouble l, GLdouble n, GLdouble d);
-    void makeDC(GLdouble trans, GLdouble a, GLdouble d, GLdouble l, GLdouble r);
+    void makeDC(GLdouble trans, GLdouble a, GLdouble d, GLdouble l, GLdouble r, GLdouble t);
     void setEO(GLdouble w, GLdouble s, GLdouble l);
 };
 
@@ -69,7 +70,7 @@ public:
 };
 
 POLYLINES dcTest(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, GLdouble sep);
-DEVICEPTR directionalCoupler(WAVELENGTH wl, GLdouble trans, GLdouble t=TAU/12, bool negResist=true);
+DEVICEPTR directionalCoupler(WAVELENGTH wl, GLdouble trans, GLdouble t=0, bool negResist=true);
 DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t=90, GLdouble r=MINRADIUS, bool text=true, bool straights=true);
 
 

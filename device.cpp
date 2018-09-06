@@ -100,24 +100,23 @@ void DEVICE::add(std::vector<POLYLINE> p) {
     }
 }
 void DEVICE::add(DEVICEPTR device, char c) {
+    if (c) {    add(device, std::string(1, c)); }
+    else {      add(device); }
+}
+void DEVICE::add(DEVICEPTR device, std::string str) {
     devices.push_back(device);
-
+    
     bb.enlarge(device.transformation * device.device->bb);
-
+    
     std::map<std::string, CONNECTION> map = device.device->connections;
-
+    
     for (std::map<std::string, CONNECTION>::iterator it = map.begin(); it != map.end(); ++it) {
         CONNECTION connection = it->second;
-//        printf("\n");
-//        it->second.print();
-//        connection.print();
-        if (c) { connection.name += c; }
-//        connection.print();
-//        printf("\n");
+        connection.name += str;
         add(device.transformation * connection);
     }
-
-    area_ += device.area();
+    
+    area_ += device.area(); // Separate into layers!
 }
 
 void DEVICE::clear() {
@@ -132,6 +131,9 @@ void DEVICE::printConnectionNames() {
 }
 void DEVICE::add(DEVICE* device, AFFINE m, char c) {
     add(DEVICEPTR(device, m), c);
+}
+void DEVICE::add(DEVICE* device, AFFINE m, std::string str) {
+    add(DEVICEPTR(device, m), str);
 }
 void DEVICE::add(CONNECTION connection) {
     if (connections.find(connection.name) == connections.end()) {    // If a connection of this key has not yet been added...
@@ -160,6 +162,8 @@ POLYLINES DEVICE::getLayer(uint16_t l1, uint16_t l2) const {
 //    }
     
     if (l1 != l2) { toReturn.setLayer(l2); }
+    
+    toReturn.recomputeBoundingBox();
     
     return toReturn;
 }

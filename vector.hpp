@@ -174,14 +174,14 @@ public:
 
 //GLdouble getAng(VECTOR u, VECTOR v);
 
-CONNECTION bendRadius(CONNECTION start, GLdouble ang, GLdouble radius=MINRADIUS);
+CONNECTION bendRadius(CONNECTION start, GLdouble ang, GLdouble radius=SAFERADIUS);
 CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang=0);
 
-CONNECTION bendLeft(CONNECTION start, GLdouble radius);
-CONNECTION bendRight(CONNECTION start, GLdouble radius);
+CONNECTION bendLeft(CONNECTION start, GLdouble radius=SAFERADIUS);
+CONNECTION bendRight(CONNECTION start, GLdouble radius=SAFERADIUS);
 
-CONNECTION bendTowards(CONNECTION start, GLdouble ang, GLdouble radius);
-CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius);
+CONNECTION bendTowards(CONNECTION start, GLdouble ang, GLdouble radius=SAFERADIUS);
+CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius=SAFERADIUS);
 
 //bool intersect(CONNECTION c1, CONNECTION c2, VECTOR** i);
 

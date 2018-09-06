@@ -718,19 +718,21 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
 
 // THICKENED CONNECTIONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble tb, GLdouble te, GLdouble lb, GLdouble le) {
-    CONNECTION b1 = bendRadius(b, tb);  if (tb != 0) { b1.w = -a0; }
-    CONNECTION e1 = bendRadius(e, te);  if (te != 0) { e1.w = -a0; }
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble tb, GLdouble te, GLdouble lb, GLdouble le, GLdouble rad) {
+    if (rad == 0) { rad = SAFERADIUS; }
+    
+    CONNECTION b1 = bendRadius(b, tb, rad);  if (tb != 0) { b1.w = -a0; }
+    CONNECTION e1 = bendRadius(e, te, rad);  if (te != 0) { e1.w = -a0; }
     
     CONNECTION b2 = b1 + lb;
     CONNECTION e2 = e1 + le;
     
     connectThickenAndAdd(addto, b, -b1, CIRCULAR);
     //    connectThickenAndAdd(addto, b1, -b2, CIRCULAR);
-    addto->add(connectThickenShortestDistance(b1, -b2, MINRADIUS));
+    addto->add(connectThickenShortestDistance(b1, -b2, rad));
     //    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
     if ((e.v - b.v).magn() > 30) {
-        addto->add(connectThickenShortestDistance(b2, e2, MINRADIUS));
+        addto->add(connectThickenShortestDistance(b2, e2, rad));
     } else {
         connectThickenAndAdd(addto, b2, e2,  CIRCULAR);
     }
@@ -738,23 +740,27 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
     //    addto->add(connectThickenShortestDistance(b1, e1, MINRADIUS));
     //    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
     //    connectThickenAndAdd(addto, e1, -e2, CIRCULAR);
-    addto->add(connectThickenShortestDistance(e1, -e2, MINRADIUS));
+    addto->add(connectThickenShortestDistance(e1, -e2, rad));
     connectThickenAndAdd(addto, e, -e1, CIRCULAR);
 }
 
-void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, WAVELENGTH wl, GLdouble tb, GLdouble te, GLdouble lb, GLdouble le) {
-    CONNECTION b1 = bendRadius(b, tb);  if (tb != 0) { b1.w = -wl.sm; }
-    CONNECTION e1 = bendRadius(e, te);  if (te != 0) { e1.w = -wl.sm; }
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, WAVELENGTH wl, GLdouble tb, GLdouble te, GLdouble lb, GLdouble le, GLdouble rad) {
+    if (rad == 0) { rad = SAFERADIUS; }
+//    if (rad == 0) { rad = wl.rad; }
+//    rad = MIN
+    
+    CONNECTION b1 = bendRadius(b, tb, rad);  if (tb != 0) { b1.w = -wl.sm; }
+    CONNECTION e1 = bendRadius(e, te, rad);  if (te != 0) { e1.w = -wl.sm; }
     
     CONNECTION b2 = b1 + lb;
     CONNECTION e2 = e1 + le;
     
     connectThickenAndAdd(addto, b, -b1, CIRCULAR);
     //    connectThickenAndAdd(addto, b1, -b2, CIRCULAR);
-    addto->add(connectThickenShortestDistance(b1, -b2, wl.rad));
+    addto->add(connectThickenShortestDistance(b1, -b2, rad));
     //    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
     if ((e.v - b.v).magn() > 30) {
-        addto->add(connectThickenShortestDistance(b2, e2, wl.rad));
+        addto->add(connectThickenShortestDistance(b2, e2, rad));
     } else {
         connectThickenAndAdd(addto, b2, e2,  CIRCULAR);
     }
@@ -762,7 +768,7 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
     //    addto->add(connectThickenShortestDistance(b1, e1, MINRADIUS));
     //    connectThickenAndAdd(addto, b1, e1,  CIRCULAR);
     //    connectThickenAndAdd(addto, e1, -e2, CIRCULAR);
-    addto->add(connectThickenShortestDistance(e1, -e2, wl.rad));
+    addto->add(connectThickenShortestDistance(e1, -e2, rad));
     connectThickenAndAdd(addto, e, -e1, CIRCULAR);
 }
     

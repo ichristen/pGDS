@@ -1,7 +1,7 @@
 #include "wavelengths.hpp"
 
-DCINFO::DCINFO() { a = 0; d = 0; l = 0; };
-DCINFO::DCINFO(GLdouble a_, GLdouble d_, GLdouble l_, GLdouble r_) { a = a_; d = d_; l = l_; r = r_; };
+DCINFO::DCINFO() { a = 1; d = 2; l = 0; t = 30; };
+DCINFO::DCINFO(GLdouble a_, GLdouble d_, GLdouble l_, GLdouble r_, GLdouble t_) { a = a_; d = d_; l = l_; r = r_; t = t_; };
 
 //POLYLINES dcTest(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, GLdouble sep) {
 //    std::string description = "DC a" + std::to_string(a) +
@@ -130,8 +130,11 @@ POLYLINES dcTest(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GL
 
 DEVICEPTR directionalCoupler(WAVELENGTH wl, GLdouble trans, GLdouble t, bool negResist) {
     DCINFO dc = wl.directionalCouplers[trans];
+    
+    if (t == 0) { t = dc.t; }
 
-    return DEVICEPTR(directionalCoupler((negResist?-1:1)*dc.a, dc.d, dc.l, wl.sm, t*360/TAU, dc.r, false, false));
+//    return DEVICEPTR(directionalCoupler((negResist?-1:1)*dc.a, dc.d, dc.l, wl.sm, t*360/TAU, dc.r, false, false));
+    return DEVICEPTR(directionalCoupler((negResist?-1:1)*dc.a, dc.d, dc.l, wl.sm, t, dc.r, false, false));
 }
 DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, bool text, bool straights) {
     std::string description = "DC a" + std::to_string(a) +
@@ -150,12 +153,14 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
     }
 
     bool negResist = false;
-    if (a < 0) { a = -a; negResist = true; }
+    if (a < 0) { a = -a; negResist = true;  printf("NEG RESIST\n"); }
+    else {                                  printf("POS RESIST\n"); }
+    
+    
 
     CONNECTION connection;
 
     if (negResist) {
-
         VECTOR end = VECTOR(L/2, 0);
         VECTOR up1 = VECTOR(0, (d-a)/2);
         VECTOR up2 = VECTOR(0, (d+a)/2);
@@ -279,8 +284,8 @@ void WAVELENGTH::setEO(GLdouble w, GLdouble s, GLdouble l) {
     eoS = s;
     eoL = l;
 }
-void WAVELENGTH::makeDC(GLdouble trans, GLdouble a, GLdouble d, GLdouble l, GLdouble r) {
-    directionalCouplers[trans] = DCINFO(a + CORRECTION, d, l, r);
+void WAVELENGTH::makeDC(GLdouble trans, GLdouble a, GLdouble d, GLdouble l, GLdouble r, GLdouble t) {
+    directionalCouplers[trans] = DCINFO(a + CORRECTION, d, l, r, t);
 
     //DEVICEPTR(directionalCoupler(a, d, l, sm, 30, rad, false, false));
 }
@@ -319,22 +324,47 @@ WAVELENGTHS::WAVELENGTHS() : wavelengths {
 //    wavelengths[0].makeDC(  .5,     0.300,  0.300,  1.000,  16);
 
 //    wavelengths[1].makeDC(  .5,     0.195,  0.275,  0.932,  16);     // 7/20
-    wavelengths[1].makeDC(  .5,     0.155,  0.3,  0.960,  16);     // 7/26
+//    wavelengths[1].makeDC(  .5,     0.155,  0.3,  0.960,  16, 12.5);     // 7/26
 //    wavelengths[1].makeDC(  .5,     0.180,  0.300,  0.932,  16);     // 7/13
 
-    wavelengths[1].makeDC(  .51,    0.150,  0.300,  0.638,  20);     // 7/26
+//    wavelengths[1].makeDC(  .51,    0.150,  0.300,  0.638,  20);     // 7/26
+//    0.26, 0.8, 0, 0.325
+//    wavelengths[1].makeDC(  .51,    0.260,  0.600,  0,  80);     // 9/04
 //    wavelengths[1].makeDC(  .51,    0.175,  0.275,  0.070,  20);     // 7/20
 //    wavelengths[1].makeDC(  .51,    0.170,  0.300,  0.615,  20);     // 7/15
 
-    wavelengths[2].makeDC(  .5,     0.300,  0.300,  1.000,  18);
-    wavelengths[3].makeDC(  .5,     0.180,  0.400,  0.909,  18);     // 7/13
-    wavelengths[3].makeDC( 1.5,     0.190,  0.450,  13.14,  18);     // 7/25
-    wavelengths[4].makeDC(  .5,     0.205,  0.450,  1.035,  20);     // 7/20
-    wavelengths[4].makeDC(  .8,     0.205,  0.475,  3.774,  20);     // 7/25
+//    wavelengths[2].makeDC(  .5,     0.300,  0.300,  1.000,  18);
+//    wavelengths[3].makeDC(  .5,     0.180,  0.400,  0.909,  18);     // 7/13
+//    wavelengths[3].makeDC( 1.5,     0.190,  0.450,  13.14,  18);     // 7/25
+//    wavelengths[4].makeDC(  .5,     0.205,  0.450,  1.035,  20);     // 7/20
+//    wavelengths[4].makeDC(  .8,     0.205,  0.475,  3.774,  20);     // 7/25
+//    wavelengths[5].makeDC(  .5,     0.240,  0.550,  1.947,  20);     // 7/13
+    
 //    wavelengths[4].makeDC(  .5,     0.210,  0.450,  1.005,  20);     // 7/13
-    wavelengths[5].makeDC(  .5,     0.240,  0.550,  1.947,  20);     // 7/13
 //    wavelengths[6].makeDC(  .5,     0.300,  0.300,  1.000,  26);
 //    wavelengths[7].makeDC(  .5,     0.300,  0.300,  1.000,  30);
+    
+    wavelengths[1].makeDC(  .51,    0.260,  0.600,  0,  80, 12.5);     // 9/04
+    wavelengths[1].makeDC(  .5,     0.260,  0.600,  0,  80, 12.5);     // 9/04
+    
+    wavelengths[2].makeDC(  .5,     0.200,  0.620,  0,  80, 12.5);     // 9/04
+    wavelengths[3].makeDC(  .5,     0.200,  0.620,  0,  80, 12.5);     // 9/04
+    wavelengths[4].makeDC(  .5,     0.200,  0.630,  0,  80, 12.5);     // 9/04
+    wavelengths[5].makeDC(  .5,     0.200,  0.630,  0,  80, 12.5);     // 9/04
+    
+    wavelengths[2].makeDC(  .8,     0.200,  0.630,  0,  80, 12.5);     // 9/04
+    wavelengths[3].makeDC(  .8,     0.200,  0.640,  0,  80, 12.5);     // 9/04
+//    wavelengths[4].makeDC(  .8,     0.200,  0.645,  0,  80, 12.5);     // 9/04
+    wavelengths[4].makeDC(  .8,     0.200,  0.645,  0,  80, 12.5);     // 9/04
+    wavelengths[5].makeDC(  .8,     0.250,  0.600,  0,  80, 12.5);     // 9/04
+    
+    wavelengths[1].makeDC(  1.5,    0.260,  0.600,  0,   80, 12.5);     // 9/04
+    wavelengths[2].makeDC(  1.5,    0.200,  0.620,  30,  80, 12.5);     // 9/04
+    wavelengths[3].makeDC(  1.5,    0.200,  0.620,  25,  80, 12.5);     // 9/04
+    wavelengths[4].makeDC(  1.5,    0.200,  0.630,  20,  80, 12.5);     // 9/04
+    wavelengths[5].makeDC(  1.5,    0.250,  0.600,  17,  80, 12.5);     // 9/04
+    
+    wavelengths[3].makeDC(  .1,     0.200,  1,  0,  80, 12.5);     // 9/04
 }
 
 WAVELENGTH WAVELENGTHS::getWavelength(int nm) {

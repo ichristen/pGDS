@@ -15,6 +15,7 @@
 #define ERROR       .000000001
 
 #define MINRADIUS   20
+#define SAFERADIUS  30
 #define PADDING     2
 //#define PADDING         1
 #define TRANSPADDING    30

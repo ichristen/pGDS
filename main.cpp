@@ -38,12 +38,12 @@ int main(int argc, const char * argv[]) {
 //    SiN();
     
     LNXEOQ();
-    LNXEO();
-    LNX_HARV_6();
+//    LNXEO();
+//    LNX_HARV_6();
     
 //    w.loop();
     
-    dcTest(.2, .4, 4, .3, 30, 20, 4);
+//    dcTest(.2, .4, 4, .3, 30, 20, 4);
     
 }
 

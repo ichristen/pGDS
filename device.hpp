@@ -159,8 +159,10 @@ public:
     void add(POLYLINE p);                                   // Add a single polyline to our device.
     void add(POLYLINES p);                                  // Add a set of polylines to our device.
     void add(std::vector<POLYLINE> p);                      // Add a vector of polylines to our device.
-    void add(DEVICEPTR device, char c=0);                   // Add a pointer to a transformed device. Suffix all `CONNECTION` in this device with `c` (does not suffix if `c == 0`). Note that all `CONNECTION`s are appropriately transformed.
-    void add(DEVICE* device, AFFINE m=AFFINE(), char c=0);  // Same as above.
+    void add(DEVICEPTR device, char c);                     // Add a pointer to a transformed device. Suffix all `CONNECTION` in this device with `c` (does not suffix if `c == 0`). Note that all `CONNECTION`s are appropriately transformed.
+    void add(DEVICEPTR device, std::string str="");         // Add a pointer to a transformed device. Suffix all `CONNECTION` in this device with `str`. Note that all `CONNECTION`s are appropriately transformed.
+    void add(DEVICE* device, AFFINE m, char c);             // Same as above.
+    void add(DEVICE* device, AFFINE m=AFFINE(), std::string str="");  // Same as above.
     void add(CONNECTION connection);                        // Add a `CONNECTION`. If a `CONNECTION` of this name already exists, replace the existing `CONNECTION`.
     
     void clear();
