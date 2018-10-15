@@ -712,6 +712,7 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
     
     toReturn.setBeginDirection(i.dv);
     toReturn.setEndDirection(-f.dv);
+//    toReturn.setLayer(i.l);
     
     return toReturn;
 }
@@ -924,6 +925,13 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    rr.printNL();
     
     if ((e.v - b.v).magn() < 2*r) {
+        if (mult <= 0) {
+            POLYLINE fin = connect(b, e);
+            toReturn.add(fin);
+            
+            return toReturn;
+        }
+        
         connectThickenAndAdd(&toReturn, b, e, CIRCULAR);
         
         return toReturn;
@@ -1118,6 +1126,13 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
         connectThickenAndAdd(&toReturn, b1, -b2, CIRCULAR);
         connectThickenAndAdd(&toReturn, e1, -e2, CIRCULAR);
     } else {
+        if (mult <= 0) {
+            POLYLINE fin = connect(b, e);
+            toReturn.add(fin);
+            
+            return toReturn;
+        }
+        
         connectThickenAndAdd(&toReturn, b, e, CIRCULAR);
     }
     

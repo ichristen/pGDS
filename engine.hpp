@@ -22,7 +22,7 @@
 #include "vector.hpp"
 #include "device.hpp"
 
-#include <extern/include/engine.h>  // MATLAB engine; it is slightly confusing that this has the same name...
+//#include <extern/include/engine.h>  // MATLAB engine; it is slightly confusing that this has the same name...
 
 //class WINDOW {
 //#ifdef __APPLE__
@@ -32,7 +32,7 @@
 
 class ENGINE {
     WINDOW* window =    nullptr;    // The window that we render to.
-    Engine* engine =    nullptr;    // Our encapsulated MATLAB context.
+//    Engine* engine =    nullptr;    // Our encapsulated MATLAB context.
     DEVICE* focus =     nullptr;    // The device we are looking at.
     
     std::string         path;       // The current MATLAB path.
