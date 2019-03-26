@@ -269,9 +269,14 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
 
         putc(0x0E, f);              // RECORD TYPE  = DATATYPE
         putc(0x02, f);              // DATA TYPE    = 2-int
+        
+//        uint16_t datatype = endianSwap((uint16_t)727);
+        uint16_t datatype = endianSwap((uint16_t)0);
+        
+        fwrite(&datatype, sizeof(uint16_t), 1, f);
 
-        putc(0x00, f);
-        putc(0x00, f);
+//        putc(0x00, f);
+//        putc(0x00, f);
 
 
         // XY

@@ -29,6 +29,7 @@
 		083CC1151F4CE0C00054FD31 /* testdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1131F4CE0C00054FD31 /* testdevices.cpp */; };
 		083CC1181F4CFCCD0054FD31 /* testing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1161F4CFCCD0054FD31 /* testing.cpp */; };
 		083CC11B1F4CFCED0054FD31 /* boolean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1191F4CFCED0054FD31 /* boolean.cpp */; };
+		083E4CB8217E423000B87120 /* mitredevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083E4CB6217E423000B87120 /* mitredevices.cpp */; };
 		084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 084F2B791F5B3BE800C604EB /* window.cpp */; };
 		0885CA461FD0862E005FE296 /* SFML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0885CA451FD0862E005FE296 /* SFML.framework */; };
 		0885CA481FD086B3005FE296 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EB1F4CE0170054FD31 /* main.cpp */; };
@@ -119,6 +120,8 @@
 		083CC1171F4CFCCD0054FD31 /* testing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = testing.hpp; sourceTree = SOURCE_ROOT; };
 		083CC1191F4CFCED0054FD31 /* boolean.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = boolean.cpp; sourceTree = SOURCE_ROOT; };
 		083CC11A1F4CFCED0054FD31 /* boolean.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = boolean.hpp; sourceTree = SOURCE_ROOT; };
+		083E4CB6217E423000B87120 /* mitredevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = mitredevices.cpp; path = ../pGDSdevices/mitredevices.cpp; sourceTree = SOURCE_ROOT; };
+		083E4CB7217E423000B87120 /* mitredevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = mitredevices.hpp; path = ../pGDSdevices/mitredevices.hpp; sourceTree = SOURCE_ROOT; };
 		084F2B791F5B3BE800C604EB /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = SOURCE_ROOT; };
 		084F2B7A1F5B3BE800C604EB /* window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = window.hpp; sourceTree = SOURCE_ROOT; };
 		0885CA451FD0862E005FE296 /* SFML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SFML.framework; path = ../../../../Library/Frameworks/SFML.framework; sourceTree = "<group>"; };
@@ -198,15 +201,17 @@
 				08156FAD1FA79A34009702F5 /* diamonddevices.hpp */,
 				083CC1101F4CE0C00054FD31 /* eodevices.hpp */,
 				0886D2202027E76F00C48D4C /* harvarddevices.hpp */,
-				083CC1111F4CE0C00054FD31 /* testdevices.hpp */,
+				083E4CB7217E423000B87120 /* mitredevices.hpp */,
 				08C820EE202D4C4300D9E032 /* quantumdevices.hpp */,
+				083CC1111F4CE0C00054FD31 /* testdevices.hpp */,
 				082DAF63204863FA00F3AF4D /* vapordevices.hpp */,
 				0836BF9F20F29E1A00C43474 /* wavelengths.hpp */,
 				08156FAC1FA79A34009702F5 /* diamonddevices.cpp */,
 				083CC1121F4CE0C00054FD31 /* eodevices.cpp */,
 				0886D21F2027E76F00C48D4C /* harvarddevices.cpp */,
-				083CC1131F4CE0C00054FD31 /* testdevices.cpp */,
+				083E4CB6217E423000B87120 /* mitredevices.cpp */,
 				08C820ED202D4C4300D9E032 /* quantumdevices.cpp */,
+				083CC1131F4CE0C00054FD31 /* testdevices.cpp */,
 				082DAF62204863FA00F3AF4D /* vapordevices.cpp */,
 				0836BF9E20F29E1A00C43474 /* wavelengths.cpp */,
 			);
@@ -321,7 +326,7 @@
 		08FBFB7D1F00AF9300C35A59 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 1000;
 				ORGANIZATIONNAME = "Ian Christen";
 				TargetAttributes = {
 					08FBFB841F00AF9300C35A59 = {
@@ -392,6 +397,7 @@
 				082DAF64204863FA00F3AF4D /* vapordevices.cpp in Sources */,
 				084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */,
 				08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */,
+				083E4CB8217E423000B87120 /* mitredevices.cpp in Sources */,
 				083CC0FF1F4CE0170054FD31 /* device.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -471,14 +477,22 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -504,6 +518,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-v";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_LDFLAGS = "";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -517,14 +534,22 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -543,6 +568,9 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = "-v";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				OTHER_LDFLAGS = "";
 				SDKROOT = macosx;
 			};
 			name = Release;

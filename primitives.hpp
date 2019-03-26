@@ -68,6 +68,8 @@ POLYLINE cBezier(VECTOR p0, VECTOR p1, VECTOR p2, VECTOR p3, size_t steps=5);
 POLYLINE qBezier(std::vector<VECTOR> pts);
 //POLYLINE longBezier(std::vector<VECTOR> pts, bool isQuadratic=true);
 
+POLYLINE euler90(GLdouble R, int steps=100);
+
 
 enum CONNECTIONTYPE { LINEAR=0, QBEZIER=1, CBEZIER=2, CIRCULAR=3, MONOCIRCULAR=4 };
 
@@ -103,6 +105,8 @@ enum RFTYPE { UPPER=0, UPPERwithGROUND=1 };
 POLYLINES rfThicken(POLYLINE open, GLdouble width, GLdouble gap, GLdouble groundWidth, uint16_t layer, uint16_t groundlayer=0);
 POLYLINES rfThicken(POLYLINE open, RFTYPE type);
 POLYLINES rfConnectThicken(CONNECTION b, CONNECTION e, RFTYPE type);
+
+//POLYLINE offset;
 
 #endif
 

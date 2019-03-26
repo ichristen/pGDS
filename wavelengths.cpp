@@ -299,17 +299,42 @@ WAVELENGTHS::WAVELENGTHS() : wavelengths {
     WAVELENGTH( 637.2,  1.8241, 0.450,  5.6,    20),
     WAVELENGTH( 737.0,  1.7629, 0.525,  5.6,    20),
     WAVELENGTH( 946.0,  1.6730, 0.650,  5.8,    26),
-    WAVELENGTH( 1550.0, 1.5457, 1.300,  0.2,    30) }
+    WAVELENGTH( 1550.0, 1.5457, 1.300,  0.2,    30),
+    WAVELENGTH(-420.3,  2,      0.275,  3.5,    30) }
 {
     // LOSS                 step    len     N       d
-    wavelengths[0].setLoss( 300,    800,    2,      .075+.5);
-    wavelengths[1].setLoss( 500,    800,    2,      .125+.5);
-    wavelengths[2].setLoss( 1250,   1000,   3,      .200+.5);
-    wavelengths[3].setLoss( 1250,   1000,   3,      .225+.5);
-    wavelengths[4].setLoss( 1250,   1000,   3,      .250+.5);
-    wavelengths[5].setLoss( 1250,   1000,   3,      .325+.5);
-    wavelengths[6].setLoss( 1250,   1000,   3,      .450+.5);
-    wavelengths[7].setLoss( 1250,   1000,   3,      .800+.5);
+//    wavelengths[0].setLoss( 300,    800,    2,      .075+.5);
+//    wavelengths[1].setLoss( 500,    800,    2,      .125+.5);
+//    wavelengths[2].setLoss( 1250,   1000,   3,      .200+.5);
+//    wavelengths[3].setLoss( 1250,   1000,   3,      .225+.5);
+//    wavelengths[4].setLoss( 1250,   1000,   3,      .250+.5);
+//    wavelengths[5].setLoss( 1250,   1000,   3,      .325+.5);
+//    wavelengths[6].setLoss( 1250,   1000,   3,      .450+.5);
+//    wavelengths[7].setLoss( 1250,   1000,   3,      .800+.5);
+//
+//    wavelengths[8].setLoss( 600,    900,    2,      .125+.5);
+    
+//    wavelengths[0].setLoss( 300,    800,    2,      .075+.2);
+//    wavelengths[1].setLoss( 400,    800,    2,      .125+.2);
+//    wavelengths[2].setLoss( 400,    1000,   3,      .200+.2);
+//    wavelengths[3].setLoss( 600,    1000,   3,      .225+.2);
+//    wavelengths[4].setLoss( 1000,   1000,   3,      .250+.2);
+//    wavelengths[5].setLoss( 1250,   1000,   3,      .325+.2);
+//    wavelengths[6].setLoss( 1250,   1000,   3,      .450+.2);
+//    wavelengths[7].setLoss( 1250,   1000,   3,      .800+.2);
+//
+//    wavelengths[8].setLoss( 600,    900,    2,      .125+.2);
+    
+    wavelengths[0].setLoss( 300,    800,    2,      .075+.2);
+    wavelengths[1].setLoss( 400,    800,    2,      .125+.2);
+    wavelengths[2].setLoss( 400,    1000,   3,      .200+.2);
+    wavelengths[3].setLoss( 500,    1000,   3,      .225+.2);
+    wavelengths[4].setLoss( 800,   1000,   3,      .250+.2);
+    wavelengths[5].setLoss( 1100,   1000,   3,      .325+.2);
+    wavelengths[6].setLoss( 1100,   1000,   3,      .450+.2);
+    wavelengths[7].setLoss( 1100,   1000,   3,      .800+.2);
+    
+    wavelengths[8].setLoss( 600,    900,    2,      .125+.2);
 
     // EO                   w       s       l (umV)
     wavelengths[0].setEO(   0.600,  1.200,  2900);
@@ -353,6 +378,8 @@ WAVELENGTHS::WAVELENGTHS() : wavelengths {
     wavelengths[5].makeDC(  .5,     0.200,  0.630,  0,  80, 12.5);     // 9/04
     wavelengths[6].makeDC(  .5,     0.200,  0.640,  0,  80, 12.5);     // 9/04 (guess!)
     
+    wavelengths[8].makeDC(  .5,     0.250,  0.400,  0,  40, 18);      // 10/26
+    
     wavelengths[2].makeDC(  .8,     0.200,  0.630,  0,  80, 12.5);     // 9/04
     wavelengths[3].makeDC(  .8,     0.200,  0.640,  0,  80, 12.5);     // 9/04
 //    wavelengths[4].makeDC(  .8,     0.200,  0.645,  0,  80, 12.5);     // 9/04
@@ -375,7 +402,7 @@ WAVELENGTHS::WAVELENGTHS() : wavelengths {
 }
 
 WAVELENGTH WAVELENGTHS::getWavelength(int nm) {
-    if (nm < NUMWAVELENGTHS) {
+    if (abs(nm) < NUMWAVELENGTHS) {
         return wavelengths[nm];
     }
 

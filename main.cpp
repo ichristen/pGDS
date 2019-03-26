@@ -10,15 +10,16 @@
 //#include "window.hpp"
 
 //#include "testdevices.hpp"
-#include "diamonddevices.hpp"
+//#include "diamonddevices.hpp"
 //#include "eodevices.hpp"
 //#include "testing.hpp"
 //#include "harvarddevices.hpp"
-#include "quantumdevices.hpp"
-#include "vapordevices.hpp"
+//#include "quantumdevices.hpp"
+//#include "vapordevices.hpp"
+#include "mitredevices.hpp"
 //#include "tesselation.hpp"
 
-extern double SPACEPAD(.8);
+extern double SPACEPAD(0);
 
 int main(int argc, const char * argv[]) {
 //    mainDiamondDevice(0);
@@ -31,13 +32,23 @@ int main(int argc, const char * argv[]) {
 //    DEVICEPTR c = DEVICEPTR(loss(2));
     //testD2(637);
     
-//    LNX_LOSS_2();
+    LNX_LOSS_2();
+    return 0;
 //    VAPORTEST();
     
 //    WINDOW w;
 //    w.focus =
 //    ALNHARV();
 //    SiN();
+    
+    DCSI();
+    return 0;
+
+//    MITRELN();
+//    return 0;
+    
+    ALNHARV();
+    return 0;
     
     DEVICEPTR dlist[3] = { LNXEOQ(), LNXEO(), LNX_HARV_6() };
     

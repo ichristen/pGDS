@@ -60,50 +60,50 @@ std::string replaceIllegalSTRNAME(std::string str);
 
 inline uint16_t endianSwap(uint16_t x) {
     return  ( (x & 0x00FF) << 8 ) |
-    ( (x & 0xFF00) >> 8 );
+            ( (x & 0xFF00) >> 8 );
 }
 inline uint32_t endianSwap(uint32_t x) {
     return  ( (x & 0x000000FF) << 24 ) |
-    ( (x & 0x0000FF00) << 8  ) |
-    ( (x & 0x00FF0000) >> 8  ) |
-    ( (x & 0xFF000000) >> 24 );
+            ( (x & 0x0000FF00) << 8  ) |
+            ( (x & 0x00FF0000) >> 8  ) |
+            ( (x & 0xFF000000) >> 24 );
 }
 inline uint64_t endianSwap(uint64_t x) {
     return  ( (x & 0x00000000000000FF) << 56 ) |
-    ( (x & 0x000000000000FF00) << 40 ) |
-    ( (x & 0x0000000000FF0000) << 24 ) |
-    ( (x & 0x00000000FF000000) << 8  ) |
-    ( (x & 0x000000FF00000000) >> 8  ) |
-    ( (x & 0x0000FF0000000000) >> 24 ) |
-    ( (x & 0x00FF000000000000) >> 40 ) |
-    ( (x & 0xFF00000000000000) >> 56 );
+            ( (x & 0x000000000000FF00) << 40 ) |
+            ( (x & 0x0000000000FF0000) << 24 ) |
+            ( (x & 0x00000000FF000000) << 8  ) |
+            ( (x & 0x000000FF00000000) >> 8  ) |
+            ( (x & 0x0000FF0000000000) >> 24 ) |
+            ( (x & 0x00FF000000000000) >> 40 ) |
+            ( (x & 0xFF00000000000000) >> 56 );
 }
 
 inline int16_t endianSwap(int16_t x) {
     return  ( (x & 0x00FF) << 8 ) |
-    ( (x & 0xFF00) >> 8 );
+            ( (x & 0xFF00) >> 8 );
 }
 inline int32_t endianSwap(int32_t x) {
     return  ( (x & 0x000000FF) << 24 ) |
-    ( (x & 0x0000FF00) << 8  ) |
-    ( (x & 0x00FF0000) >> 8  ) |
-    ( (x & 0xFF000000) >> 24 );
+            ( (x & 0x0000FF00) << 8  ) |
+            ( (x & 0x00FF0000) >> 8  ) |
+            ( (x & 0xFF000000) >> 24 );
 }
 inline int64_t endianSwap(int64_t x) {
     return  ( (x & 0x00000000000000FF) << 56 ) |
-    ( (x & 0x000000000000FF00) << 40 ) |
-    ( (x & 0x0000000000FF0000) << 24 ) |
-    ( (x & 0x00000000FF000000) << 8  ) |
-    ( (x & 0x000000FF00000000) >> 8  ) |
-    ( (x & 0x0000FF0000000000) >> 24 ) |
-    ( (x & 0x00FF000000000000) >> 40 ) |
-    ( (x & 0xFF00000000000000) >> 56 );
+            ( (x & 0x000000000000FF00) << 40 ) |
+            ( (x & 0x0000000000FF0000) << 24 ) |
+            ( (x & 0x00000000FF000000) << 8  ) |
+            ( (x & 0x000000FF00000000) >> 8  ) |
+            ( (x & 0x0000FF0000000000) >> 24 ) |
+            ( (x & 0x00FF000000000000) >> 40 ) |
+            ( (x & 0xFF00000000000000) >> 56 );
 }
 
 inline GLdouble sem2num(uint64_t sem) {
-    return          (sem & 0x8000000000000000)?(-1):(1) *           // Sign.
-    std::pow(16, (((sem & 0x7F00000000000000) >> 56) - 64)) *       // Exponent.
-    (sem & 0x00FFFFFFFFFFFFFF);                     // Mantissa.
+    return             (sem & 0x8000000000000000)?(-1):(1) *           // Sign.
+        std::pow(16, (((sem & 0x7F00000000000000) >> 56) - 64)) *       // Exponent.
+                       (sem & 0x00FFFFFFFFFFFFFF);                     // Mantissa.
 }
 
 inline uint64_t num2sem(GLdouble num) {
