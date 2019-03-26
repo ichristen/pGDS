@@ -171,7 +171,7 @@ POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW, int steps, GLdoub
         dt += TAU;
     }
     
-//    printf("t1: %f, t2: %f, dt: %f\n", t1, t2, dt);
+    //    printf("t1: %f, t2: %f, dt: %f\n", t1, t2, dt);
     
     if (r == 0) {
         return POLYLINE();  // Return empty...
@@ -189,7 +189,7 @@ POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW, int steps, GLdoub
     
     AFFINE m = AFFINE(dt/steps);
     
-//    m.print();
+    //    m.print();
     
     VECTOR s = VECTOR(r, t1, true);
     VECTOR e = VECTOR(r, t2, true);
@@ -204,8 +204,36 @@ POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW, int steps, GLdoub
     }
     toReturn.add(e);
     
-//    toReturn.begin =    s.perpCCW().unit();
-//    toReturn.end =      e.perpCCW().unit();
+    //    toReturn.begin =    s.perpCCW().unit();
+    //    toReturn.end =      e.perpCCW().unit();
+    
+    return toReturn;
+}
+
+//GLdouble fresnels(GLdouble x) {
+//    return pow(x,3)*PI/6 - pow(x,7)*PI*PI*PI/42/8;
+//}
+//GLdouble fresnelc(GLdouble x) {
+//    return x - pow(x,5)*PI*PI/40;
+//}
+POLYLINE euler90(GLdouble R, int steps) {
+    POLYLINE ebend;
+    
+    GLdouble T = TAU/4;
+    
+    ebend = parametricCartesian([R, T] (GLdouble t) -> GLdouble { return R * sqrt(T) * sqrt(PI) * ( pow(t*sqrt(T/PI),3)*PI/6    - pow(t*sqrt(T/PI),7)*PI*PI*PI/42/8 - pow(1*sqrt(T/PI),3)*PI/6    + pow(1*sqrt(T/PI),7)*PI*PI*PI/42/8 ); },
+                                [R, T] (GLdouble t) -> GLdouble { return R * sqrt(T) * sqrt(PI) * ( t*sqrt(T/PI)                - pow(t*sqrt(T/PI),5)*PI*PI/40      - 1*sqrt(T/PI)                + pow(1*sqrt(T/PI),5)*PI*PI/40 ); },
+                                steps/2);
+    
+    POLYLINE toReturn;
+    
+    toReturn.add((ebend * mirrorYemX()));
+    toReturn.add(ebend.reverse());
+    
+    toReturn.setBeginDirection( VECTOR(-1, 0));
+    toReturn.setEndDirection(   VECTOR(0,-1));
+    
+    toReturn *= AFFINE( toReturn.bb, BOUNDINGBOX(VECTOR(0,0), VECTOR(60,60)) );
     
     return toReturn;
 }
@@ -255,7 +283,7 @@ POLYLINE parabola(GLdouble x0, GLdouble x1, GLdouble a, GLdouble b, GLdouble c, 
     if (!steps) { steps = ceil(std::abs(x0 - x1)) + 10; }
     
     return parametric([x0,x1,a,b,c] (GLdouble t) -> VECTOR {
-        return a * ( x0 + (x1-x0)*t ) * ( x0 + (x1-x0)*t ) + b* ( x0 + (x1-x0)*t ) + c;
+        return VECTOR(x0 + (x1-x0)*t, a * ( x0 + (x1-x0)*t ) * ( x0 + (x1-x0)*t ) + b* ( x0 + (x1-x0)*t ) + c);
     }, steps);
 }
 
@@ -712,6 +740,7 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
     
     toReturn.setBeginDirection(i.dv);
     toReturn.setEndDirection(-f.dv);
+//    toReturn.setLayer(i.l);
     
     return toReturn;
 }
@@ -789,7 +818,12 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
         GLdouble w1 = std::abs(b.w);
         GLdouble w2 = std::abs(e.w);
         
-        lambda = [w1,w2] (GLdouble t) -> GLdouble { return ((w2 - w1)*(3*t*t - 2*t*t*t) + w1); };
+        if (type == LINEAR) {
+            lambda = [w1,w2] (GLdouble t) -> GLdouble { return ((w2 - w1)*t + w1); };
+        } else {
+            lambda = [w1,w2] (GLdouble t) -> GLdouble { return ((w2 - w1)*(3*t*t - 2*t*t*t) + w1); };
+        }
+            
     } else {
         GLdouble w = std::abs(b.w);
         
@@ -924,6 +958,13 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    rr.printNL();
     
     if ((e.v - b.v).magn() < 2*r) {
+        if (mult <= 0) {
+            POLYLINE fin = connect(b, e);
+            toReturn.add(fin);
+            
+            return toReturn;
+        }
+        
         connectThickenAndAdd(&toReturn, b, e, CIRCULAR);
         
         return toReturn;
@@ -1118,6 +1159,13 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
         connectThickenAndAdd(&toReturn, b1, -b2, CIRCULAR);
         connectThickenAndAdd(&toReturn, e1, -e2, CIRCULAR);
     } else {
+        if (mult <= 0) {
+            POLYLINE fin = connect(b, e);
+            toReturn.add(fin);
+            
+            return toReturn;
+        }
+        
         connectThickenAndAdd(&toReturn, b, e, CIRCULAR);
     }
     

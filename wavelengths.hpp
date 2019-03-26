@@ -13,6 +13,7 @@
 //
 //#define WG_W_MULT   3
 
+//#define CORRECTION .020
 #define CORRECTION .020
 //DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t=90, GLdouble r=MINRADIUS, bool text=true, bool straights=true);
 
@@ -58,7 +59,7 @@ public:
     void setEO(GLdouble w, GLdouble s, GLdouble l);
 };
 
-#define NUMWAVELENGTHS 8
+#define NUMWAVELENGTHS 9
 
 class WAVELENGTHS {
 public:
