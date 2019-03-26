@@ -60,50 +60,50 @@ std::string replaceIllegalSTRNAME(std::string str);
 
 inline uint16_t endianSwap(uint16_t x) {
     return  ( (x & 0x00FF) << 8 ) |
-    ( (x & 0xFF00) >> 8 );
+            ( (x & 0xFF00) >> 8 );
 }
 inline uint32_t endianSwap(uint32_t x) {
     return  ( (x & 0x000000FF) << 24 ) |
-    ( (x & 0x0000FF00) << 8  ) |
-    ( (x & 0x00FF0000) >> 8  ) |
-    ( (x & 0xFF000000) >> 24 );
+            ( (x & 0x0000FF00) << 8  ) |
+            ( (x & 0x00FF0000) >> 8  ) |
+            ( (x & 0xFF000000) >> 24 );
 }
 inline uint64_t endianSwap(uint64_t x) {
     return  ( (x & 0x00000000000000FF) << 56 ) |
-    ( (x & 0x000000000000FF00) << 40 ) |
-    ( (x & 0x0000000000FF0000) << 24 ) |
-    ( (x & 0x00000000FF000000) << 8  ) |
-    ( (x & 0x000000FF00000000) >> 8  ) |
-    ( (x & 0x0000FF0000000000) >> 24 ) |
-    ( (x & 0x00FF000000000000) >> 40 ) |
-    ( (x & 0xFF00000000000000) >> 56 );
+            ( (x & 0x000000000000FF00) << 40 ) |
+            ( (x & 0x0000000000FF0000) << 24 ) |
+            ( (x & 0x00000000FF000000) << 8  ) |
+            ( (x & 0x000000FF00000000) >> 8  ) |
+            ( (x & 0x0000FF0000000000) >> 24 ) |
+            ( (x & 0x00FF000000000000) >> 40 ) |
+            ( (x & 0xFF00000000000000) >> 56 );
 }
 
 inline int16_t endianSwap(int16_t x) {
     return  ( (x & 0x00FF) << 8 ) |
-    ( (x & 0xFF00) >> 8 );
+            ( (x & 0xFF00) >> 8 );
 }
 inline int32_t endianSwap(int32_t x) {
     return  ( (x & 0x000000FF) << 24 ) |
-    ( (x & 0x0000FF00) << 8  ) |
-    ( (x & 0x00FF0000) >> 8  ) |
-    ( (x & 0xFF000000) >> 24 );
+            ( (x & 0x0000FF00) << 8  ) |
+            ( (x & 0x00FF0000) >> 8  ) |
+            ( (x & 0xFF000000) >> 24 );
 }
 inline int64_t endianSwap(int64_t x) {
     return  ( (x & 0x00000000000000FF) << 56 ) |
-    ( (x & 0x000000000000FF00) << 40 ) |
-    ( (x & 0x0000000000FF0000) << 24 ) |
-    ( (x & 0x00000000FF000000) << 8  ) |
-    ( (x & 0x000000FF00000000) >> 8  ) |
-    ( (x & 0x0000FF0000000000) >> 24 ) |
-    ( (x & 0x00FF000000000000) >> 40 ) |
-    ( (x & 0xFF00000000000000) >> 56 );
+            ( (x & 0x000000000000FF00) << 40 ) |
+            ( (x & 0x0000000000FF0000) << 24 ) |
+            ( (x & 0x00000000FF000000) << 8  ) |
+            ( (x & 0x000000FF00000000) >> 8  ) |
+            ( (x & 0x0000FF0000000000) >> 24 ) |
+            ( (x & 0x00FF000000000000) >> 40 ) |
+            ( (x & 0xFF00000000000000) >> 56 );
 }
 
 inline GLdouble sem2num(uint64_t sem) {
-    return          (sem & 0x8000000000000000)?(-1):(1) *           // Sign.
-    std::pow(16, (((sem & 0x7F00000000000000) >> 56) - 64)) *       // Exponent.
-    (sem & 0x00FFFFFFFFFFFFFF);                     // Mantissa.
+    return                  (sem & 0x8000000000000000)?(-1):(1) *           // Sign.
+            std::pow(16,  (((sem & 0x7F00000000000000) >> 56) - 64)) *      // Exponent.
+                            (sem & 0x00FFFFFFFFFFFFFF);                     // Mantissa.
 }
 
 inline uint64_t num2sem(GLdouble num) {
@@ -167,8 +167,8 @@ public:
     
     void clear();
     
-    POLYLINES getLayer(uint16_t l1) const;
-    POLYLINES getLayer(uint16_t l1, uint16_t l2) const;
+    POLYLINES getLayer(uint16_t l1) const;                  // Get all child `POLYLINES` of the specified layer `l1`.
+    POLYLINES getLayer(uint16_t l1, uint16_t l2) const;     // Get all child `POLYLINES` of the specified layer `l1`, and also convert the layer of each one to `l2`.
 //    POLYLINES removeLayer(uint16_t l);
 //    POLYLINES setLayer(uint16_t from, uint16_t to);
 //    POLYLINES exchangeLayers(uint16_t l1, uint16_t l2);
@@ -180,7 +180,8 @@ public:
 //    void render();
 //    void flush();
     
-    double area();                          // Returns the summed and transformed area of this device.
+    double area();                          // Returns the summed and transformed area of this device. Clockwise ==> positive area.
+    double area(uint16_t l);                // Returns the summed and transformed area of all children of layer `l`.
 //    void refreshConnections();
 //    void checkOverlap();
     
@@ -204,11 +205,14 @@ public:
     bool exportLibraryGDS(std::string fname, bool flatten=true);    // Export as .gds...
     bool exportLibraryGDS(FILE* f, bool flatten=true);              // Generally for internal use only...
     
-//    POLYLINES getLayer(uint8_t l);
+    bool exportLibraryGerber(std::string fname);                    // Export as gerber
+    bool exportLibraryGerber(FILE* f);
     
 private:
     bool exportStructureGDS(FILE* f);                               // For internal use only...
     bool exportNoStructureGDS(FILE* f, AFFINE tranformation);       // For internal use only...
+    
+    bool exportStructureGerber(FILE* f);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
