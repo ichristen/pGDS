@@ -176,6 +176,7 @@ public:
     void setLayer(uint16_t layer);
     void setConnectionName(std::string prev, std::string next);
     void eraseConnection(std::string name);
+    void eraseAllConnections();
     
 //    void render();
 //    void flush();

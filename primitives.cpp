@@ -869,10 +869,10 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
         }
     }
 }
-POLYLINES connectThicken(CONNECTION b, CONNECTION e, CONNECTIONTYPE type) {
+POLYLINES connectThicken(CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep, GLdouble padding) {
     POLYLINES toReturn;
     
-    connectThickenAndAdd(&toReturn, b, e, type);
+    connectThickenAndAdd(&toReturn, b, e, type, minstep, padding);
     
     return toReturn;
 }

@@ -16,8 +16,9 @@
 //#include "harvarddevices.hpp"
 //#include "quantumdevices.hpp"
 //#include "vapordevices.hpp"
-#include "mitredevices.hpp"
+//#include "mitredevices.hpp"
 //#include "tesselation.hpp"
+#include "nemsdevices.hpp"
 
 extern double SPACEPAD(0);
 
@@ -31,6 +32,9 @@ int main(int argc, const char * argv[]) {
 //    DEVICEPTR c = DEVICEPTR(superDuperDevice2(637));
 //    DEVICEPTR c = DEVICEPTR(loss(2));
     //testD2(637);
+    
+    NEMS();
+    return 0;
     
     LNX_LOSS_2();
     return 0;

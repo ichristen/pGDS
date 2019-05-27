@@ -31,6 +31,7 @@
 		083CC11B1F4CFCED0054FD31 /* boolean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1191F4CFCED0054FD31 /* boolean.cpp */; };
 		083E4CB8217E423000B87120 /* mitredevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083E4CB6217E423000B87120 /* mitredevices.cpp */; };
 		084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 084F2B791F5B3BE800C604EB /* window.cpp */; };
+		085E8B8822920771007DB885 /* nemsdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 085E8B8622920771007DB885 /* nemsdevices.cpp */; };
 		0885CA461FD0862E005FE296 /* SFML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0885CA451FD0862E005FE296 /* SFML.framework */; };
 		0885CA481FD086B3005FE296 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EB1F4CE0170054FD31 /* main.cpp */; };
 		0886D2212027E76F00C48D4C /* harvarddevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0886D21F2027E76F00C48D4C /* harvarddevices.cpp */; };
@@ -124,6 +125,8 @@
 		083E4CB7217E423000B87120 /* mitredevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = mitredevices.hpp; path = ../pGDSdevices/mitredevices.hpp; sourceTree = SOURCE_ROOT; };
 		084F2B791F5B3BE800C604EB /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = SOURCE_ROOT; };
 		084F2B7A1F5B3BE800C604EB /* window.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = window.hpp; sourceTree = SOURCE_ROOT; };
+		085E8B8622920771007DB885 /* nemsdevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = nemsdevices.cpp; path = ../pGDSdevices/nemsdevices.cpp; sourceTree = SOURCE_ROOT; };
+		085E8B8722920771007DB885 /* nemsdevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = nemsdevices.hpp; path = ../pGDSdevices/nemsdevices.hpp; sourceTree = SOURCE_ROOT; };
 		0885CA451FD0862E005FE296 /* SFML.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SFML.framework; path = ../../../../Library/Frameworks/SFML.framework; sourceTree = "<group>"; };
 		0886D21F2027E76F00C48D4C /* harvarddevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = harvarddevices.cpp; path = ../pGDSdevices/harvarddevices.cpp; sourceTree = SOURCE_ROOT; };
 		0886D2202027E76F00C48D4C /* harvarddevices.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = harvarddevices.hpp; path = ../pGDSdevices/harvarddevices.hpp; sourceTree = SOURCE_ROOT; };
@@ -202,6 +205,7 @@
 				083CC1101F4CE0C00054FD31 /* eodevices.hpp */,
 				0886D2202027E76F00C48D4C /* harvarddevices.hpp */,
 				083E4CB7217E423000B87120 /* mitredevices.hpp */,
+				085E8B8722920771007DB885 /* nemsdevices.hpp */,
 				08C820EE202D4C4300D9E032 /* quantumdevices.hpp */,
 				083CC1111F4CE0C00054FD31 /* testdevices.hpp */,
 				082DAF63204863FA00F3AF4D /* vapordevices.hpp */,
@@ -210,6 +214,7 @@
 				083CC1121F4CE0C00054FD31 /* eodevices.cpp */,
 				0886D21F2027E76F00C48D4C /* harvarddevices.cpp */,
 				083E4CB6217E423000B87120 /* mitredevices.cpp */,
+				085E8B8622920771007DB885 /* nemsdevices.cpp */,
 				08C820ED202D4C4300D9E032 /* quantumdevices.cpp */,
 				083CC1131F4CE0C00054FD31 /* testdevices.cpp */,
 				082DAF62204863FA00F3AF4D /* vapordevices.cpp */,
@@ -339,6 +344,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -396,6 +402,7 @@
 				083CC1021F4CE0170054FD31 /* main.cpp in Sources */,
 				082DAF64204863FA00F3AF4D /* vapordevices.cpp in Sources */,
 				084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */,
+				085E8B8822920771007DB885 /* nemsdevices.cpp in Sources */,
 				08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */,
 				083E4CB8217E423000B87120 /* mitredevices.cpp in Sources */,
 				083CC0FF1F4CE0170054FD31 /* device.cpp in Sources */,

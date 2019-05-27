@@ -195,6 +195,9 @@ void DEVICE::setConnectionName(std::string prev, std::string next) {
 void DEVICE::eraseConnection(std::string name) {
     connections.erase(name);
 }
+void DEVICE::eraseAllConnections() {
+    connections.clear();
+}
 
 double DEVICE::area() {
     if (area_ == 0) {
