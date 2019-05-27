@@ -42,4 +42,8 @@ std::vector<VECTOR> intersections(std::map<VECTOR, std::vector<POLYLINE*>> m);
 
 std::vector<SEGMENT> getMonotonicInsideSegmentsFromPolyline(POLYLINE p, BOUNDINGBOX interesting);
 
-#endif // BOOLEAN_H
+#endif // BOOLEAN_HPP
+
+
+
+
