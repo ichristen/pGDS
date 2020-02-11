@@ -249,14 +249,15 @@ VECTOR AFFINE::operator*(VECTOR v)      const { return VECTOR(a*v.x + b*v.y + e,
 VECTOR AFFINE::linearTimes(VECTOR v)    const { return VECTOR(a*v.x + b*v.y, c*v.x + d*v.y); }
 
 CONNECTION AFFINE::operator*(CONNECTION c) const {
-    VECTOR dv = linearTimes(c.dv.perpCCW()).perpCW() * det();
-    GLdouble magn = dv.magn();
-
-    return CONNECTION(operator*(c.v), // + translation(),
-                      dv/std::abs(magn),          // Make dv a unit vector.
-                      c.w*magn,         // Grow/shrink width appropriately.
-                      c.name,
-                      c.l);
+//    VECTOR dv = linearTimes(c.dv.perpCCW()).perpCW() * det();
+//    GLdouble magn = dv.magn();
+//
+//    return CONNECTION(operator*(c.v), // + translation(),
+//                      dv/std::abs(magn),          // Make dv a unit vector.
+//                      c.w*magn,         // Grow/shrink width appropriately.
+//                      c.name,
+//                      c.l);
+    return c * (*this);
 }
 CONNECTION AFFINE::linearTimes(CONNECTION c) const {
     VECTOR dv = linearTimes(c.dv.perpCCW()).perpCW() * det();
@@ -406,19 +407,23 @@ CONNECTION CONNECTION::operator/=(GLdouble s) {         v /= s; dv *= sign(s); w
 
 CONNECTION CONNECTION::operator* (AFFINE m) const { return copy() *= m; }
 CONNECTION CONNECTION::operator*=(AFFINE m) {
-//    VECTOR dv_ = m.linearTimes(dv.perpCCW()).perpCW();
-    VECTOR dv_ = m.linearTimes(dv.perpCCW()).perpCW() ;
-    GLdouble magn = dv_.magn();
+////    VECTOR dv_ = m.linearTimes(dv.perpCCW()).perpCW();
+//    VECTOR dv_ = m.linearTimes(dv.perpCCW()).perpCW() ;
+//    GLdouble magn = dv_.magn();
+//
+////    return CONNECTION(c.v,
+////                      dv/magn,          // Make dv a unit vector.
+////                      c.w*magn,         // Grow/shrink width appropriately.
+////                      c.name);
+////    printf("FISHFISH");
+//
+//    dv /= magn * m.det();       // FIX ME!!!
+//    w *= magn;
     
-//    return CONNECTION(c.v,
-//                      dv/magn,          // Make dv a unit vector.
-//                      c.w*magn,         // Grow/shrink width appropriately.
-//                      c.name);
-//    printf("FISHFISH");
-    
-    dv /= magn * m.det();       // FIX ME!!!
-    w *= magn;
-    
+    v   = m.linearTimes(v);
+    dv  = m.linearTimes(dv);
+    w  *= abs(m.linearTimes(dv.perpCCW()).magn());
+                  
     return *this;
 }
 
@@ -480,13 +485,17 @@ CONNECTION bendRadius(CONNECTION start, GLdouble ang, GLdouble radius) {
 CONNECTION bendTowards(CONNECTION start, GLdouble ang, GLdouble radius) {
     return bendTowards(start, VECTOR(ang), radius);
 }
-CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius) {
-    bool dir = start.dv.perpCCWdot(towards) > 0;
+CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius, int dirOverride) {
+    int dir = (start.dv.perpCCWdot(towards) > 0)?(-1):(1);
+    
+    if (dirOverride != 0) {
+        dir = dirOverride;
+    }
     
 //    printf("%f\n", acos(start.dv * towards.unit()));
 //    printf("%f\n", ((dir)?(-1):(1)) * acos(start.dv * towards.unit()));
     
-    return bendRadius(start, ((dir)?(-1):(1)) * acos(start.dv * towards.unit()), radius);
+    return bendRadius(start, acos(start.dv * towards.unit()), radius);
 }
 
 CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang) {
@@ -551,6 +560,34 @@ CONNECTION bendVertical(CONNECTION start,   GLdouble vertical, GLdouble radius) 
     
     delete i;
     return CONNECTION();
+}
+
+CONNECTION bendToLine(CONNECTION start, CONNECTION line, GLdouble radius) {
+//    CONNECTION checkplus =  bendTowards(start, line.dv, radius, +1);
+//    CONNECTION checkminus = bendTowards(start, line.dv, radius, -1);
+//
+//    CONNECTION mid = checkplus;
+//
+//    if (abs(checkplus.v * line.dv.perpCW()) > abs(checkminus.v * line.dv.perpCW())) {
+//        mid = checkminus;
+//    }
+    
+    CONNECTION mid = bendTowards(start, line.dv, radius);
+    
+    GLdouble off = (line.v - mid.v)  * line.dv.perpCW();
+    
+    if (off == 0) {
+        return mid;
+    } else if (abs(off) > 2*radius) {
+        return CONNECTION(start.v + line.dv*2*radius + line.dv.perpCW() * off, line.dv, start.w, start.name + "+");
+    } else {
+        GLdouble theta = acos(1 - abs(off)/2/radius);
+        if (off > 0) {
+            return bendRadius(bendRadius(mid, -theta, radius), +theta, radius);
+        } else {
+            return bendRadius(bendRadius(mid, +theta, radius), -theta, radius);
+        }
+    }
 }
 
 bool intersect(CONNECTION a, CONNECTION b, VECTOR** i, bool onlyForward) {

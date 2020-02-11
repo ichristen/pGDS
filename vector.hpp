@@ -181,12 +181,14 @@ CONNECTION bendLeft(CONNECTION start, GLdouble radius=SAFERADIUS);
 CONNECTION bendRight(CONNECTION start, GLdouble radius=SAFERADIUS);
 
 CONNECTION bendTowards(CONNECTION start, GLdouble ang, GLdouble radius=SAFERADIUS);
-CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius=SAFERADIUS);
+CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius=SAFERADIUS, int dirOverride=0);
 
 //bool intersect(CONNECTION c1, CONNECTION c2, VECTOR** i);
 
 CONNECTION bendHorizontal(CONNECTION start, GLdouble horizontal,    GLdouble radius=0);
 CONNECTION bendVertical(CONNECTION start,   GLdouble vertical,      GLdouble radius=0);
+
+CONNECTION bendToLine(CONNECTION start, CONNECTION line, GLdouble radius);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

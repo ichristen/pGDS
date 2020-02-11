@@ -125,14 +125,18 @@ void DEVICE::clear() {
 }
 
 void DEVICE::printConnectionNames() {
-    for (std::map<std::string, CONNECTION>::iterator it = connections.begin(); it != connections.end(); ++it) {
-        printf("%s\n", it->first.c_str());
+    if (connections.size() > 0) {
+        for (std::map<std::string, CONNECTION>::iterator it = connections.begin(); it != connections.end(); ++it) {
+            printf("%s\n", it->first.c_str());
+        }
+    } else {
+        printf("Device %s has no connections.", description.c_str());
     }
 }
-void DEVICE::add(DEVICE* device, AFFINE m, char c) {
+void DEVICE::add(DEVICE* device, char c, AFFINE m) {
     add(DEVICEPTR(device, m), c);
 }
-void DEVICE::add(DEVICE* device, AFFINE m, std::string str) {
+void DEVICE::add(DEVICE* device, std::string str, AFFINE m) {
     add(DEVICEPTR(device, m), str);
 }
 void DEVICE::add(CONNECTION connection) {
@@ -381,74 +385,79 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
             putc(0x00, f);              // DATA TYPE    = null
         }
 #endif
-        
-#ifdef DEVICE_CONNECTIONS
-        for (auto const& x : connections) {
-            // TEXT
-            putc(0x00, f);
-            putc(0x04, f);              // LENGTH = 4 bytes
-            
-            putc(0x0C, f);              // RECORD TYPE  = TEXT
-            putc(0x00, f);              // DATA TYPE    = null
-            
-            // LAYER
-            putc(0x00, f);
-            putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
-            
-            putc(0x0D, f);              // RECORD TYPE  = LAYER
-            putc(0x02, f);              // DATA TYPE    = 2-int
-            
-//            uint16_t layer = endianSwap(x.second.l);
-            uint16_t layer = endianSwap(-1);
-            
-            fwrite(&layer, sizeof(uint16_t), 1, f);
-            
-            // TEXTTYPE
-            putc(0x00, f);
-            putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
-            
-            putc(0x16, f);              // RECORD TYPE  = TEXTTYPE
-            putc(0x02, f);              // DATA TYPE    = 2-int
-            
-            uint16_t texttype = endianSwap(0);
-            
-            fwrite(&texttype, sizeof(uint16_t), 1, f);
-            
-            // XY
-            uint16_t size = endianSwap((uint16_t)(8 + 4));
-            
-            fwrite(&size, sizeof(uint16_t), 1, f);
-            
-            putc(0x10, f);              // RECORD TYPE  = XY
-            putc(0x03, f);              // DATA TYPE    = 4-int
-            
-            VECTORINT v = VECTORINT(x.second.v, DBUNIT, transformation);
-            
-            fwrite(&v,   sizeof(VECTORINT), 1, f);
-            
-            // STRING
-            char str[16];
-            snprintf(str, 16, "%s", x.first.c_str());
-//            snprintf(str, 8, "%s", x.second.name.c_str());
-            
-            putc(0x00, f);
-            putc((uint8_t)(16+4), f);
-            
-            putc(0x19, f);              // RECORD TYPE  = STRING
-            putc(0x06, f);              // DATA TYPE    = ASCII string
-            
-            fwrite(str,   sizeof(char), 16, f);
-            
-            // ENDEL
-            putc(0x00, f);
-            putc(0x04, f);              // LENGTH = 4 bytes
-            
-            putc(0x11, f);              // RECORD TYPE  = ENDEL
-            putc(0x00, f);              // DATA TYPE    = null
-        }
-#endif
     }
 //    }
+      
+//        print();
+//    printConnectionNames();
+//    printf("There are %i connections.\n", connections.size());
+    
+//#ifdef DEVICE_CONNECTIONS
+    for (auto const& x : connections) {
+        // TEXT
+        putc(0x00, f);
+        putc(0x04, f);              // LENGTH = 4 bytes
+        
+        putc(0x0C, f);              // RECORD TYPE  = TEXT
+        putc(0x00, f);              // DATA TYPE    = null
+        
+        // LAYER
+        putc(0x00, f);
+        putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+        
+        putc(0x0D, f);              // RECORD TYPE  = LAYER
+        putc(0x02, f);              // DATA TYPE    = 2-int
+        
+//            uint16_t layer = endianSwap(x.second.l);
+        uint16_t layer = endianSwap(-1);
+        
+        fwrite(&layer, sizeof(uint16_t), 1, f);
+        
+        // TEXTTYPE
+        putc(0x00, f);
+        putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+        
+        putc(0x16, f);              // RECORD TYPE  = TEXTTYPE
+        putc(0x02, f);              // DATA TYPE    = 2-int
+        
+        uint16_t texttype = endianSwap(0);
+        
+        fwrite(&texttype, sizeof(uint16_t), 1, f);
+        
+        // XY
+        uint16_t size = endianSwap((uint16_t)(8 + 4));
+        
+        fwrite(&size, sizeof(uint16_t), 1, f);
+        
+        putc(0x10, f);              // RECORD TYPE  = XY
+        putc(0x03, f);              // DATA TYPE    = 4-int
+        
+        VECTORINT v = VECTORINT(x.second.v, DBUNIT, transformation);
+        
+        fwrite(&v,   sizeof(VECTORINT), 1, f);
+        
+        // STRING
+        char str[16];
+        snprintf(str, 16, "%s", x.first.c_str());
+        printf("%f, %f, %s\n", x.second.v.x, x.second.v.y, str);
+//            snprintf(str, 8, "%s", x.second.name.c_str());
+        
+        putc(0x00, f);
+        putc((uint8_t)(16+4), f);
+        
+        putc(0x19, f);              // RECORD TYPE  = STRING
+        putc(0x06, f);              // DATA TYPE    = ASCII string
+        
+        fwrite(str,   sizeof(char), 16, f);
+        
+        // ENDEL
+        putc(0x00, f);
+        putc(0x04, f);              // LENGTH = 4 bytes
+        
+        putc(0x11, f);              // RECORD TYPE  = ENDEL
+        putc(0x00, f);              // DATA TYPE    = null
+    }
+//#endif
 
     if (!transformation.isZero()) {
         for (int i = 0; i < devices.size(); i++) {
@@ -942,7 +951,11 @@ BOUNDINGBOX DEVICEPTR::bb() const {                 return transformation * devi
 DEVICEPTR DEVICEPTR::copy() const {                 return DEVICEPTR(device, transformation); }
 
 std::string DEVICEPTR::description() const {
-    return device->description;
+    if (device) {
+        return device->description;
+    } else {
+        return "EMPTY DEVICE";
+    }
 }
 
 void DEVICEPTR::print() const {

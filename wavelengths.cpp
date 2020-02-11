@@ -136,7 +136,86 @@ DEVICEPTR directionalCoupler(WAVELENGTH wl, GLdouble trans, GLdouble t, bool neg
 //    return DEVICEPTR(directionalCoupler((negResist?-1:1)*dc.a, dc.d, dc.l, wl.sm, t*360/TAU, dc.r, false, false));
     return DEVICEPTR(directionalCoupler((negResist?-1:1)*dc.a, dc.d, dc.l, wl.sm, t, dc.r, false, false));
 }
-DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, bool text, bool straights) {
+//DEVICE* directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, bool text, bool straights) {
+//    std::string description = "DC2 a" + std::to_string(a) +
+//    " d" + std::to_string(d) +
+//    " L" + std::to_string(L) +
+//    " a0" + std::to_string(a0) +
+//    " t" + std::to_string(t) +
+//    " r" + std::to_string(r) +
+//    " text" + std::to_string(text) +
+//    " straights" + std::to_string(straights);
+//
+//    DEVICE* toReturn = getDevice(description);
+//
+//    if (toReturn->initialized()) {
+//        return toReturn;
+//    }
+//
+//
+//
+//    return toReturn;
+//}
+DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GLdouble theta, bool bend, bool text) {
+    std::string description ="DC2 a" + std::to_string(a) +
+                                " d" + std::to_string(d) +
+                                " L" + std::to_string(L) +
+                                " t" + std::to_string(theta) +
+                                " r" + std::to_string(r) +
+                                " text" + std::to_string(text) +
+                                " bend" + std::to_string(bend);
+    
+    CONNECTION bu = CONNECTION(VECTOR(0, bend*(r+d)),   VECTOR(1, 0), a);
+    CONNECTION bd = CONNECTION(VECTOR(0, bend*r),       VECTOR(1, 0), a);
+    
+    bool negResist = false;
+    if (a < 0) { a = -a; negResist = true;  printf("NEG RESIST\n"); }
+    else {                                  printf("POS RESIST\n"); }
+    
+    DEVICE* toReturn = getDevice(description);
+    
+    if (toReturn->initialized()) {
+        return toReturn;
+    }
+    
+    GLdouble lengthang = L/r;
+    
+    CONNECTION lu0;
+    if (bend) { lu0 = bendRadius(bu, -lengthang/2, r); }
+    else {      lu0 = bu + L/2; }
+    CONNECTION lu1 = bendRadius(lu0, theta, r);
+    
+    CONNECTION ld1 = bendRadius(bd, -theta-lengthang/2, r);
+    
+    POLYLINE up = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, PADDING);
+    toReturn->add(up); toReturn->add(-up*mirrorY());
+    
+    POLYLINE down = thicken(connect(bd, -ld1), a, -PADDING);
+    toReturn->add(down); toReturn->add(-down*mirrorY());
+    
+    POLYLINE midup = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, -100*PADDING);
+    POLYLINE middown = thicken(connect(bd, -ld1), a, 100*PADDING);
+    POLYLINES mid = midup & middown;
+    toReturn->add(mid); toReturn->add(-mid*mirrorY());
+    
+    CONNECTION ul = lu1 * mirrorY();    ul.setName("ul");
+    CONNECTION ur = lu1;                ur.setName("ur");
+    CONNECTION ll = ld1 * mirrorY();    ll.setName("ll");
+    CONNECTION lr = ld1;                lr.setName("lr");
+    
+    ul.print();
+    ur.print();
+    ll.print();
+    lr.print();
+    
+    toReturn->add(ul);
+    toReturn->add(ur);
+    toReturn->add(ll);
+    toReturn->add(lr);
+    
+    return DEVICEPTR(toReturn);
+}
+DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, bool text, bool straights, bool bend) {
     std::string description = "DC a" + std::to_string(a) +
     " d" + std::to_string(d) +
     " L" + std::to_string(L) +
@@ -144,7 +223,8 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
     " t" + std::to_string(t) +
     " r" + std::to_string(r) +
     " text" + std::to_string(text) +
-    " straights" + std::to_string(straights);
+    " straights" + std::to_string(straights) +
+    " bend" + std::to_string(bend);
 
     DEVICE* toReturn = getDevice(description);
 
@@ -156,8 +236,6 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
     if (a < 0) { a = -a; negResist = true;  printf("NEG RESIST\n"); }
     else {                                  printf("POS RESIST\n"); }
     
-    
-
     CONNECTION connection;
 
     if (negResist) {
@@ -166,9 +244,24 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
         VECTOR up2 = VECTOR(0, (d+a)/2);
         VECTOR up3 = VECTOR(0, (d+a)/2 + PADDING);
 
-        toReturn->add(rect(-end-up1, end+up1).setLayer(1));  // Middle rectangle
-        toReturn->add(rect(-end+up2, end+up3).setLayer(1));  // Upper rectangle
-        toReturn->add(rect(-end-up3, end-up2).setLayer(1));  // Lower rectangle
+        if (bend) {
+            CONNECTION base = CONNECTION(VECTOR(0, r+d/2), VECTOR(1, 0));
+            
+            GLdouble ang = L/r;
+            
+            CONNECTION from =   -bendTowards(-base,  ang/2);
+            CONNECTION to =      bendTowards( base, -ang/2);
+            
+            POLYLINE path = connect(from, -to);
+            
+            toReturn->add(thicken(path, d-a).setLayer(1));  // Middle arc
+            toReturn->add(thicken(path, -(d-a)/2, PADDING).setLayer(1));  // Upper rectangle
+            toReturn->add(thicken(path, -(d-a)/2, -PADDING).setLayer(1));  // Lower rectangle
+        } else {
+            toReturn->add(rect(-end-up1, end+up1).setLayer(1));  // Middle rectangle
+            toReturn->add(rect(-end+up2, end+up3).setLayer(1));  // Upper rectangle
+            toReturn->add(rect(-end-up3, end-up2).setLayer(1));  // Lower rectangle
+        }
 
         GLdouble paddingInnerR =    r - a/2 - PADDING;
         GLdouble wgInnerR =         r - a/2;
@@ -182,6 +275,8 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
         AFFINE c = AFFINE(L/2, radiusOffset);
 
         GLdouble t2 = acos( radiusOffset / paddingOuterR );
+        
+        VECTOR v = VECTOR(L/2, radiusOffset) + VECTOR(r, DEG2RAD*(270+t), true);
 
         //    arc_.print();
         //
@@ -189,7 +284,15 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
 
         POLYLINE ur =   ( (arc_ - arc_*( wgInnerR/paddingInnerR )) * c).close().setLayer(1);
 
-        POLYLINE mur =   arc_*( wgOuterR/paddingInnerR ) - arc(paddingOuterR, DEG2RAD*(270)+t2, DEG2RAD*(270+t));
+        POLYLINE mur;
+        if (abs(v.y/cos(DEG2RAD*t)) > a/2 + PADDING) {
+            mur =   arc_*( wgOuterR/paddingInnerR ) - arc(paddingOuterR, DEG2RAD*(270)+t2, DEG2RAD*(270+t));
+        } else {
+            mur =   arc_*( wgOuterR/paddingInnerR );
+//            mur.add(v);
+//            mur.add(VECTOR(L/2, 0));
+            mur.add(VECTOR(r + abs(v.y/cos(DEG2RAD*t)), DEG2RAD*(270+t), true));
+        }
 
         POLYLINE mr = ((mur * c) - (mur*mirrorX() * AFFINE(L/2, -radiusOffset))).setLayer(1);
 
@@ -213,9 +316,7 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
         toReturn->add(-mr);
         toReturn->add((mr*mirrorY()).reverse());
 
-        //    printf("ang=%f\n", DEG2RAD*(270+t)/TAU);
-
-        VECTOR v = VECTOR(L/2, radiusOffset) + VECTOR(r, DEG2RAD*(270+t), true);//
+        //    printf("ang=%f\n", DEG2RAD*(270+t)/TAU);//
                                                                                 //    v.printNL();
 
         connection =     CONNECTION(v, VECTOR(1, DEG2RAD*t, true), -a, "ur");

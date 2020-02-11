@@ -72,8 +72,8 @@ public:
 
 POLYLINES dcTest(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, GLdouble sep);
 DEVICEPTR directionalCoupler(WAVELENGTH wl, GLdouble trans, GLdouble t=0, bool negResist=true);
-DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t=90, GLdouble r=MINRADIUS, bool text=true, bool straights=true);
-
+DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t=90, GLdouble r=MINRADIUS, bool text=true, bool straights=true, bool bend=false);
+DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r=MINRADIUS, GLdouble t=TAU/8, bool bend=false, bool text=true);
 
 //WAVELENGTHS wavelengths = WAVELENGTHS();
 
