@@ -111,9 +111,13 @@ void DEVICE::add(DEVICEPTR device, std::string str) {
     std::map<std::string, CONNECTION> map = device.device->connections;
     
     for (std::map<std::string, CONNECTION>::iterator it = map.begin(); it != map.end(); ++it) {
-        CONNECTION connection = it->second;
+        CONNECTION connection = it->second.copy();
         connection.name += str;
-        add(device.transformation * connection);
+//        connection.print();
+        add(connection * device.transformation);
+//        device.transformation.print();
+//        connection *= device.transformation;
+//        connection.print();
     }
     
     area_ += device.area(); // Separate into layers!

@@ -420,7 +420,7 @@ CONNECTION CONNECTION::operator*=(AFFINE m) {
 //    dv /= magn * m.det();       // FIX ME!!!
 //    w *= magn;
     
-    v   = m.linearTimes(v);
+    v   = m * v;
     dv  = m.linearTimes(dv);
     w  *= abs(m.linearTimes(dv.perpCCW()).magn());
                   

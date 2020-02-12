@@ -747,6 +747,31 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
 
 // THICKENED CONNECTIONS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void connectThickenSMTaper(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble adiabat) {
+    POLYLINE toThicken = connect(b, e);
+    
+    GLdouble L = toThicken.length();
+    
+    GLdouble w1 =   std::abs(b.w);
+    GLdouble w2 =   std::abs(e.w);
+    GLdouble w =    std::abs(a0);
+    
+    std::function<GLdouble(GLdouble t)> lambda;
+    
+    if (L < 2*adiabat) {
+        lambda = [w,w1,w2,L,adiabat] (GLdouble t) -> GLdouble { if (t*L < adiabat/2) { return w1 + (w-w1)*t*L/adiabat; } else { return w2 + (w-w2)*(1-t)*L/adiabat; } };
+    } else {
+        lambda = [w,w1,w2,L,adiabat] (GLdouble t) -> GLdouble { if (t*L < adiabat) { return w1 + (w-w1)*t*L/adiabat; } else { if ((1-t)*L < adiabat) { return w2 + (w-w2)*(1-t)*L/adiabat; } else { return w; } } };
+    }
+    
+    GLdouble padding = PADDING;
+    GLdouble minstep = 1;
+    bool outer = b.w < 0;
+
+    for (int i = (outer)?(-1):(0); i < 2; i += 2) {
+        addto->add(thicken(toThicken, lambda, i*padding, minstep).setLayer(b.l));
+    }
+}
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble tb, GLdouble te, GLdouble lb, GLdouble le, GLdouble rad) {
     if (rad == 0) { rad = SAFERADIUS; }
     
@@ -830,8 +855,8 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
         lambda = [w] (GLdouble t) -> GLdouble { return w; };
     }
     
-    b.print();
-    e.print();
+//    b.print();
+//    e.print();
     
     POLYLINE p = connect(b, e, type, (b.w != e.w)?((int)((e.v-b.v).magn()/minstep) + 2):(0));
     
