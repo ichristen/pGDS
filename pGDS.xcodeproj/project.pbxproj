@@ -39,6 +39,7 @@
 		08A4483D201666B200C8B564 /* tesselation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A4483A201666A800C8B564 /* tesselation.cpp */; };
 		08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
 		08AA7D6D23EE5BEE00A18D6E /* straindevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08AA7D6B23EE5BEE00A18D6E /* straindevices.cpp */; };
+		08AA7D7023FD8F0900A18D6E /* lincolndevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08AA7D6E23FD8F0800A18D6E /* lincolndevices.cpp */; };
 		08C820EF202D4C4300D9E032 /* quantumdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08C820ED202D4C4300D9E032 /* quantumdevices.cpp */; };
 		08D51B461F90342200091ECB /* testing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1161F4CFCCD0054FD31 /* testing.cpp */; };
 		08D51B481F90342200091ECB /* polyline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EE1F4CE0170054FD31 /* polyline.cpp */; };
@@ -138,6 +139,8 @@
 		08A8D1741F5B207500DC4F70 /* pgdsNSOpenGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = pgdsNSOpenGLView.mm; path = macOS/pgdsNSOpenGLView.mm; sourceTree = SOURCE_ROOT; };
 		08AA7D6B23EE5BEE00A18D6E /* straindevices.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = straindevices.cpp; path = ../pGDSdevices/straindevices.cpp; sourceTree = SOURCE_ROOT; };
 		08AA7D6C23EE5BEE00A18D6E /* straindevices.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = straindevices.hpp; path = ../pGDSdevices/straindevices.hpp; sourceTree = SOURCE_ROOT; };
+		08AA7D6E23FD8F0800A18D6E /* lincolndevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lincolndevices.cpp; path = ../pGDSdevices/lincolndevices.cpp; sourceTree = SOURCE_ROOT; };
+		08AA7D6F23FD8F0900A18D6E /* lincolndevices.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = lincolndevices.hpp; path = ../pGDSdevices/lincolndevices.hpp; sourceTree = SOURCE_ROOT; };
 		08C820ED202D4C4300D9E032 /* quantumdevices.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quantumdevices.cpp; path = ../pGDSdevices/quantumdevices.cpp; sourceTree = SOURCE_ROOT; };
 		08C820EE202D4C4300D9E032 /* quantumdevices.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = quantumdevices.hpp; path = ../pGDSdevices/quantumdevices.hpp; sourceTree = SOURCE_ROOT; };
 		08D51B601F90342300091ECB /* pGDS OpenGL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "pGDS OpenGL"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -208,6 +211,7 @@
 				083CC1101F4CE0C00054FD31 /* eodevices.hpp */,
 				0886D2202027E76F00C48D4C /* harvarddevices.hpp */,
 				083E4CB7217E423000B87120 /* mitredevices.hpp */,
+				08AA7D6F23FD8F0900A18D6E /* lincolndevices.hpp */,
 				085E8B8722920771007DB885 /* nemsdevices.hpp */,
 				08C820EE202D4C4300D9E032 /* quantumdevices.hpp */,
 				08AA7D6C23EE5BEE00A18D6E /* straindevices.hpp */,
@@ -218,6 +222,7 @@
 				083CC1121F4CE0C00054FD31 /* eodevices.cpp */,
 				0886D21F2027E76F00C48D4C /* harvarddevices.cpp */,
 				083E4CB6217E423000B87120 /* mitredevices.cpp */,
+				08AA7D6E23FD8F0800A18D6E /* lincolndevices.cpp */,
 				085E8B8622920771007DB885 /* nemsdevices.cpp */,
 				08C820ED202D4C4300D9E032 /* quantumdevices.cpp */,
 				08AA7D6B23EE5BEE00A18D6E /* straindevices.cpp */,
@@ -346,10 +351,9 @@
 			};
 			buildConfigurationList = 08FBFB801F00AF9300C35A59 /* Build configuration list for PBXProject "pGDS" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
@@ -410,6 +414,7 @@
 				084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */,
 				085E8B8822920771007DB885 /* nemsdevices.cpp in Sources */,
 				08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */,
+				08AA7D7023FD8F0900A18D6E /* lincolndevices.cpp in Sources */,
 				083E4CB8217E423000B87120 /* mitredevices.cpp in Sources */,
 				083CC0FF1F4CE0170054FD31 /* device.cpp in Sources */,
 			);

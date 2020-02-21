@@ -18,7 +18,9 @@
 //#include "vapordevices.hpp"
 //#include "mitredevices.hpp"
 //#include "tesselation.hpp"
-#include "nemsdevices.hpp"
+//#include "nemsdevices.hpp"
+#include "lincolndevices.hpp"
+#include "straindevices.hpp"
 
 extern double SPACEPAD(0);
 
@@ -32,6 +34,12 @@ int main(int argc, const char * argv[]) {
 //    DEVICEPTR c = DEVICEPTR(superDuperDevice2(637));
 //    DEVICEPTR c = DEVICEPTR(loss(2));
     //testD2(637);
+    
+    SiNStrain();
+    return 0;
+    
+    Lincoln();
+    return 0;
     
     GANHARV();
     return 0;
