@@ -63,8 +63,8 @@ VECTOR VECTOR::operator*=(AFFINE m)               { *this = m*(*this); return *t
 GLdouble VECTOR::magn()                     const { return sqrt(x*x + y*y); }
 GLdouble VECTOR::magn2()                    const { return x*x + y*y; }
 
-GLdouble VECTOR::norm()                     const { return magn(); }
-GLdouble VECTOR::norm2()                    const { return magn2(); }
+//GLdouble VECTOR::norm()                     const { return magn(); }
+//GLdouble VECTOR::norm2()                    const { return magn2(); }
 
 void VECTOR::zero() { x = 0; y = 0; }
 
@@ -108,6 +108,15 @@ void VECTOR::rotateEquals(GLdouble radians) {
 
     x = c*x - s*y;
     y = s*xtemp + c*y;
+}
+GLdouble VECTOR::angle(VECTOR v)        const {
+    if (isZero() || v.isZero()) {
+        return 0;
+    } else if (operator==(-v)) {
+        return TAU/2;
+    } else {
+        return acos(dot(v));
+    }
 }
 
 void VECTOR::print()                    const {
@@ -524,7 +533,7 @@ CONNECTION bendHorizontal(CONNECTION start, GLdouble horizontal, GLdouble radius
         VECTOR path = *i - start.v;
         
         if (path * start.dv > 0) {
-            GLdouble d = path.norm();
+            GLdouble d = path.magn();
             int dir = sign(start.dv.x);
             
             
@@ -551,7 +560,7 @@ CONNECTION bendVertical(CONNECTION start,   GLdouble vertical, GLdouble radius) 
 //        path.printNL();
         
         if (path * start.dv > 0) {
-            GLdouble d = path.norm();
+            GLdouble d = path.magn();
             int dir = sign(start.dv.y);
             
             return CONNECTION(*i + VECTOR(0, dir*d), VECTOR(0, -dir), start.w, start.name + "+");

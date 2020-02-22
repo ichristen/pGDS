@@ -412,7 +412,7 @@ GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
     }
     
     if ((e - b).magn2() < 1e-9) {
-        printf("getArcAngle(VECTOR^3, bool): Start and end are at the same position\n");
+//        printf("getArcAngle(VECTOR^3, bool): Start and end are at the same position\n");
         return 0;
         //        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Start and end are at the same position");
     }
@@ -1127,7 +1127,7 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
         return toReturn;
     }
     
-    GLdouble Lminfin = (b1.v - e1.v).norm();
+    GLdouble Lminfin = (b1.v - e1.v).magn();
     
     if (std::abs(Lmin - Lminfin) > .1) { printf("Lmin=%f, Lminfin=%f\n", Lmin, Lminfin); Lmin = Lminfin; }
     

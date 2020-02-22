@@ -443,7 +443,7 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
         // STRING
         char str[16];
         snprintf(str, 16, "%s", x.first.c_str());
-        printf("%f, %f, %s\n", x.second.v.x, x.second.v.y, str);
+//        printf("%f, %f, %s\n", x.second.v.x, x.second.v.y, str);
 //            snprintf(str, 8, "%s", x.second.name.c_str());
         
         putc(0x00, f);
@@ -479,9 +479,9 @@ bool DEVICE::exportLibraryGDS(std::string fname, bool flatten) {
 //    FILE* f2 = fopen("/Users/i/Desktop/hyper2.gds", "wb"); mexPrintf("2 - 0x%X\n", f2);
 //    FILE* f3 = fopen("/Users/i/Desktop/hyper3.gds", "w+"); mexPrintf("3 - 0x%X\n", f3);
 //    
-    printf("HERE!\n");
-    
-    printf("%s\n", fname.c_str());
+//    printf("HERE!\n");
+//
+//    printf("%s\n", fname.c_str());
 //
 //#endif
 //    printf(fname.c_str())
@@ -937,6 +937,7 @@ DEVICEPTR DEVICEPTR::operator*=(GLdouble s) {       transformation *= AFFINE(s, 
 DEVICEPTR DEVICEPTR::operator/=(GLdouble s) {       transformation *= AFFINE(1/s, 0, 0, 1/s); return *this; }
 
 CONNECTION DEVICEPTR::operator[](std::string connectionName)    const {
+//    transformation.print();
     return device->operator[](connectionName) * transformation;
 }
 CONNECTION DEVICEPTR::getConnection(std::string connectionName) const {

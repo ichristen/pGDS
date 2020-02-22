@@ -35,11 +35,11 @@ int main(int argc, const char * argv[]) {
 //    DEVICEPTR c = DEVICEPTR(loss(2));
     //testD2(637);
     
-    SiNStrain();
-    return 0;
-    
-    Lincoln();
-    return 0;
+//    SiNStrain();
+//    return 0;
+//    
+//    Lincoln();
+//    return 0;
     
     GANHARV();
     return 0;

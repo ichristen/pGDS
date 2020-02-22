@@ -74,8 +74,8 @@ public:
     
     void zero();                                // Sets the vector to zero.
 
-    void unitEquals();                          // Scales by `1/magn()`; does not change zero vector.
     VECTOR unit()                       const;  // Returns copy scaled by `1/magn()`; returns zero vector if `magn() == 0`.
+    void unitEquals();                          // Scales by `1/magn()`; does not change zero vector.
     bool isUnit()                       const;  // Checks if `magn() == 1`.
 
     VECTOR perpCCW()                    const;  // Returns the perpendicular vector in the CounterClockWise direction.
@@ -88,6 +88,7 @@ public:
 
     VECTOR rotate(GLdouble radians)     const;  // Returns a copy of the vector rotated by specified radians.
     void rotateEquals(GLdouble radians);        // Rotates the vector by specified radians.
+    GLdouble angle(VECTOR v=VECTOR(1,0))    const;  // Returns the angle from `v`.
 
     void print()                        const;  // Prints the vector in `[ x, y ]` form.
     void printNL()                      const;  // Prints the vector in `[ x, y ]` form, with a newline.
