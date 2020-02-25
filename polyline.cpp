@@ -783,7 +783,7 @@ bool POLYLINE::boundaryContains(VECTOR v) const {
 }
 
 GLdouble POLYLINE::length() {
-    if (length_ == 0) {
+    if (length_ == 0 && points.size() > 0) {
         for (int i = 0; i < points.size()-1; i++) {
             length_ += (points[i] - points[i+1]).magn();
         }

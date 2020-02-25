@@ -71,7 +71,7 @@ POLYLINE roundRect(VECTOR u, VECTOR v, GLdouble r) {
         
         r = min(r, min(w/2, h/2));
         
-        POLYLINE round = arc(VECTOR(r,r), VECTOR(0,r), VECTOR(r,0));
+        POLYLINE round = arc(VECTOR(r,r), VECTOR(0,r), VECTOR(r,0), true, 0, .1);
         
         toReturn.add(round * (AFFINE(ll)));
         toReturn.add(round * (AFFINE(VECTOR(ur.x, ll.y)) * AFFINE(TAU/4)));
@@ -772,6 +772,31 @@ void connectThickenSMTaper(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTION
         addto->add(thicken(toThicken, lambda, i*padding, minstep).setLayer(b.l));
     }
 }
+void connectThickenSMTaper(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble adiabat) {
+    POLYLINE toThicken = connect(b, e);
+    
+    GLdouble L = toThicken.length();
+    
+    GLdouble w1 =   std::abs(b.w);
+    GLdouble w2 =   std::abs(e.w);
+    GLdouble w =    std::abs(a0);
+    
+    std::function<GLdouble(GLdouble t)> lambda;
+    
+    if (L < 2*adiabat) {
+        lambda = [w,w1,w2,L,adiabat] (GLdouble t) -> GLdouble { if (t*L < adiabat/2) { return w1 + (w-w1)*t*L/adiabat; } else { return w2 + (w-w2)*(1-t)*L/adiabat; } };
+    } else {
+        lambda = [w,w1,w2,L,adiabat] (GLdouble t) -> GLdouble { if (t*L < adiabat) { return w1 + (w-w1)*t*L/adiabat; } else { if ((1-t)*L < adiabat) { return w2 + (w-w2)*(1-t)*L/adiabat; } else { return w; } } };
+    }
+    
+    GLdouble padding = PADDING;
+    GLdouble minstep = 1;
+    bool outer = b.w < 0;
+
+    for (int i = (outer)?(-1):(0); i < 2; i += 2) {
+        addto->add(thicken(toThicken, lambda, i*padding, minstep).setLayer(b.l));
+    }
+}
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble a0, GLdouble tb, GLdouble te, GLdouble lb, GLdouble le, GLdouble rad) {
     if (rad == 0) { rad = SAFERADIUS; }
     
@@ -959,8 +984,12 @@ void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTI
     }
 }
 
-POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat, GLdouble mult, GLdouble padding) {
+POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat, GLdouble mult, GLdouble padding, GLdouble a) {
     POLYLINES toReturn;
+    
+    if (a == 0) {
+        a = sign(b.w) * max(std::abs(b.w), std::abs(e.w));
+    }
     
     VECTOR bl = b.v + b.dv.perpCCW()*r;
     VECTOR br = b.v + b.dv.perpCW()*r;
@@ -1084,7 +1113,7 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    printf("min( %f, ")
     
 //    GLdouble longWidth = mult*(b.w + e.w)/2.;
-    GLdouble longWidth = sign(b.w)*mult*max(std::abs(b.w), std::abs(e.w));
+    GLdouble longWidth = mult*a;
     
     GLdouble angb, ange;
     
@@ -1116,8 +1145,8 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    angb = angbll; ange = angell;
     
     // And make the connections...
-    CONNECTION b1 = bendRadius(b, angb, r);
-    CONNECTION e1 = bendRadius(e, ange, r);
+    CONNECTION b1 = bendRadius(b, angb, r); b1.setWidth(a);
+    CONNECTION e1 = bendRadius(e, ange, r); e1.setWidth(a);
     
     if (mult <= 0) {
         POLYLINE fin = connect(b, -b1);
@@ -1132,8 +1161,11 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     if (std::abs(Lmin - Lminfin) > .1) { printf("Lmin=%f, Lminfin=%f\n", Lmin, Lminfin); Lmin = Lminfin; }
     
     if (Lmin > 2*adiabat) {
-        connectThickenAndAdd(&toReturn, b, -b1, CIRCULAR);  // Change this to thicken the arc?
-        connectThickenAndAdd(&toReturn, e, -e1, CIRCULAR);
+//        connectThickenAndAdd(&toReturn, b, -b1, CIRCULAR);  // Change this to thicken the arc?
+//        connectThickenAndAdd(&toReturn, e, -e1, CIRCULAR);
+        
+        connectThickenSMTaper(&toReturn, b, -b1, CIRCULAR, a, 5);
+        connectThickenSMTaper(&toReturn, e, -e1, CIRCULAR, a, 5);
         
         CONNECTION b2 = b1 + adiabat; b2.w = longWidth;
         CONNECTION e2 = e1 + adiabat; e2.w = longWidth;
