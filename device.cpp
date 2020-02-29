@@ -692,7 +692,7 @@ bool DEVICE::importGDS(std::string fname) {
         
         uint16_t rt =           (header & 0x0000FFFF);              // The record and the token.
         
-        printf("Head = 0x%X, Record = 0x%X, Token = 0x%X, Length = 0x%X = %i\n", header, record, token, length, length);
+//        printf("Head = 0x%X, Record = 0x%X, Token = 0x%X, Length = 0x%X = %i\n", header, record, token, length, length);
 
         if (token == 0 && length > 0) {
             throw std::runtime_error("DEVICE::importGDS(std::string): Header says that we should not expect data, but gives non-zero length");
