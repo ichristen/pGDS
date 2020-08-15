@@ -283,7 +283,7 @@ POLYLINE parabola(GLdouble x0, GLdouble x1, GLdouble a, GLdouble b, GLdouble c, 
     if (!steps) { steps = ceil(std::abs(x0 - x1)) + 10; }
     
     return parametric([x0,x1,a,b,c] (GLdouble t) -> VECTOR {
-        return VECTOR(x0 + (x1-x0)*t, a * ( x0 + (x1-x0)*t ) * ( x0 + (x1-x0)*t ) + b* ( x0 + (x1-x0)*t ) + c);
+        return VECTOR(x0 + (x1-x0)*t, a * ( x0 + (x1-x0)*t ) * ( x0 + (x1-x0)*t ) + b * ( x0 + (x1-x0)*t ) + c);
     }, steps);
 }
 
@@ -1160,7 +1160,7 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     
 //    if (std::abs(Lmin - Lminfin) > .1) { printf("Lmin=%f, Lminfin=%f\n", Lmin, Lminfin); Lmin = Lminfin; }
     
-    if (Lmin > 2*adiabat) {
+    if (Lmin >= 2*adiabat) {
 //        connectThickenAndAdd(&toReturn, b, -b1, CIRCULAR);  // Change this to thicken the arc?
 //        connectThickenAndAdd(&toReturn, e, -e1, CIRCULAR);
         

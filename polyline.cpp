@@ -256,18 +256,9 @@ POLYLINE::POLYLINE(std::vector<GLdouble> x, std::vector<GLdouble> y, bool isCyli
     
 //    points.reserve(x.size());
     
-    if (isCylindrical) {
-        for (size_t i = 0; i < x.size(); i++) {
-//            points[i] = VECTOR(x[i], y[i]);     // Best way to do this? Ideally, there would be a std::algorithm way...
-            add(VECTOR(x[i], y[i]));
-            points[i].printNL();
-        }
-    } else {    // Duplicated for speed.
-        for (size_t i = 0; i < x.size(); i++) {
-//            points[i] = VECTOR(x[i], y[i], true);
-            add(VECTOR(x[i], y[i], true));
-            points[i].printNL();
-        }
+    for (size_t i = 0; i < x.size(); i++) {
+//        points[i] = VECTOR(x[i], y[i]);     // Best way to do this? Ideally, there would be a std::algorithm way...
+        add(VECTOR(x[i], y[i], isCylindrical));
     }
     
     layer = MATERIAL::currentLayer;

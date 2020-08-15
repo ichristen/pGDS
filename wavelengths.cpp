@@ -157,20 +157,22 @@ DEVICEPTR directionalCoupler(WAVELENGTH wl, GLdouble trans, GLdouble t, bool neg
 //    return toReturn;
 //}
 DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GLdouble theta, bool bend, bool text) {
-    std::string description ="DC2 a" + std::to_string(a) +
-                                " d" + std::to_string(d) +
-                                " L" + std::to_string(L) +
-                                " t" + std::to_string(theta) +
-                                " r" + std::to_string(r) +
-                                " text" + std::to_string(text) +
-                                " bend" + std::to_string(bend);
+    std::string description ="DC a" + std::to_string((int)(a*1e3)) +
+                                " d" + std::to_string((int)(d*1e3)) +
+                                " L" + std::to_string((int)(L*1e3)) +
+//                                " t" + std::to_string(theta) +
+                                " r" + std::to_string((int)r);
+//                                " text" + std::to_string(text) +
+//                                " bend" + std::to_string(bend);
+    
+    if (bend) { description += " bend"; }
     
     CONNECTION bu = CONNECTION(VECTOR(0, bend*(r+d)),   VECTOR(1, 0), a);
     CONNECTION bd = CONNECTION(VECTOR(0, bend*r),       VECTOR(1, 0), a);
     
     bool negResist = false;
-    if (a < 0) { a = -a; negResist = true;  printf("NEG RESIST\n"); }
-    else {                                  printf("POS RESIST\n"); }
+    if (a < 0) { a = -a; negResist = true; } // printf("NEG RESIST\n"); }
+//    else {                                  printf("POS RESIST\n"); }
     
     DEVICE* toReturn = getDevice(description);
     
@@ -216,15 +218,16 @@ DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GL
     return DEVICEPTR(toReturn);
 }
 DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, bool text, bool straights, bool bend) {
-    std::string description = "DC a" + std::to_string(a) +
-    " d" + std::to_string(d) +
-    " L" + std::to_string(L) +
-    " a0" + std::to_string(a0) +
-    " t" + std::to_string(t) +
-    " r" + std::to_string(r) +
-    " text" + std::to_string(text) +
-    " straights" + std::to_string(straights) +
-    " bend" + std::to_string(bend);
+    std::string description = "DC a=" + std::to_string((int)(a*1e3)) +
+    " d=" + std::to_string((int)(d*1e3)) +
+    " L=" + std::to_string((int)(L*1e3)) +
+    " a0=" + std::to_string((int)(a0*1e3)) +
+//    " t=" + std::to_string(t) +
+    " r=" + std::to_string((int)r);
+//    " text" + std::to_string(text) +
+//    " straights" + std::to_string(straights) +
+    
+    if (bend) { description += " bend"; }
 
     DEVICE* toReturn = getDevice(description);
 

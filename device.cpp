@@ -250,7 +250,7 @@ void DEVICE::print() {
     printf("}\n");
 }
 
-bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
+bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint16_t level=0) {
     for (int i = 0; i < polylines.polylines.size(); i++) {
         if (!polylines.polylines[i].isCCW()) { polylines.polylines[i].reverse(); }
 //        if () {
@@ -462,10 +462,76 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE()) {
         putc(0x00, f);              // DATA TYPE    = null
     }
 //#endif
+    
+
+//#ifdef DEVICE_LABELS
+    // TEXT
+    putc(0x00, f);
+    putc(0x04, f);              // LENGTH = 4 bytes
+    
+    putc(0x0C, f);              // RECORD TYPE  = TEXT
+    putc(0x00, f);              // DATA TYPE    = null
+    
+    // LAYER
+    putc(0x00, f);
+    putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+    
+    putc(0x0D, f);              // RECORD TYPE  = LAYER
+    putc(0x02, f);              // DATA TYPE    = 2-int
+    
+//            uint16_t layer = endianSwap(x.second.l);
+    uint16_t layer = endianSwap(level);
+    
+    fwrite(&layer, sizeof(uint16_t), 1, f);
+    
+    // TEXTTYPE
+    putc(0x00, f);
+    putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+    
+    putc(0x16, f);              // RECORD TYPE  = TEXTTYPE
+    putc(0x02, f);              // DATA TYPE    = 2-int
+    
+    uint16_t texttype = endianSwap(0);
+    
+    fwrite(&texttype, sizeof(uint16_t), 1, f);
+    
+    // XY
+    uint16_t size = endianSwap((uint16_t)(8 + 4));
+    
+    fwrite(&size, sizeof(uint16_t), 1, f);
+    
+    putc(0x10, f);              // RECORD TYPE  = XY
+    putc(0x03, f);              // DATA TYPE    = 4-int
+    
+    VECTORINT v = VECTORINT(bb.center(), DBUNIT, transformation);
+    
+    fwrite(&v,   sizeof(VECTORINT), 1, f);
+    
+    // STRING
+    char str[64];
+    snprintf(str, 64, "%s", description.c_str());
+//        printf("%f, %f, %s\n", x.second.v.x, x.second.v.y, str);
+//            snprintf(str, 8, "%s", x.second.name.c_str());
+    
+    putc(0x00, f);
+    putc((uint8_t)(64+4), f);
+    
+    putc(0x19, f);              // RECORD TYPE  = STRING
+    putc(0x06, f);              // DATA TYPE    = ASCII string
+    
+    fwrite(str,   sizeof(char), 64, f);
+    
+    // ENDEL
+    putc(0x00, f);
+    putc(0x04, f);              // LENGTH = 4 bytes
+    
+    putc(0x11, f);              // RECORD TYPE  = ENDEL
+    putc(0x00, f);              // DATA TYPE    = null
+//#endif
 
     if (!transformation.isZero()) {
         for (int i = 0; i < devices.size(); i++) {
-            devices[i].device->exportNoStructureGDS(f, transformation*devices[i].transformation);
+            devices[i].device->exportNoStructureGDS(f, transformation*devices[i].transformation, level-1);
         }
     }
 
@@ -628,7 +694,7 @@ bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
         fwrite(legalDescription.c_str(),   sizeof(char), legalDescription.length()+1, f);
 
 
-        exportNoStructureGDS(f);
+        exportNoStructureGDS(f, AFFINE(), -2);
 
 
         // ENDSTR
