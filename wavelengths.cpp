@@ -189,16 +189,24 @@ DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GL
     
     CONNECTION ld1 = bendRadius(bd, -theta-lengthang/2, r);
     
-    POLYLINE up = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, PADDING);
-    toReturn->add(up); toReturn->add(-up*mirrorY());
-    
-    POLYLINE down = thicken(connect(bd, -ld1), a, -PADDING);
-    toReturn->add(down); toReturn->add(-down*mirrorY());
-    
-    POLYLINE midup = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, -100*PADDING);
-    POLYLINE middown = thicken(connect(bd, -ld1), a, 100*PADDING);
-    POLYLINES mid = midup & middown;
-    toReturn->add(mid); toReturn->add(-mid*mirrorY());
+    if (negResist) {
+        POLYLINE up = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, PADDING);
+        toReturn->add(up); toReturn->add(-up*mirrorY());
+        
+        POLYLINE down = thicken(connect(bd, -ld1), a, -PADDING);
+        toReturn->add(down); toReturn->add(-down*mirrorY());
+        
+        POLYLINE midup = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, -100*PADDING);
+        POLYLINE middown = thicken(connect(bd, -ld1), a, 100*PADDING);
+        POLYLINES mid = midup & middown;
+        toReturn->add(mid); toReturn->add(-mid*mirrorY());
+    } else {
+        POLYLINE up = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a);
+        toReturn->add(up); toReturn->add(-up*mirrorY());
+        
+        POLYLINE down = thicken(connect(bd, -ld1), a);
+        toReturn->add(down); toReturn->add(-down*mirrorY());
+    }
     
     CONNECTION ul = lu1 * mirrorY();    ul.setName("ul");
     CONNECTION ur = lu1;                ur.setName("ur");

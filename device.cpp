@@ -464,7 +464,7 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint1
 //#endif
     
 
-//#ifdef DEVICE_LABELS
+#ifdef DEVICE_LABELS
     // TEXT
     putc(0x00, f);
     putc(0x04, f);              // LENGTH = 4 bytes
@@ -527,7 +527,7 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint1
     
     putc(0x11, f);              // RECORD TYPE  = ENDEL
     putc(0x00, f);              // DATA TYPE    = null
-//#endif
+#endif
 
     if (!transformation.isZero()) {
         for (int i = 0; i < devices.size(); i++) {

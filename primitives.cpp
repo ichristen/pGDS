@@ -405,8 +405,8 @@ GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
     //    printf("\tr1=%f\n", (b - c).magn2());
     //    printf("\tr2=%f\n", (e - c).magn2());
     
-    if ((b - c).magn2() - (e - c).magn2() > 1e-9) { // 100*E) {
-        printf("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...\n");
+    if (abs((b - c).magn2() - (e - c).magn2()) > 1e-6) { // 100*E) {
+        printf("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii... Difference=%fe-9\n", 1e9*((b - c).magn2() - (e - c).magn2()));
         return 1e22;  // Arbitrary!
                       //        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...");
     }
@@ -442,8 +442,8 @@ GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, VECTOR db) {
     //    printf("\tr1=%f\n", (b - c).magn2());
     //    printf("\tr2=%f\n", (e - c).magn2());
     
-    if ((b - c).magn2() - (e - c).magn2() > 1e-9) { // 100*E) {
-        printf("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...\n");
+    if (abs((b - c).magn2() - (e - c).magn2()) > 1e-6) { // 100*E) {
+        printf("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii... Difference=%fe-9\n", 1e9*((b - c).magn2() - (e - c).magn2()));
         return 1e22;  // Arbitrary!
                       //        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...");
     }
@@ -984,7 +984,7 @@ void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTI
     }
 }
 
-POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat, GLdouble mult, GLdouble padding, GLdouble a) {
+POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat, GLdouble mult, GLdouble padding, GLdouble a, GLdouble stepMutliplier) {
     POLYLINES toReturn;
     
     if (a == 0) {
@@ -1149,8 +1149,8 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
     CONNECTION e1 = bendRadius(e, ange, r); e1.setWidth(a);
     
     if (mult <= 0) {
-        POLYLINE fin = connect(b, -b1);
-        fin += connect(-e1, e);
+        POLYLINE fin = connect(b, -b1, CIRCULAR, 2, stepMutliplier);
+        fin += connect(-e1, e, CIRCULAR, 2, stepMutliplier);
         toReturn.add(fin);
         
         return toReturn;

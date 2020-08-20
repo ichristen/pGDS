@@ -19,9 +19,11 @@
 //#include "mitredevices.hpp"
 //#include "tesselation.hpp"
 //#include "nemsdevices.hpp"
-#include "lincolndevices.hpp"
+
 //#include "straindevices.hpp"
 //#include "interposerdevices.hpp"
+
+#include "lincolndevices.hpp"
 #include "csemdevices.hpp"
 
 extern double SPACEPAD(0);
@@ -40,16 +42,17 @@ int main(int argc, const char * argv[]) {
 //    SiNStrain();
 //    return 0;
 ////
-    CSEM();
-    return 0;
+//    CSEM();
+//    return 0;
     
 //    Lincoln();
 //    return 0;
         
-//    LincolnShort();
-//    return 0;
+    LincolnShort();
+    return 0;
     
 //    GANHARV();
+//    interposerv2();
 //    GANHARVinterposer();
 //    return 0;
     

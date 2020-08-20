@@ -62,7 +62,7 @@ std::map<uint16_t, MATERIAL> MATERIAL::layers =   { {0, MATERIAL("Helper",      
                                                     {4, MATERIAL("Au2",                 4, {.8, .6, .11,  1}, {.81, .66, .35,  1}, 3., 18.)},
 //                                                    {4, MATERIAL("Au2",                 4, {.8, .6, .11,  1}, {.81, .66, .35,  1}, 2., 14.)},
                                                     {5, MATERIAL("Diamond",             5, {.8, .8, .8, 1}, {.8, .8, .8, 1}, 1./7., 1)},
-                                                    {6, MATERIAL("AuSi",                6, {1, .6, .11,  1}, {1, .66, .35,  1}, 2., 14.)},
+                                                    {6, MATERIAL("AuSi",                6, {1, .6, .11,  1}, {1, .66, .35,  1}, 5., 30.)},
                                                     {7, MATERIAL("SiHelper",            7, {.8, 0, 0, 1}, {1, 0, 0, 1}, 1./14, .5)} };
 
 GLuint MATERIAL::shaders = 0;

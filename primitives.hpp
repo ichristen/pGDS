@@ -87,7 +87,7 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1, GLdouble padding=PADDING);
 void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1, GLdouble padding=PADDING);
 
-POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat=15, GLdouble mult=1, GLdouble padding=PADDING, GLdouble a=0);
+POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat=15, GLdouble mult=1, GLdouble padding=PADDING, GLdouble a=0, GLdouble stepMutliplier=1);
 
 POLYLINE thicken(POLYLINE open, std::function<GLdouble(GLdouble t)> lambda, GLdouble side=0, GLdouble minstep=1);
 POLYLINE thicken(POLYLINE open, GLdouble width, GLdouble side=0, GLdouble minstep=1);
