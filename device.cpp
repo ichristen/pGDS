@@ -100,6 +100,8 @@ void DEVICE::add(std::vector<POLYLINE> p) {
     }
 }
 void DEVICE::add(DEVICEPTR device, char c) {
+    if (device.device == this) { printf("Recursion!"); return; }  // Make more general!
+    
     if (c) {    add(device, std::string(1, c)); }
     else {      add(device); }
 }
@@ -397,70 +399,78 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint1
 //    printf("There are %i connections.\n", connections.size());
     
 //#ifdef DEVICE_CONNECTIONS
-    for (auto const& x : connections) {
-        // TEXT
-        putc(0x00, f);
-        putc(0x04, f);              // LENGTH = 4 bytes
-        
-        putc(0x0C, f);              // RECORD TYPE  = TEXT
-        putc(0x00, f);              // DATA TYPE    = null
-        
-        // LAYER
-        putc(0x00, f);
-        putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
-        
-        putc(0x0D, f);              // RECORD TYPE  = LAYER
-        putc(0x02, f);              // DATA TYPE    = 2-int
-        
-//            uint16_t layer = endianSwap(x.second.l);
-        uint16_t layer = endianSwap(-1);
-        
-        fwrite(&layer, sizeof(uint16_t), 1, f);
-        
-        // TEXTTYPE
-        putc(0x00, f);
-        putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
-        
-        putc(0x16, f);              // RECORD TYPE  = TEXTTYPE
-        putc(0x02, f);              // DATA TYPE    = 2-int
-        
-        uint16_t texttype = endianSwap(0);
-        
-        fwrite(&texttype, sizeof(uint16_t), 1, f);
-        
-        // XY
-        uint16_t size = endianSwap((uint16_t)(8 + 4));
-        
-        fwrite(&size, sizeof(uint16_t), 1, f);
-        
-        putc(0x10, f);              // RECORD TYPE  = XY
-        putc(0x03, f);              // DATA TYPE    = 4-int
-        
-        VECTORINT v = VECTORINT(x.second.v, DBUNIT, transformation);
-        
-        fwrite(&v,   sizeof(VECTORINT), 1, f);
-        
-        // STRING
-        char str[16];
-        snprintf(str, 16, "%s", x.first.c_str());
-//        printf("%f, %f, %s\n", x.second.v.x, x.second.v.y, str);
-//            snprintf(str, 8, "%s", x.second.name.c_str());
-        
-        putc(0x00, f);
-        putc((uint8_t)(16+4), f);
-        
-        putc(0x19, f);              // RECORD TYPE  = STRING
-        putc(0x06, f);              // DATA TYPE    = ASCII string
-        
-        fwrite(str,   sizeof(char), 16, f);
-        
-        // ENDEL
-        putc(0x00, f);
-        putc(0x04, f);              // LENGTH = 4 bytes
-        
-        putc(0x11, f);              // RECORD TYPE  = ENDEL
-        putc(0x00, f);              // DATA TYPE    = null
-    }
+//    if (level == (uint16_t)(-2)) {
+        for (auto const& x : connections) {
+            bool good = x.first[0] == '>';
+            
+            if (good || true) {
+                // TEXT
+                putc(0x00, f);
+                putc(0x04, f);              // LENGTH = 4 bytes
+                
+                putc(0x0C, f);              // RECORD TYPE  = TEXT
+                putc(0x00, f);              // DATA TYPE    = null
+                
+                // LAYER
+                putc(0x00, f);
+                putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+                
+                putc(0x0D, f);              // RECORD TYPE  = LAYER
+                putc(0x02, f);              // DATA TYPE    = 2-int
+                
+        //            uint16_t layer = endianSwap(x.second.l);
+                uint16_t layer = endianSwap((uint16_t)(good ? -1 : 10));
+                
+                fwrite(&layer, sizeof(uint16_t), 1, f);
+                
+                // TEXTTYPE
+                putc(0x00, f);
+                putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+                
+                putc(0x16, f);              // RECORD TYPE  = TEXTTYPE
+                putc(0x02, f);              // DATA TYPE    = 2-int
+                
+                uint16_t texttype = endianSwap(0);
+                
+                fwrite(&texttype, sizeof(uint16_t), 1, f);
+                
+                // XY
+                uint16_t size = endianSwap((uint16_t)(8 + 4));
+                
+                fwrite(&size, sizeof(uint16_t), 1, f);
+                
+                putc(0x10, f);              // RECORD TYPE  = XY
+                putc(0x03, f);              // DATA TYPE    = 4-int
+                
+                VECTORINT v = VECTORINT(x.second.v, DBUNIT, transformation);
+                
+                fwrite(&v,   sizeof(VECTORINT), 1, f);
+                
+                // STRING
+                int N = min(x.first.size()+1, 512);
+                
+                char str[N];
+                snprintf(str, N, "%s", x.first.c_str());
+        //        printf("%f, %f, %s\n", x.second.v.x, x.second.v.y, str);
+        //            snprintf(str, 8, "%s", x.second.name.c_str());
+                
+                putc(0x00, f);
+                putc((uint8_t)(N+4), f);
+                
+                putc(0x19, f);              // RECORD TYPE  = STRING
+                putc(0x06, f);              // DATA TYPE    = ASCII string
+                
+                fwrite(str,   sizeof(char), N, f);
+                
+                // ENDEL
+                putc(0x00, f);
+                putc(0x04, f);              // LENGTH = 4 bytes
+                
+                putc(0x11, f);              // RECORD TYPE  = ENDEL
+                putc(0x00, f);              // DATA TYPE    = null
+            }
+        }
+//    }
 //#endif
     
 

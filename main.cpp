@@ -41,13 +41,13 @@ int main(int argc, const char * argv[]) {
     
 //    SiNStrain();
 //    return 0;
-////
+
 //    CSEM();
 //    return 0;
     
-//    Lincoln();
+//    LincolnIon();
 //    return 0;
-        
+    
     LincolnShort();
     return 0;
     

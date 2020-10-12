@@ -772,6 +772,8 @@ DEVICEPTR FONT::getText(std::string text, int anchorx, int anchory) {
     else if (anchory == 0) { shift.y = -toReturn->bb.height()/2; }   // Mid,
                                                                     // Otherwise bottom.
     
+    shift -= toReturn->bb.sw();
+    
     return DEVICEPTR(toReturn, AFFINE(shift));
 }
 

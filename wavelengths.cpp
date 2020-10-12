@@ -243,6 +243,8 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
         return toReturn;
     }
 
+    if (bend) { toReturn->add(CONNECTION(VECTOR(), VECTOR(), 1, "c")); }
+    
     bool negResist = false;
     if (a < 0) { a = -a; negResist = true;  printf("NEG RESIST\n"); }
     else {                                  printf("POS RESIST\n"); }
@@ -343,16 +345,33 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
         toReturn->add((mirrorY()*connection2).setName("ul"));
         toReturn->add((connection2*(-1)).setName("ll"));
     } else {
-        CONNECTION base = CONNECTION(VECTOR(L/2, d/2), VECTOR(1,0), a);
+//        if (bend) {
+//
+//CONNECTION base = CONNECTION(VECTOR(0, r+d/2), VECTOR(1, 0));
+//
+//GLdouble ang = L/r;
+//
+//CONNECTION from =   -bendTowards(-base,  ang/2);
+//CONNECTION to =      bendTowards( base, -ang/2);
+//
+//POLYLINE path = connect(from, -to);
+//
+//toReturn->add(thicken(path, d-a).setLayer(1));  // Middle arc
+//toReturn->add(thicken(path, -(d-a)/2, PADDING).setLayer(1));  // Upper rectangle
+//toReturn->add(thicken(path, -(d-a)/2, -PADDING).setLayer(1));  // Lower rectangle
+//
+//        } else {
+            CONNECTION base = CONNECTION(VECTOR(L/2, d/2), VECTOR(1,0), a);
 
-        connectThickenAndAdd(toReturn, -base, base - L, CIRCULAR, true);
-        connectThickenAndAdd(toReturn, mirrorX() * -base, mirrorX() * base - L, CIRCULAR, true);
+            connectThickenAndAdd(toReturn, -base, base - L, CIRCULAR, true);
+            connectThickenAndAdd(toReturn, mirrorX() * -base, mirrorX() * base - L, CIRCULAR, true);
 
-        CONNECTION base2 = bendRadius(base, DEG2RAD*t, r);
-        connectThickenAndAdd(toReturn, base,                -base2,             CIRCULAR, true);    toReturn->add(base2.setName("ur"));
-        connectThickenAndAdd(toReturn, mirrorX() * base,    mirrorX() * -base2, CIRCULAR, true);    toReturn->add((mirrorX() * base2).setName("lr"));
-        connectThickenAndAdd(toReturn, mirrorY() * base,    mirrorY() * -base2, CIRCULAR, true);    toReturn->add((mirrorY() * base2).setName("ul"));
-        connectThickenAndAdd(toReturn, mirrorX() * mirrorY() * base,  mirrorX() * mirrorY() * -base2, CIRCULAR, true);  toReturn->add((mirrorX() * mirrorY() * base2).setName("ll"));
+            CONNECTION base2 = bendRadius(base, DEG2RAD*t, r);
+            connectThickenAndAdd(toReturn, base,                -base2,             CIRCULAR, true);    toReturn->add(base2.setName("ur"));
+            connectThickenAndAdd(toReturn, mirrorX() * base,    mirrorX() * -base2, CIRCULAR, true);    toReturn->add((mirrorX() * base2).setName("lr"));
+            connectThickenAndAdd(toReturn, mirrorY() * base,    mirrorY() * -base2, CIRCULAR, true);    toReturn->add((mirrorY() * base2).setName("ul"));
+            connectThickenAndAdd(toReturn, mirrorX() * mirrorY() * base,  mirrorX() * mirrorY() * -base2, CIRCULAR, true);  toReturn->add((mirrorX() * mirrorY() * base2).setName("ll"));
+//        }
     }
 
     // Clean this up.

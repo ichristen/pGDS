@@ -59,8 +59,9 @@ POLYLINE roundRect(VECTOR u, VECTOR v, GLdouble r) {
     POLYLINE toReturn = POLYLINE(4);
     toReturn.isClosed = true;
     
-    //    u.printNL();
-    //    v.printNL();
+    if (r <= 0){
+        return rect(u, v);
+    }
     
     if (!u.inLine(v)) {
         VECTOR ll = VECTOR(min(u.x, v.x), min(u.y, v.y));
@@ -77,10 +78,6 @@ POLYLINE roundRect(VECTOR u, VECTOR v, GLdouble r) {
         toReturn.add(round * (AFFINE(VECTOR(ur.x, ll.y)) * AFFINE(TAU/4)));
         toReturn.add(round * (AFFINE(ur)                 * AFFINE(TAU/2)));
         toReturn.add(round * (AFFINE(VECTOR(ll.x, ur.y)) * AFFINE(-TAU/4)));
-        
-//        if (toReturn.area() < 0) {
-//            toReturn.reverse();
-//        }
     } else {
         printf("primitives.hpp::roundRect(u,v): Points defining rectangle are inline! Empty POLYLINE returned.\n");  // Make this more official.
     }
@@ -122,7 +119,11 @@ POLYLINE circle(GLdouble r, VECTOR c, int steps) {
 }
 
 POLYLINE ellipse(GLdouble a, GLdouble b, VECTOR c, VECTOR semimajorunit) {
-    return circle(1) * (AFFINE(semimajorunit, semimajorunit.perpCCW(), c) * AFFINE(a,0,0,b));
+//    if (semimajorunit == VECTOR(1,0)) {
+//        return circle(1) * AFFINE(a,0,0,b,c.x,c.y);
+//    } else {
+    return circle(1, VECTOR(), 40) * (AFFINE(semimajorunit, semimajorunit.perpCCW(), c) * AFFINE(a,0,0,b));
+//    }
     
 //    POLYLINE toReturn;
 //    
