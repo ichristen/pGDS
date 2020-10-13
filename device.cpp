@@ -252,7 +252,7 @@ void DEVICE::print() {
     printf("}\n");
 }
 
-bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint16_t level=0) {
+bool DEVICE::exportNoStructureGDS(FILE* f, FILE* txt, AFFINE transformation=AFFINE(), uint16_t level=0) {
     for (int i = 0; i < polylines.polylines.size(); i++) {
         if (!polylines.polylines[i].isCCW()) { polylines.polylines[i].reverse(); }
 //        if () {
@@ -392,11 +392,6 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint1
         }
 #endif
     }
-//    }
-      
-//        print();
-//    printConnectionNames();
-//    printf("There are %i connections.\n", connections.size());
     
 //#ifdef DEVICE_CONNECTIONS
 //    if (level == (uint16_t)(-2)) {
@@ -419,7 +414,7 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint1
                 putc(0x02, f);              // DATA TYPE    = 2-int
                 
         //            uint16_t layer = endianSwap(x.second.l);
-                uint16_t layer = endianSwap((uint16_t)(good ? -1 : 10));
+                uint16_t layer = endianSwap((uint16_t)(good ? -1 : 10));        // Layer stuff!
                 
                 fwrite(&layer, sizeof(uint16_t), 1, f);
                 
@@ -447,10 +442,10 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint1
                 fwrite(&v,   sizeof(VECTORINT), 1, f);
                 
                 // STRING
-                int N = min(x.first.size()+1, 512);
+                int N = min(x.first.size()+2, 512);
                 
                 char str[N];
-                snprintf(str, N, "%s", x.first.c_str());
+                snprintf(str, N, "%s\n", x.first.c_str());
         //        printf("%f, %f, %s\n", x.second.v.x, x.second.v.y, str);
         //            snprintf(str, 8, "%s", x.second.name.c_str());
                 
@@ -461,6 +456,9 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint1
                 putc(0x06, f);              // DATA TYPE    = ASCII string
                 
                 fwrite(str,   sizeof(char), N, f);
+                if (txt && good) {
+                    fwrite(str+3,   sizeof(char), N-3, txt);
+                }
                 
                 // ENDEL
                 putc(0x00, f);
@@ -475,6 +473,7 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint1
     
 
 #ifdef DEVICE_LABELS
+    {
     // TEXT
     putc(0x00, f);
     putc(0x04, f);              // LENGTH = 4 bytes
@@ -537,42 +536,21 @@ bool DEVICE::exportNoStructureGDS(FILE* f, AFFINE transformation=AFFINE(), uint1
     
     putc(0x11, f);              // RECORD TYPE  = ENDEL
     putc(0x00, f);              // DATA TYPE    = null
+    }
 #endif
 
     if (!transformation.isZero()) {
         for (int i = 0; i < devices.size(); i++) {
-            devices[i].device->exportNoStructureGDS(f, transformation*devices[i].transformation, level-1);
+            devices[i].device->exportNoStructureGDS(f, txt, transformation*devices[i].transformation, level-1);
         }
     }
 
     return true;
 }
 bool DEVICE::exportLibraryGDS(std::string fname, bool flatten) {
-//#ifdef MATLAB_MEX_FILE
-//    mexPrintf("HERE!\n");
-//    
-//    FILE* f1 = fopen("/Users/i/Desktop/hyper1.gds", "w");  mexPrintf("1 - 0x%X\n", f1);
-//    FILE* f2 = fopen("/Users/i/Desktop/hyper2.gds", "wb"); mexPrintf("2 - 0x%X\n", f2);
-//    FILE* f3 = fopen("/Users/i/Desktop/hyper3.gds", "w+"); mexPrintf("3 - 0x%X\n", f3);
-//    
-//    printf("HERE!\n");
-//
-//    printf("%s\n", fname.c_str());
-//
-//#endif
-//    printf(fname.c_str())
-    // return exportLibraryGDS(fopen("/Users/i/Desktop/hyper.gds", "wb"), flatten);
-#ifdef MATLAB_MEX_FILE
-    if (fname.length() < 10) {
-        return exportLibraryGDS(fopen("/Users/i/Desktop/MPB/wmc/wmc.gds", "w"), flatten);
-    } else {
-        return exportLibraryGDS(fopen(fname.c_str(), "w"), flatten);
-    }
-#else
-    return exportLibraryGDS(fopen(fname.c_str(), "w"), flatten);
-#endif
+    return exportLibraryGDS(fopen(fname.c_str(), "w"), fopen((fname + ".txt").c_str(), "w"), flatten);
 }
-bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
+bool DEVICE::exportLibraryGDS(FILE* f, FILE* txt, bool flatten) {
     // References:  http://www.cnf.cornell.edu/cnf_spie9.html
     //              http://www.rulabinsky.com/cavd/text/chapc.html
     //              http://boolean.klaasholwerda.nl/interface/bnf/gdsformat.html
@@ -664,18 +642,9 @@ bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
 
     GLdouble dbUnitUser =       1.0/DBUNIT;
     GLdouble dbUnitsMeters =    (1e-6)/DBUNIT;
-    
-    // printf("dbUnitUser = %.10f\n",     dbUnitUser);
-    // printf("dbUnitsMeters = %.10f\n",  dbUnitsMeters);
 
     uint64_t dbUnitUserSEM =    num2sem(dbUnitUser);
     uint64_t dbUnitsMetersSEM = num2sem(dbUnitsMeters);
-
-    //    printf("dbUnitUser    = %f\n", dbUnitUser);
-    //    printf("dbUnitsMeters = %f\n", dbUnitsMeters);
-    //
-    //    printf("dbUnitUserSEM    = %llu\n", dbUnitUserSEM);
-    //    printf("dbUnitsMetersSEM = %llu\n", dbUnitsMetersSEM);
 
     fwrite(&dbUnitUserSEM,      8, 1, f);
     fwrite(&dbUnitsMetersSEM,   8, 1, f);
@@ -704,7 +673,7 @@ bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
         fwrite(legalDescription.c_str(),   sizeof(char), legalDescription.length()+1, f);
 
 
-        exportNoStructureGDS(f, AFFINE(), -2);
+        exportNoStructureGDS(f, txt, AFFINE(), -2);
 
 
         // ENDSTR
@@ -723,8 +692,9 @@ bool DEVICE::exportLibraryGDS(FILE* f, bool flatten) {
     putc(0x04, f);              // RECORD TYPE  = ENDLIB
     putc(0x00, f);              // DATA TYPE    = null
 
-
+    
     fclose(f);
+    if (txt) { fclose(txt); }
 
     auto end = std::chrono::steady_clock::now();
 

@@ -504,7 +504,7 @@ CONNECTION bendTowards(CONNECTION start, VECTOR towards, GLdouble radius, int di
 //    printf("%f\n", acos(start.dv * towards.unit()));
 //    printf("%f\n", ((dir)?(-1):(1)) * acos(start.dv * towards.unit()));
     
-    return bendRadius(start, ((dir)?(-1):(1)) * acos(start.dv * towards.unit()), radius);
+    return bendRadius(start, dir * acos(start.dv * towards.unit()), radius);
 }
 
 CONNECTION bendLength(CONNECTION start, GLdouble length, GLdouble ang) {
