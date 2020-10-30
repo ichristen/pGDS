@@ -656,8 +656,6 @@ DEVICE* FONT::getChar(unsigned char c) {
             p += VECTOR(width,  mid);
             p += VECTOR(0,      mid+width/2);
             
-            printf("HERE!");
-            
             p.reverse();
             p.close();
             toReturn->add(p);
@@ -667,12 +665,9 @@ DEVICE* FONT::getChar(unsigned char c) {
             p += VECTOR(0,      mid);
             p += VECTOR(width,  mid-width/2);
             
-            
-            printf("THERE!");
-            
             p.close();
             toReturn->add(p);
-        } else if (c == 0x1E) {
+        } else if (c == '$') { // 0x1E
             POLYLINE p = POLYLINE();
             p += VECTOR(width/2,    mid+width/2);
             p += VECTOR(0,          mid-width/2);
@@ -680,7 +675,7 @@ DEVICE* FONT::getChar(unsigned char c) {
             
             p.close();
             toReturn->add(p);
-        } else if (c == 0x1F) {
+        } else if (c == '%') { // 0x1F
             POLYLINE p = POLYLINE();
             p += VECTOR(width/2,    mid-width/2);
             p += VECTOR(width,      mid+width/2);

@@ -371,6 +371,12 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
             connectThickenAndAdd(toReturn, mirrorX() * base,    mirrorX() * -base2, CIRCULAR, true);    toReturn->add((mirrorX() * base2).setName("lr"));
             connectThickenAndAdd(toReturn, mirrorY() * base,    mirrorY() * -base2, CIRCULAR, true);    toReturn->add((mirrorY() * base2).setName("ul"));
             connectThickenAndAdd(toReturn, mirrorX() * mirrorY() * base,  mirrorX() * mirrorY() * -base2, CIRCULAR, true);  toReturn->add((mirrorX() * mirrorY() * base2).setName("ll"));
+        
+
+            toReturn->add(base.setName("-ur"));
+            toReturn->add((mirrorX() * base).setName("-lr"));
+            toReturn->add((mirrorY() * base).setName("-ul"));
+            toReturn->add((mirrorX() * mirrorY() * base).setName("-ll"));
 //        }
     }
 

@@ -428,6 +428,21 @@ bool DEVICE::exportNoStructureGDS(FILE* f, FILE* txt, AFFINE transformation=AFFI
                 uint16_t texttype = endianSwap(0);
                 
                 fwrite(&texttype, sizeof(uint16_t), 1, f);
+                    
+                // PRESENTATION
+                putc(0x00, f);
+                putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+                
+                putc(0x17, f);              // RECORD TYPE  = PRESENTATION
+                putc(0x01, f);              // DATA TYPE    = 2-bitarr
+
+                putc(0x00, f);              // First char unused
+                if (good) {
+                    putc(0b00000101, f);              // DATA TYPE    = 2-bitarr
+                } else {
+                    putc(0b00000100, f);              // DATA TYPE    = 2-bitarr
+                }
+                    
                 
                 // XY
                 uint16_t size = endianSwap((uint16_t)(8 + 4));
@@ -503,6 +518,17 @@ bool DEVICE::exportNoStructureGDS(FILE* f, FILE* txt, AFFINE transformation=AFFI
     uint16_t texttype = endianSwap(0);
     
     fwrite(&texttype, sizeof(uint16_t), 1, f);
+        
+    // PRESENTATION
+    putc(0x00, f);
+    putc(0x06, f);              // LENGTH = 6 = 4 + 2 bytes
+    
+    putc(0x17, f);              // RECORD TYPE  = PRESENTATION
+    putc(0x01, f);              // DATA TYPE    = 2-bitarr
+
+    putc(0x00, f);              // First char unused
+    putc(0b00000100, f);              // DATA TYPE    = 2-bitarr
+        
     
     // XY
     uint16_t size = endianSwap((uint16_t)(8 + 4));

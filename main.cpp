@@ -39,7 +39,7 @@ int main(int argc, const char * argv[]) {
 //    DEVICEPTR c = DEVICEPTR(loss(2));
     //testD2(637);
     
-//    SiNStrain();
+//    AluminaStrain();
 //    return 0;
 
 //    CSEM();
