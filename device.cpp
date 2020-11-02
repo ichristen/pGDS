@@ -735,7 +735,7 @@ bool DEVICE::importGDS(std::string fname) {
     FILE* f = fopen(fname.c_str(), "r");
 
     if (!f) {
-        throw std::runtime_error("File does not exist");
+        throw std::runtime_error("File \"" + fname + "\" does not exist");
     }
 
     uint32_t header =       0;

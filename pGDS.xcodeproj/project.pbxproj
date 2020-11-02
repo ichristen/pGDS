@@ -30,7 +30,6 @@
 		083CC1181F4CFCCD0054FD31 /* testing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1161F4CFCCD0054FD31 /* testing.cpp */; };
 		083CC11B1F4CFCED0054FD31 /* boolean.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC1191F4CFCED0054FD31 /* boolean.cpp */; };
 		083E4CB8217E423000B87120 /* mitredevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083E4CB6217E423000B87120 /* mitredevices.cpp */; };
-		084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 084F2B791F5B3BE800C604EB /* window.cpp */; };
 		085E8B8822920771007DB885 /* nemsdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 085E8B8622920771007DB885 /* nemsdevices.cpp */; };
 		0885CA461FD0862E005FE296 /* SFML.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0885CA451FD0862E005FE296 /* SFML.framework */; };
 		0885CA481FD086B3005FE296 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 083CC0EB1F4CE0170054FD31 /* main.cpp */; };
@@ -38,7 +37,6 @@
 		088B3FC3248DCC41005AB7F0 /* interposerdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 088B3FC1248DCC40005AB7F0 /* interposerdevices.cpp */; };
 		08A4483C201666A800C8B564 /* tesselation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A4483A201666A800C8B564 /* tesselation.cpp */; };
 		08A4483D201666B200C8B564 /* tesselation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A4483A201666A800C8B564 /* tesselation.cpp */; };
-		08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A8D16D1F58D16200DC4F70 /* engine.cpp */; };
 		08AA7D6D23EE5BEE00A18D6E /* straindevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08AA7D6B23EE5BEE00A18D6E /* straindevices.cpp */; };
 		08AA7D7023FD8F0900A18D6E /* lincolndevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08AA7D6E23FD8F0800A18D6E /* lincolndevices.cpp */; };
 		08B401DE24CE2DF2008DE2E5 /* csemdevices.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08B401DC24CE2DF2008DE2E5 /* csemdevices.cpp */; };
@@ -423,9 +421,7 @@
 				0886D2212027E76F00C48D4C /* harvarddevices.cpp in Sources */,
 				083CC1021F4CE0170054FD31 /* main.cpp in Sources */,
 				082DAF64204863FA00F3AF4D /* vapordevices.cpp in Sources */,
-				084F2B7B1F5B3BE800C604EB /* window.cpp in Sources */,
 				085E8B8822920771007DB885 /* nemsdevices.cpp in Sources */,
-				08A8D16F1F58D16200DC4F70 /* engine.cpp in Sources */,
 				08AA7D7023FD8F0900A18D6E /* lincolndevices.cpp in Sources */,
 				083E4CB8217E423000B87120 /* mitredevices.cpp in Sources */,
 				083CC0FF1F4CE0170054FD31 /* device.cpp in Sources */,
@@ -626,10 +622,7 @@
 					/usr/local/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				OTHER_LDFLAGS = (
-					"-lglew",
-					"-lglfw",
-				);
+				OTHER_LDFLAGS = "";
 				OTHER_OSACOMPILEFLAGS = "-DGLFW_USE_WAYLAND=ON";
 				PRODUCT_NAME = "$(TARGET_NAME).app";
 			};
@@ -653,10 +646,7 @@
 					/usr/local/lib,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
-				OTHER_LDFLAGS = (
-					"-lglew",
-					"-lglfw",
-				);
+				OTHER_LDFLAGS = "";
 				OTHER_OSACOMPILEFLAGS = "-DGLFW_USE_WAYLAND=ON";
 				PRODUCT_NAME = "$(TARGET_NAME).app";
 			};
