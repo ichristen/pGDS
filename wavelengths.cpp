@@ -228,13 +228,14 @@ DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GL
 DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, bool text, bool straights, bool bend) {
     std::string description = "DC a=" + std::to_string((int)(a*1e3)) +
     " d=" + std::to_string((int)(d*1e3)) +
-    " L=" + std::to_string((int)(L*1e3)) +
-    " a0=" + std::to_string((int)(a0*1e3)) +
+    " L=" + std::to_string((int)(L*1)) +
 //    " t=" + std::to_string(t) +
     " r=" + std::to_string((int)r);
 //    " text" + std::to_string(text) +
 //    " straights" + std::to_string(straights) +
     
+    if (text) { description += " bend"; }
+    if (straights) { description += " a0=" + std::to_string((int)(a0*1e3)); }
     if (bend) { description += " bend"; }
 
     DEVICE* toReturn = getDevice(description);
