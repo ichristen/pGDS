@@ -21,10 +21,10 @@
 //#include "nemsdevices.hpp"
 
 //#include "straindevices.hpp"
-//#include "interposerdevices.hpp"
+#include "interposerdevices.hpp"
 
-#include "lincolndevices.hpp"
-#include "csemdevices.hpp"
+//#include "lincolndevices.hpp"
+//#include "csemdevices.hpp"
 
 extern double SPACEPAD(0);
 
@@ -50,6 +50,10 @@ int main(int argc, const char * argv[]) {
     
     LincolnShort();
     return 0;
+    
+    
+//    AIMout();
+//    return 0;
     
 //    GANHARV();
 //    interposerv2();
