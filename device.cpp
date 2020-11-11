@@ -283,8 +283,8 @@ bool DEVICE::exportNoStructureGDS(FILE* f, FILE* txt, AFFINE transformation=AFFI
         putc(0x0E, f);              // RECORD TYPE  = DATATYPE
         putc(0x02, f);              // DATA TYPE    = 2-int
         
-        uint16_t datatype = endianSwap((uint16_t)727);
-//        uint16_t datatype = endianSwap((uint16_t)0);
+//        uint16_t datatype = endianSwap((uint16_t)727);
+        uint16_t datatype = endianSwap((uint16_t)0);
         
         fwrite(&datatype, sizeof(uint16_t), 1, f);
 
