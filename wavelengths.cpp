@@ -229,7 +229,7 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
     std::string description = "DC a=" + std::to_string((int)(a*1e3)) +
     " d=" + std::to_string((int)(d*1e3)) +
     " L=" + std::to_string((int)(L*1)) +
-//    " t=" + std::to_string(t) +
+//    " t=" + std::to_string((int)t) +
     " r=" + std::to_string((int)r);
 //    " text" + std::to_string(text) +
 //    " straights" + std::to_string(straights) +
@@ -244,7 +244,6 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
         return toReturn;
     }
 
-    if (bend) { toReturn->add(CONNECTION(VECTOR(), VECTOR(), 1, "c")); }
     
     bool negResist = false;
     if (a < 0) { a = -a; negResist = true;  printf("NEG RESIST\n"); }
@@ -253,6 +252,8 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
     CONNECTION connection;
 
     if (negResist) {
+        if (bend) { toReturn->add(CONNECTION(VECTOR(), VECTOR(), 1, "c")); }
+        
         VECTOR end = VECTOR(L/2, 0);
         VECTOR up1 = VECTOR(0, (d-a)/2);
         VECTOR up2 = VECTOR(0, (d+a)/2);
@@ -346,22 +347,52 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
         toReturn->add((mirrorY()*connection2).setName("ul"));
         toReturn->add((connection2*(-1)).setName("ll"));
     } else {
-//        if (bend) {
+        if (bend) {
+//            CONNECTION base = CONNECTION(VECTOR(0, r+d/2), VECTOR(1, 0));
 //
-//CONNECTION base = CONNECTION(VECTOR(0, r+d/2), VECTOR(1, 0));
+            GLdouble ang = L/r;
+            DEVICE* toMirror = getDevice(description + " mir");
 //
-//GLdouble ang = L/r;
+//            CONNECTION from =   -bendTowards(-base,  ang/2);
+//            CONNECTION to =      bendTowards( base, -ang/2);
 //
-//CONNECTION from =   -bendTowards(-base,  ang/2);
-//CONNECTION to =      bendTowards( base, -ang/2);
+//            POLYLINE path = connect(from, -to);
 //
-//POLYLINE path = connect(from, -to);
-//
-//toReturn->add(thicken(path, d-a).setLayer(1));  // Middle arc
-//toReturn->add(thicken(path, -(d-a)/2, PADDING).setLayer(1));  // Upper rectangle
-//toReturn->add(thicken(path, -(d-a)/2, -PADDING).setLayer(1));  // Lower rectangle
-//
-//        } else {
+//            toReturn->add(thicken(path, d-a).setLayer(1));  // Middle arc
+//            toReturn->add(thicken(path, -(d-a)/2, PADDING).setLayer(1));  // Upper rectangle
+//            toReturn->add(thicken(path, -(d-a)/2, -PADDING).setLayer(1));  // Lower rectangle
+            
+            CONNECTION basei = CONNECTION(VECTOR(0), VECTOR(1,0), a);
+            CONNECTION baseo = CONNECTION(VECTOR(0, d), VECTOR(1,0), a);
+            //            CONNECTION from =   -bendTowards(-base,  ang/2);
+            //            CONNECTION to =      bendTowards( base, -ang/2);
+            
+            connectThickenAndAdd(toMirror, basei, -(basei = bendRadius(basei, -ang/2, r)), CIRCULAR, true);
+            connectThickenAndAdd(toMirror, baseo, -(baseo = bendRadius(baseo, -ang/2, r+d)), CIRCULAR, true);
+            
+            CONNECTION basei2 = bendRadius(basei, -DEG2RAD*t, r);
+            CONNECTION baseo2 = bendRadius(baseo,  DEG2RAD*t, r);
+            
+            connectThickenAndAdd(toMirror, basei, -basei2, CIRCULAR, true);
+            connectThickenAndAdd(toMirror, baseo, -baseo2, CIRCULAR, true);
+            
+            toReturn->add(baseo2.setName("ur"));
+            toReturn->add(basei2.setName("lr"));
+            toReturn->add((mirrorY() * baseo2).setName("ul"));
+            toReturn->add((mirrorY() * basei2).setName("ll"));
+            
+            toReturn->add(toMirror);
+            toReturn->add(DEVICEPTR(toMirror, mirrorY()));
+//            connectThickenAndAdd(toMirror, mirrorY() * base,    mirrorY() * -base2, CIRCULAR, true);    toReturn->add((mirrorY() * base2).setName("ul"));
+//            connectThickenAndAdd(toMirror, mirrorX() * mirrorY() * base,  mirrorX() * mirrorY() * -base2, CIRCULAR, true);  toReturn->add((mirrorX() * mirrorY() * base2).setName("ll"));
+            
+            
+//            toReturn->add(base.setName("-ur"));
+//            toReturn->add((mirrorX() * base).setName("-lr"));
+//            toReturn->add((mirrorY() * base).setName("-ul"));
+//            toReturn->add((mirrorX() * mirrorY() * base).setName("-ll"));
+
+        } else {
             CONNECTION base = CONNECTION(VECTOR(L/2, d/2), VECTOR(1,0), a);
 
             connectThickenAndAdd(toReturn, -base, base - L, CIRCULAR, true);
@@ -378,7 +409,11 @@ DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdo
             toReturn->add((mirrorX() * base).setName("-lr"));
             toReturn->add((mirrorY() * base).setName("-ul"));
             toReturn->add((mirrorX() * mirrorY() * base).setName("-ll"));
-//        }
+//            toReturn->add(base.setName("ur"));
+//            toReturn->add((mirrorX() * base).setName("lr"));
+//            toReturn->add((mirrorY() * base).setName("ul"));
+//            toReturn->add((mirrorX() * mirrorY() * base).setName("ll"));
+        }
     }
 
     // Clean this up.

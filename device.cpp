@@ -414,7 +414,8 @@ bool DEVICE::exportNoStructureGDS(FILE* f, FILE* txt, AFFINE transformation=AFFI
                 putc(0x02, f);              // DATA TYPE    = 2-int
                 
         //            uint16_t layer = endianSwap(x.second.l);
-                uint16_t layer = endianSwap((uint16_t)(good ? -1 : 10));        // Layer stuff!
+//                uint16_t layer = endianSwap((uint16_t)(good ? -1 : 10));        // Layer stuff!
+                uint16_t layer = endianSwap((uint16_t)(good ? -1 : -2));        // Layer stuff!
                 
                 fwrite(&layer, sizeof(uint16_t), 1, f);
                 

@@ -42,17 +42,17 @@ int main(int argc, const char * argv[]) {
 //    AluminaStrain();
 //    return 0;
 
-    CSEM();
-    return 0;
+//    CSEM();
+//    return 0;
     
 //    LincolnIon();
 //    return 0;
     
 //    CSEMcavities(true);
 //    return 0;
-    
-//    LincolnShort();
-//    return 0;
+//
+    LincolnShort();
+    return 0;
     
     
 //    AIMout();

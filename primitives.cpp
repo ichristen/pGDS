@@ -205,6 +205,9 @@ POLYLINE arc(GLdouble r, GLdouble t1_, GLdouble t2_, bool CCW, int steps, GLdoub
     }
     toReturn.add(e);
     
+    toReturn.setBeginDirection(VECTOR(r, t1, true).unit().perpCCW());
+    toReturn.setEndDirection(  e.unit().perpCCW());
+    
     //    toReturn.begin =    s.perpCCW().unit();
     //    toReturn.end =      e.perpCCW().unit();
     

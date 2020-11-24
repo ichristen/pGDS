@@ -308,11 +308,12 @@ DEVICE* FONT::getChar(unsigned char c) {
         } else if (c == 'u' || c == 'U') {
             POLYLINE p = POLYLINE();
             p += VECTOR(right, height);
-            p += VECTOR(right, bot + chamfer);
-            p += VECTOR(right-chamfer, bot);
-//            p += VECTOR(left+chamfer, bot);
-//            p += VECTOR(left, bot+chamfer);
-            p += VECTOR(left, bot);
+//            p += VECTOR(right, bot + chamfer);
+//            p += VECTOR(right-chamfer, bot);
+            p += VECTOR(right, bot);
+            p += VECTOR(left+chamfer, bot);
+            p += VECTOR(left, bot+chamfer);
+//            p += VECTOR(left, bot);
             p += VECTOR(left, height);
             
             toReturn->add(thicken(p, thick));
@@ -642,12 +643,12 @@ DEVICE* FONT::getChar(unsigned char c) {
             toReturn->add(thicken(p, thick));
         } else if (c == ')') {
             POLYLINE p = POLYLINE();
-            p += VECTOR(right-5*chamfer, bot-thick/2);
+            p += VECTOR(right-4*chamfer, bot-thick/2);
             p += VECTOR(right-2*chamfer, bot-thick/2);
             p += VECTOR(right-1*chamfer, bot+chamfer-thick/2);
             p += VECTOR(right-1*chamfer, top-chamfer+thick/2);
             p += VECTOR(right-2*chamfer, top+thick/2);
-            p += VECTOR(right-5*chamfer, top+thick/2);
+            p += VECTOR(right-4*chamfer, top+thick/2);
             
             toReturn->add(thicken(p, thick));
         } else if (c == '@') {
@@ -683,6 +684,22 @@ DEVICE* FONT::getChar(unsigned char c) {
             
             p.close();
             toReturn->add(p);
+        } else if (c == '`') { // 0x60
+            POLYLINE p = POLYLINE();
+            p += VECTOR(left, mid);
+            p += VECTOR(left, top-chamfer);
+            p += VECTOR(left+chamfer, top);
+            p += VECTOR(right-chamfer, top);
+            p += VECTOR(right, top-chamfer);
+            p += VECTOR(right, bot+chamfer);
+            p += VECTOR(right-chamfer, bot);
+            p += VECTOR(left+chamfer, bot);
+            p += VECTOR(left, bot+chamfer);
+            p += VECTOR(left, mid);
+            
+            toReturn->add(thicken(p, thick));
+            
+            toReturn->add(rect(VECTOR(left+.5*thick, bot+.5*thick), VECTOR(right-.5*thick, top-.5*thick)));
         }
         
         MATERIAL::currentLayer = cl;
