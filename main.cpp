@@ -20,11 +20,11 @@
 //#include "tesselation.hpp"
 //#include "nemsdevices.hpp"
 
-//#include "straindevices.hpp"
-//#include "interposerdevices.hpp"
+#include "straindevices.hpp"
+#include "interposerdevices.hpp"
 
-#include "lincolndevices.hpp"
-#include "csemdevices.hpp"
+//#include "lincolndevices.hpp"
+//#include "csemdevices.hpp"
 
 extern double SPACEPAD(0);
 
@@ -39,11 +39,11 @@ int main(int argc, const char * argv[]) {
 //    DEVICEPTR c = DEVICEPTR(loss(2));
     //testD2(637);
     
-//    AluminaStrain();
+//    SiNStrain();
 //    return 0;
 
-//    CSEM();
-//    return 0;
+    CSEM();
+    return 0;
     
 //    LincolnIon();
 //    return 0;
@@ -51,8 +51,8 @@ int main(int argc, const char * argv[]) {
 //    CSEMcavities(true);
 //    return 0;
 //
-    LincolnShort();
-    return 0;
+//    LincolnShort();
+//    return 0;
     
     
 //    AIMout();

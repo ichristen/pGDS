@@ -161,7 +161,7 @@ DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GL
                                 " d" + std::to_string((int)(d*1e3)) +
                                 " L" + std::to_string((int)(L*1e3)) +
 //                                " t" + std::to_string(theta) +
-                                " r" + std::to_string((int)r);
+                                " r" + std::to_string((int)(r*1e3));
 //                                " text" + std::to_string(text) +
 //                                " bend" + std::to_string(bend);
     

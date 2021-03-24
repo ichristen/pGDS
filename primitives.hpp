@@ -86,6 +86,7 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, WAVELENGTH wl,    GLdouble tb, GLdouble te, GLdouble lb=0, GLdouble le=0, GLdouble rad=0);
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1, GLdouble padding=PADDING);
 void connectThickenAndAdd(POLYLINES* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep=1, GLdouble padding=PADDING);
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, GLdouble stepmultiplier, CONNECTIONTYPE type);
 
 POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r, GLdouble adiabat=15, GLdouble mult=1, GLdouble padding=PADDING, GLdouble a=0, GLdouble stepMutliplier=1);
 

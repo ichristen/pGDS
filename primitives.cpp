@@ -243,7 +243,7 @@ POLYLINE euler90(GLdouble R, int steps) {
 }
 
 POLYLINE parametric(std::function<VECTOR(GLdouble t)> lambda, size_t steps) {
-    if (steps < 2 || steps > 200) {
+    if (steps < 2) { //  || steps > 200
         steps = 200;    // Placeholder; this should estimate the
     }
     
@@ -854,7 +854,7 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
     addto->add(connectThickenShortestDistance(e1, -e2, rad));
     connectThickenAndAdd(addto, e, -e1, CIRCULAR);
 }
-    
+
 void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONTYPE type, GLdouble minstep, GLdouble padding) {
     std::function<GLdouble(GLdouble t)> lambda;
     
@@ -877,21 +877,21 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
         } else {
             lambda = [w1,w2] (GLdouble t) -> GLdouble { return ((w2 - w1)*(3*t*t - 2*t*t*t) + w1); };
         }
-            
+        
     } else {
         GLdouble w = std::abs(b.w);
         
         lambda = [w] (GLdouble t) -> GLdouble { return w; };
     }
     
-//    b.print();
-//    e.print();
+    //    b.print();
+    //    e.print();
     
     POLYLINE p = connect(b, e, type, (b.w != e.w)?((int)((e.v-b.v).magn()/minstep) + 2):(0));
     
-//    printf("%i", p.size());
+    //    printf("%i", p.size());
     
-//    if (p.size() > 5000) { return; }
+    //    if (p.size() > 5000) { return; }
     
     //    printf("p.begin="); p.begin.printNL();
     //    printf("p.end=");   p.end.printNL();
@@ -920,6 +920,75 @@ void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, CONNECTIONT
     for (int j = 0; j < polylines.size(); j++) {
         for (int i = (outer)?(-1):(0); i < 2; i += 2) {
             addto->add(thicken(polylines[j], lambda, padding*i, minstep).setLayer(b.l));
+        }
+    }
+}
+
+void connectThickenAndAdd(DEVICE* addto, CONNECTION b, CONNECTION e, GLdouble stepmultiplier, CONNECTIONTYPE type) {
+    std::function<GLdouble(GLdouble t)> lambda;
+    
+    if ( (b.w > 0 && e.w < 0) || (b.w < 0 && e.w > 0) ) {
+        return;
+    }
+    
+    bool outer = b.w + e.w < 0;
+    
+    if (b.l != e.l) {
+        printf("connectThickenAndAdd(): Warning! Connections have different layers. Choosing the layer of the first connection.\n");
+    }
+    
+    if (b.w != e.w) {
+        GLdouble w1 = std::abs(b.w);
+        GLdouble w2 = std::abs(e.w);
+        
+        if (type == LINEAR) {
+            lambda = [w1,w2] (GLdouble t) -> GLdouble { return ((w2 - w1)*t + w1); };
+        } else {
+            lambda = [w1,w2] (GLdouble t) -> GLdouble { return ((w2 - w1)*(3*t*t - 2*t*t*t) + w1); };
+        }
+        
+    } else {
+        GLdouble w = std::abs(b.w);
+        
+        lambda = [w] (GLdouble t) -> GLdouble { return w; };
+    }
+    
+    //    b.print();
+    //    e.print();
+    
+    POLYLINE p = connect(b, e, type, 2, stepmultiplier);
+    
+    //    printf("%i", p.size());
+    
+    //    if (p.size() > 5000) { return; }
+    
+    //    printf("p.begin="); p.begin.printNL();
+    //    printf("p.end=");   p.end.printNL();
+    
+    std::vector<POLYLINE> polylines;
+    
+    // Currently bugged...
+    //    if (p.size() > 100) { // GDS prefers polylines with points < 200...
+    //        int numpeices = ceil(p.size()/100)+1;
+    //
+    //        int lengthpeice = ceil(p.size()/numpeices); // Check this...
+    //
+    //        int x = 0;
+    //
+    //        for (int i = 0; i < numpeices-1; i++) {
+    //            polylines.push_back(POLYLINE(p, x, x + lengthpeice));
+    //
+    //            x += lengthpeice;
+    //        }
+    //
+    //        polylines.push_back(POLYLINE(p, x, p.size()-1));
+    //    } else {
+    polylines.push_back(p);
+    //    }
+    
+    for (int j = 0; j < polylines.size(); j++) {
+        for (int i = (outer)?(-1):(0); i < 2; i += 2) {
+            addto->add(thicken(polylines[j], lambda, PADDING*i).setLayer(b.l));
         }
     }
 }
