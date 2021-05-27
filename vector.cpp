@@ -386,7 +386,7 @@ CONNECTION::CONNECTION(VECTOR v_, VECTOR dv_, GLdouble w_, std::string name_, in
 //    v = v_; dv = dv_; w = std::abs(w_); name = name_;
     v = v_; dv = dv_; w = w_; name = name_;
     
-    if (l_ == -1)   { l = 1; } //l = MATERIAL::currentLayer; }
+    if (l_ == -1)   { l = MATERIAL::currentLayer; }
     else            { l = l_; }
 }
 bool CONNECTION::isEmpty() const { return v.isZero() && dv ==  VECTOR(1,0) && w == 1 && name == "default"; }

@@ -20,11 +20,11 @@
 //#include "tesselation.hpp"
 //#include "nemsdevices.hpp"
 
-#include "straindevices.hpp"
-#include "interposerdevices.hpp"
+//#include "straindevices.hpp"
+//#include "interposerdevices.hpp"
 
 //#include "lincolndevices.hpp"
-//#include "csemdevices.hpp"
+#include "csemdevices.hpp"
 
 extern double SPACEPAD(0);
 
@@ -42,14 +42,14 @@ int main(int argc, const char * argv[]) {
 //    SiNStrain();
 //    return 0;
 
-    CSEM();
-    return 0;
+//    CSEM();
+//    return 0;
     
 //    LincolnIon();
 //    return 0;
     
-//    CSEMcavities(true);
-//    return 0;
+    CSEM_r2();
+    return 0;
 //
 //    LincolnShort();
 //    return 0;

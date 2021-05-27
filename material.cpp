@@ -52,10 +52,10 @@ void MATERIAL::glOutlineColor() {
 #endif
 }
 
-uint16_t MATERIAL::currentLayer = 1;
+uint16_t MATERIAL::currentLayer = 130;
 
 std::map<uint16_t, MATERIAL> MATERIAL::layers =   { {0, MATERIAL("Helper",              0, {.8, .8, .8, 1}, {.5, .5, .5, 1}, 1., 7.)},
-                                                    {1, MATERIAL("LiNbO_3",             1, {.12, .6, 1, 1}, {.56, .8, 1, 1}, 1./2, 7./2)},
+                                                    {1, MATERIAL("LiNbO_3",             MATERIAL::currentLayer, {.12, .6, 1, 1}, {.56, .8, 1, 1}, 1./2, 7./2)},
                                                     {2, MATERIAL("Au",                  2, {1,  .73, .15,  1}, {1, .82, .43, 1}, 3., 18.)},
 //                                                    {2, MATERIAL("Au",                  2, {1,  .73, .15,  1}, {1, .82, .43, 1}, 1., 7.)},
                                                     {3, MATERIAL("Oxide Window",        3, {.5, .5, .5, 1}, {1, 1, 1, 1}, 2., 14.)},

@@ -1,5 +1,19 @@
 #include "device.hpp"
 
+#include <string>
+#include <cctype>
+
+std::string strip(const std::string &inpt)
+{
+    auto start_it = inpt.begin();
+    auto end_it = inpt.rbegin();
+    while (std::isspace(*start_it))
+        ++start_it;
+    while (std::isspace(*end_it))
+        ++end_it;
+    return std::string(start_it, end_it.base());
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 VECTORINT::VECTORINT() {
@@ -397,6 +411,10 @@ bool DEVICE::exportNoStructureGDS(FILE* f, FILE* txt, AFFINE transformation=AFFI
 //    if (level == (uint16_t)(-2)) {
         for (auto const& x : connections) {
             bool good = x.first[0] == '>';
+            bool good2 = false;
+            if (x.first.size() > 1) {
+                good2 = x.first[1] == '>';
+            }
             
             if (good || true) {
                 // TEXT
@@ -415,7 +433,7 @@ bool DEVICE::exportNoStructureGDS(FILE* f, FILE* txt, AFFINE transformation=AFFI
                 
         //            uint16_t layer = endianSwap(x.second.l);
 //                uint16_t layer = endianSwap((uint16_t)(good ? -1 : 10));        // Layer stuff!
-                uint16_t layer = endianSwap((uint16_t)(good ? -1 : -2));        // Layer stuff!
+                uint16_t layer = endianSwap((uint16_t)(good ? (good2 ? -3 : -1) : -2));        // Layer stuff!
                 
                 fwrite(&layer, sizeof(uint16_t), 1, f);
                 
@@ -461,7 +479,7 @@ bool DEVICE::exportNoStructureGDS(FILE* f, FILE* txt, AFFINE transformation=AFFI
                 int N = min(x.first.size()+2, 512);
                 
                 char str[N];
-                snprintf(str, N, "%s\n", x.first.c_str());
+                snprintf(str, N, "%s", strip(x.first).c_str()+(good && !good2));
         //        printf("%f, %f, %s\n", x.second.v.x, x.second.v.y, str);
         //            snprintf(str, 8, "%s", x.second.name.c_str());
                 
@@ -575,6 +593,7 @@ bool DEVICE::exportNoStructureGDS(FILE* f, FILE* txt, AFFINE transformation=AFFI
     return true;
 }
 bool DEVICE::exportLibraryGDS(std::string fname, bool flatten) {
+    printf("Writing to %s\n", fname.c_str());
     return exportLibraryGDS(fopen(fname.c_str(), "w"), fopen((fname + ".txt").c_str(), "w"), flatten);
 }
 bool DEVICE::exportLibraryGDS(FILE* f, FILE* txt, bool flatten) {
