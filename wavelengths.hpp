@@ -3,7 +3,7 @@
 
 #include "math.hpp"
 #include "device.hpp"
-//#include "device.hpp"
+//#include "material.hpp"
 #include <OpenGL/gl3.h>         //OpenGL
 #include <map>
 
@@ -73,7 +73,7 @@ public:
 POLYLINES dcTest(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, GLdouble sep);
 DEVICEPTR directionalCoupler(WAVELENGTH wl, GLdouble trans, GLdouble t=0, bool negResist=true);
 DEVICE* directionalCoupler(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t=90, GLdouble r=MINRADIUS, bool text=true, bool straights=true, bool bend=false);
-DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r=MINRADIUS, GLdouble t=TAU/8, bool bend=false, bool text=true);
+DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r=MINRADIUS, GLdouble t=TAU/8, bool bend=false, bool text=true, uint16_t layer=130);
 
 //WAVELENGTHS wavelengths = WAVELENGTHS();
 

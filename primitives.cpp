@@ -54,6 +54,11 @@ POLYLINE rect(VECTOR c, GLdouble w, GLdouble h, int anchorx, int anchory) {
     
     return rect(c - VECTOR((1+anchorx)*w/2, (1+anchory)*h/2), c + VECTOR((1-anchorx)*w/2, (1-anchory)*h/2));
 }
+POLYLINE rect(GLdouble w, GLdouble h, int anchorx, int anchory) {
+    if (h == 0) { h = w; }
+    
+    return rect(VECTOR(), w, h, anchorx, anchory);
+}
 
 POLYLINE roundRect(VECTOR u, VECTOR v, GLdouble r) {
     POLYLINE toReturn = POLYLINE(4);
@@ -409,8 +414,8 @@ GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
     //    printf("\tr1=%f\n", (b - c).magn2());
     //    printf("\tr2=%f\n", (e - c).magn2());
     
-    if (abs((b - c).magn2() - (e - c).magn2()) > 1e-6) { // 100*E) {
-        printf("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii... Difference=%fe-9\n", 1e9*((b - c).magn2() - (e - c).magn2()));
+    if (abs((b - c).magn2() - (e - c).magn2()) > 1e-4) { // 100*E) {
+        printf("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii... Difference=%fe-3\n", 1e3*((b - c).magn2() - (e - c).magn2()));
         return 1e22;  // Arbitrary!
                       //        throw std::runtime_error("getArcAngle(VECTOR^3, bool): Can't make an arc with two radii...");
     }
@@ -434,7 +439,7 @@ GLdouble getArcAngle(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest) {
     }
     
     if (!chooseShortest) {
-        if (ang > 0) {  } // ang -= TAU; }
+        if (ang > 0) {  ang -= TAU; }
                           //        if (ang > 0) { ang -= TAU; }
         else {          ang += TAU; }
     }
@@ -520,11 +525,16 @@ POLYLINE arc(VECTOR c, VECTOR b, VECTOR e, bool chooseShortest, int steps, GLdou
     
 //    if (ang > TAU || r > 2000000) { return POLYLINE(); }
     
-//    printf("ang: %f\n", ang);
-    
     if (!steps) {
         steps = ceil(std::abs(ang)/acos(1 - EPSILON/r))*stepMutliplier + 2;
     }
+    
+//    printf("b/e: ");
+//    b.print();
+//    e.printNL();
+//
+//    printf("ang: %f\n", ang);
+//    printf("steps: %f\n", steps);
     
     if (ang > TAU) { return POLYLINE(); }
     
@@ -600,6 +610,9 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
     }
     
     VECTOR* v = nullptr;
+    VECTOR* c = nullptr;
+    CONNECTION i2;
+    CONNECTION f2;
     
     switch (type) {
         case QBEZIER:
@@ -615,25 +628,64 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
             
             break;
         case MONOCIRCULAR:
-//            v = new VECTOR();
+            v = new VECTOR();
+            c = new VECTOR();
+            
+            intersect(i, f, &v);
+            
+//            v->printNL();
+            
+            
+            toReturn.add(i.v);
+
+            if (v) {
+                GLdouble ang = acos(i.dv.dot(f.dv));
+                GLdouble L = sqrt(min((i.v - *v).magn2(), (f.v - *v).magn2()));
+                GLdouble R = L / tan(ang);
 //
-//            intersect(i, f, &v);
-//
-//            if (v) {
-//
-//
-//                toReturn.add(arc(<#VECTOR c#>, <#VECTOR b#>, <#VECTOR e#>))
-//
-//                if ((i.v - *v).magn2() < (f.v - *v).magn2()) {  // If we need to make a straight segment from f
-//
-//                } else {                                        // If we need to make a straight segment from i
-//
-//                }
-//
-//                delete v;
-//            } else {
-//
-//            }
+//                (i.v - *v).magn2() < (f.v - *v).magn2()
+
+                
+
+                if ((i.v - *v).magn2() < (f.v - *v).magn2()) {  // If we need to make a straight segment from f
+                    i2 = i;
+                    i2.dv = i2.dv.perpCW();
+                    f2 = f;
+                    f2.v = *v - f.dv*L;
+                    f2.dv = f2.dv.perpCW();
+                    
+                    intersect(i2, f2, &c);
+//                    c->printNL();
+                    
+//                    toReturn.add(*v);
+//                    toReturn.add(*c);
+//                    toReturn.add(*v);
+//                    toReturn.add(f2.v);
+                    
+                    toReturn.add(arc(*c, i.v, f2.v, true, 0, stepMutliplier));
+                } else {                                        // If we need to make a straight segment from i
+                    i2 = i;
+                    i2.v = *v + i.dv*L;
+                    i2.dv = i2.dv.perpCW();
+                    f2 = f;
+                    f2.dv = f2.dv.perpCW();
+                    
+                    intersect(i2, f2, &c);
+//                    c->printNL();
+                    
+//                    toReturn.add(i2.v);
+//                    toReturn.add(*v);
+//                    toReturn.add(*c);
+//                    toReturn.add(*v);
+                    
+                    toReturn.add(arc(*c, i2.v, f.v, true, 0, stepMutliplier));
+                }
+            } else {
+                printf("DEBUG ME!");
+            }
+            toReturn.add(f.v);
+            
+            delete v;
             
             break;
         case CIRCULAR:
@@ -664,7 +716,7 @@ POLYLINE connect(CONNECTION i, CONNECTION f, CONNECTIONTYPE type, int numPointsD
                         
                         VECTOR m = (ci + cf)/2;
                         
-                        if (std::abs((cf - ci).magn2() - 4*root[r]*root[r]) < 1e-6) {
+                        if (std::abs((cf - ci).magn2() - 4*root[r]*root[r]) < 1e-2) {
                             GLdouble x = std::abs(root[r])*(std::abs(getArcAngle(ci, i.v, m, (m-i.v)*i.dv > 0)) + std::abs(getArcAngle(cf, m, f.v, (m-f.v)*f.dv > 0)));
                             
 //                            printf("a1: %f\n", getArcAngle(ci, i.v, m, (m-i.v)*i.dv > 0));
@@ -1084,18 +1136,18 @@ POLYLINES connectThickenShortestDistance(CONNECTION b, CONNECTION e, GLdouble r,
 //    rl.printNL();
 //    rr.printNL();
     
-    if ((e.v - b.v).magn() < 2*r) {
-        if (mult <= 0) {
-            POLYLINE fin = connect(b, e);
-            toReturn.add(fin);
-            
-            return toReturn;
-        }
-        
-        connectThickenAndAdd(&toReturn, b, e, CIRCULAR);
-        
-        return toReturn;
-    }
+//    if ((e.v - b.v).magn() < 2*r) {
+//        if (mult <= 0) {
+//            POLYLINE fin = connect(b, e);
+//            toReturn.add(fin);
+//
+//            return toReturn;
+//        }
+//
+//        connectThickenAndAdd(&toReturn, b, e, CIRCULAR);
+//
+//        return toReturn;
+//    }
     
 //    bool chooseshortest = false;
 //    bool chooseshortest = b.dv * e.dv < 0;

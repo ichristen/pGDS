@@ -136,27 +136,7 @@ DEVICEPTR directionalCoupler(WAVELENGTH wl, GLdouble trans, GLdouble t, bool neg
 //    return DEVICEPTR(directionalCoupler((negResist?-1:1)*dc.a, dc.d, dc.l, wl.sm, t*360/TAU, dc.r, false, false));
     return DEVICEPTR(directionalCoupler((negResist?-1:1)*dc.a, dc.d, dc.l, wl.sm, t, dc.r, false, false));
 }
-//DEVICE* directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble a0, GLdouble t, GLdouble r, bool text, bool straights) {
-//    std::string description = "DC2 a" + std::to_string(a) +
-//    " d" + std::to_string(d) +
-//    " L" + std::to_string(L) +
-//    " a0" + std::to_string(a0) +
-//    " t" + std::to_string(t) +
-//    " r" + std::to_string(r) +
-//    " text" + std::to_string(text) +
-//    " straights" + std::to_string(straights);
-//
-//    DEVICE* toReturn = getDevice(description);
-//
-//    if (toReturn->initialized()) {
-//        return toReturn;
-//    }
-//
-//
-//
-//    return toReturn;
-//}
-DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GLdouble theta, bool bend, bool text) {
+DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GLdouble theta, bool bend, bool text, uint16_t layer) {
     std::string description ="DC a" + std::to_string((int)(a*1e3)) +
                                 " d" + std::to_string((int)(d*1e3)) +
                                 " L" + std::to_string((int)(L*1e3)) +
@@ -166,9 +146,10 @@ DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GL
 //                                " bend" + std::to_string(bend);
     
     if (bend) { description += " bend"; }
+    description += " layer" + std::to_string(layer);
     
-    CONNECTION bu = CONNECTION(VECTOR(0, bend*(r+d)),   VECTOR(1, 0), a);
-    CONNECTION bd = CONNECTION(VECTOR(0, bend*r),       VECTOR(1, 0), a);
+    CONNECTION bu = CONNECTION(VECTOR(0, bend*(r+d)),   VECTOR(1, 0), a, "", layer);
+    CONNECTION bd = CONNECTION(VECTOR(0, bend*r),       VECTOR(1, 0), a, "", layer);
     
     bool negResist = false;
     if (a < 0) { a = -a; negResist = true; } // printf("NEG RESIST\n"); }
@@ -183,28 +164,28 @@ DEVICEPTR directionalCoupler2(GLdouble a, GLdouble d, GLdouble L, GLdouble r, GL
     GLdouble lengthang = L/r;
     
     CONNECTION lu0;
-    if (bend) { lu0 = bendRadius(bu, -lengthang/2, r); }
+    if (bend) { lu0 = bendRadius(bu, -lengthang/2, r+d); }
     else {      lu0 = bu + L/2; }
     CONNECTION lu1 = bendRadius(lu0, theta, r);
     
     CONNECTION ld1 = bendRadius(bd, -theta-lengthang/2, r);
     
     if (negResist) {
-        POLYLINE up = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, PADDING);
+        POLYLINE up = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, PADDING).setLayer(layer);
         toReturn->add(up); toReturn->add(-up*mirrorY());
         
-        POLYLINE down = thicken(connect(bd, -ld1), a, -PADDING);
+        POLYLINE down = thicken(connect(bd, -ld1), a, -PADDING).setLayer(layer);
         toReturn->add(down); toReturn->add(-down*mirrorY());
         
-        POLYLINE midup = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, -100*PADDING);
-        POLYLINE middown = thicken(connect(bd, -ld1), a, 100*PADDING);
+        POLYLINE midup = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a, -100*PADDING).setLayer(layer);
+        POLYLINE middown = thicken(connect(bd, -ld1), a, 100*PADDING).setLayer(layer);
         POLYLINES mid = midup & middown;
         toReturn->add(mid); toReturn->add(-mid*mirrorY());
     } else {
-        POLYLINE up = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a);
+        POLYLINE up = thicken(connect(bu, -lu0) + connect(lu0, -lu1), a).setLayer(layer);
         toReturn->add(up); toReturn->add(-up*mirrorY());
         
-        POLYLINE down = thicken(connect(bd, -ld1), a);
+        POLYLINE down = thicken(connect(bd, -ld1), a).setLayer(layer);
         toReturn->add(down); toReturn->add(-down*mirrorY());
     }
     

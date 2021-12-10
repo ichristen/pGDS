@@ -621,7 +621,7 @@
 					/opt/local/lib,
 					/usr/local/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_LDFLAGS = "";
 				OTHER_OSACOMPILEFLAGS = "-DGLFW_USE_WAYLAND=ON";
 				PRODUCT_NAME = "$(TARGET_NAME).app";
@@ -645,7 +645,7 @@
 					/opt/local/lib,
 					/usr/local/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				OTHER_LDFLAGS = "";
 				OTHER_OSACOMPILEFLAGS = "-DGLFW_USE_WAYLAND=ON";
 				PRODUCT_NAME = "$(TARGET_NAME).app";

@@ -48,8 +48,19 @@ int main(int argc, const char * argv[]) {
 //    LincolnIon();
 //    return 0;
     
-    CSEM_r2();
+//    printf("EXPORTING!\n");
+//    full->exportLibraryGDS("/Users/i/GDS/" + dateCSEM + full->description + ".gds");
+//    CSEM_coupler();
+//    return 0;
+    
+    CSEM_cmzi();
     return 0;
+    
+//    CSEM_r3();
+//    return 0;
+
+    
+    
     
 //    CSEM_pcb_2();
 //    return 0;

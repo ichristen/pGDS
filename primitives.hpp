@@ -25,6 +25,7 @@
 
 POLYLINE rect(VECTOR u, VECTOR v);
 POLYLINE rect(VECTOR c, GLdouble w, GLdouble h=0, int anchorx=0, int anchory=0);
+POLYLINE rect(GLdouble w, GLdouble h=0, int anchorx=0, int anchory=0);
 
 POLYLINE roundRect(VECTOR u, VECTOR v, GLdouble r);
 POLYLINE roundRect(VECTOR c, GLdouble r, GLdouble w, GLdouble h=0, int anchorx=0, int anchory=0);
